@@ -2,10 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Makes the page fit phone screens instead of showing a zoomed-out desktop page -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickQuote</title>
+  <title>QuickQuote | Sparkle Home Cleaning</title>
 </head>
 <body>
-  <h1>Hello QuickQuote</h1>
+
+  <!-- HEADER: logo + navigation, shown at the top of every page -->
+  <header class="site-header">
+    <div class="container">
+      <a href="#top" class="logo">QuickQuote</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="#top">Home</a></li>
+          <li><a href="#calculator">Get a quote</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO: the first thing visitors see, with one clear action -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero-company">Sparkle Home Cleaning</p>
+        <h1>Know your cleaning price in 30 seconds</h1>
+        <p class="hero-text">
+          Choose your service, number of rooms and any extras.
+          QuickQuote shows your price instantly, with no phone calls and no surprises.
+        </p>
+        <!-- href="#calculator" jumps to the element with id="calculator" below -->
+        <a href="#calculator" class="button">Get my quote</a>
+      </div>
+    </section>
+
+    <!-- CALCULATOR: the form is added in Task 6 -->
+    <section id="calculator" class="calculator">
+      <div class="container">
+        <h2>Get your quote</h2>
+        <p>The price calculator is coming soon.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER: contact details and copyright -->
+  <footer id="contact" class="site-footer">
+    <div class="container">
+      <p><strong>Sparkle Home Cleaning</strong></p>
+      <p>Email: <a href="mailto:hello@sparkle-cleaning.example">hello@sparkle-cleaning.example</a></p>
+      <p>&copy; 2026 QuickQuote · A student project</p>
+    </div>
+  </footer>
+
 </body>
 </html>

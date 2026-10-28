@@ -43,3 +43,29 @@ that calculate prices and save requests.
   the `PORT` environment variable. `||` means "if PORT isn't set, use 3000". I tested both:
   `npm start` ran on 3000, and `PORT=4000 node server.js` ran on 4000.
 - **`npm start`** runs the `start` script from `package.json` (`node server.js`). `Ctrl + C` stops it.
+
+## Task 3: Page structure
+
+**What changed**
+- `public/index.html` now has the real page layout, built from **semantic** HTML tags:
+  - `<header>`: the logo and the `<nav>` menu (Home, Get a quote, Contact)
+  - `<main>`: the main content, with two `<section>`s:
+    - the **hero** (big headline, short pitch, and a "Get my quote" button)
+    - the **calculator** area (`id="calculator"`, still empty; the form arrives in Task 6)
+  - `<footer>`: contact details and copyright (`id="contact"`)
+- The `<title>` is now "QuickQuote | Sparkle Home Cleaning", the text shown in the browser tab.
+
+**Why**
+Structure first, style later. When the HTML is clean and meaningful, the CSS (Task 4) and
+JavaScript (Task 6+) have clear places to attach to.
+
+**What I learned**
+- **Semantic tags** (`header`, `nav`, `main`, `section`, `footer`) describe *what* each part is.
+  Screen readers and search engines understand the page better than with plain `<div>`s.
+- **In-page links:** `<a href="#calculator">` jumps to the element with `id="calculator"`.
+  No JavaScript needed. Tested: clicking "Get my quote" changed the address to `#calculator`.
+- **The viewport meta tag** (`width=device-width`) stops phones from showing a tiny zoomed-out page.
+  It's the first step to a responsive site.
+- **`class` vs `id`:** an `id` is unique (one per page, used for jump links); a `class` can repeat
+  (like `container`, which CSS will use in Task 4).
+- I didn't link the CSS/JS files yet: linking files that don't exist causes "404 Not Found" errors in the console.
