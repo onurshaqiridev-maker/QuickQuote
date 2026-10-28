@@ -6,7 +6,7 @@ commit `Task N: <title>`, and push.
 
 Full details for every task are in [PLAN.md](PLAN.md).
 
-- [ ] **Task 1 — Project setup:** `npm init`, install Express, `.gitignore`, folders, `README.md` stub, `LEARNING_NOTES.md`
+- [x] **Task 1 — Project setup:** `npm init`, install Express, `.gitignore`, folders, `README.md` stub, `LEARNING_NOTES.md`
   - Done when: `npm install` works; first commit pushed
 - [ ] **Task 2 — First server:** `server.js` serves `public/`; `npm start` script; uses `process.env.PORT || 3000`
   - Done when: `http://localhost:3000` shows "Hello QuickQuote"

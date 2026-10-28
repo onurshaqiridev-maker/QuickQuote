@@ -1,0 +1,9 @@
+# Installed packages (recreated with "npm install")
+node_modules/
+
+# Saved quote requests (real customer data, never commit it)
+data/requests.json
+
+# Secrets and system files
+.env
+.DS_Store
