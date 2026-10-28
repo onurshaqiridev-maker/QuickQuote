@@ -69,3 +69,29 @@ JavaScript (Task 6+) have clear places to attach to.
 - **`class` vs `id`:** an `id` is unique (one per page, used for jump links); a `class` can repeat
   (like `container`, which CSS will use in Task 4).
 - I didn't link the CSS/JS files yet: linking files that don't exist causes "404 Not Found" errors in the console.
+
+## Task 4: Base CSS
+
+**What changed**
+- New file `public/css/style.css`, linked from `index.html` with `<link rel="stylesheet" href="css/style.css">`.
+- The file has 8 numbered parts: variables, reset, base text, layout (`.container` + `.button`),
+  header, hero, sections, footer.
+- Brand look: teal (a "fresh and clean" color), a light teal hero, a dark teal footer.
+
+**Why**
+Task 3 gave the page structure. CSS makes it look like a real business site.
+Putting the colors and spacing in **variables** means the look can be changed in one place later.
+
+**What I learned**
+- **CSS variables:** `--color-primary: #0f766e;` defines it once, and `var(--color-primary)` uses it anywhere.
+- **Reset + `box-sizing: border-box`:** browsers add their own margins. Removing them makes every
+  browser start the same. `border-box` means padding doesn't make boxes wider than I set.
+- **`.container`:** `max-width` + `margin: 0 auto` centres the content and stops lines getting
+  too long on big screens. Its `padding` keeps text off the screen edge on phones.
+- **Flexbox in the header:** `display: flex` puts the logo and menu in one row.
+  `justify-content: space-between` pushes them to opposite sides, and `flex-wrap: wrap` lets the menu
+  drop under the logo on narrow phones.
+- **`clamp()`** for the headline: the font size grows with the screen width but stays between
+  a minimum and maximum.
+- **`scroll-behavior: smooth`** makes the "Get my quote" jump glide instead of snapping.
+- Tested at 375px, 768px and 1280px: no sideways scrolling, no console errors, and the CSS file loads (200 OK).

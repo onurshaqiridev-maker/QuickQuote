@@ -12,7 +12,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: `http://localhost:3000` shows "Hello QuickQuote"
 - [x] **Task 3 — Page structure:** viewport meta, title, header/nav, hero with "Get my quote" button to `#calculator`, empty calculator section, footer
   - Done when: all sections visible; button jumps to the calculator
-- [ ] **Task 4 — Base CSS:** CSS variables, reset, fonts, `.container`, header/hero/footer styling
+- [x] **Task 4 — Base CSS:** CSS variables, reset, fonts, `.container`, header/hero/footer styling
   - Done when: page looks clean and branded
 - [ ] **Task 5 — API: price list:** prices in `prices.js`, `GET /api/services` returns them as JSON
   - Done when: `/api/services` shows the JSON in the browser

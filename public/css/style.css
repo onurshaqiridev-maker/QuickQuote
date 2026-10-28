@@ -1,0 +1,177 @@
+/* ==========================================================
+   QuickQuote styles
+   1. Variables   2. Reset   3. Base   4. Layout
+   5. Header      6. Hero    7. Sections   8. Footer
+   ========================================================== */
+
+/* 1. VARIABLES: change a color here and it changes everywhere */
+:root {
+  --color-primary: #0f766e;      /* teal: buttons, logo, links */
+  --color-primary-dark: #115e59; /* darker teal: hover states */
+  --color-soft: #f0fdfa;         /* very light teal: hero background */
+  --color-text: #1f2937;         /* near-black: main text */
+  --color-muted: #4b5563;        /* grey: secondary text */
+  --color-white: #ffffff;
+  --color-footer: #134e4a;       /* deep teal: footer background */
+
+  --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  --space-s: 0.5rem;   /* 8px */
+  --space-m: 1rem;     /* 16px */
+  --space-l: 2rem;     /* 32px */
+  --space-xl: 4rem;    /* 64px */
+
+  --radius: 8px;
+  --max-width: 1100px;
+}
+
+/* 2. RESET: remove browser default spacing so every browser starts the same */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* width includes padding and border: easier maths */
+}
+
+body,
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. BASE: default text styles */
+html {
+  scroll-behavior: smooth; /* "Get my quote" glides down instead of jumping */
+}
+
+body {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-white);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+/* 4. LAYOUT: .container keeps content centred and not too wide */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-m); /* 16px gap from the screen edge on phones */
+}
+
+/* Reusable button */
+.button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* 5. HEADER */
+.site-header {
+  background-color: var(--color-white);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.site-header .container {
+  display: flex;                  /* logo and menu side by side */
+  flex-wrap: wrap;                /* menu moves under the logo on narrow phones */
+  align-items: center;
+  justify-content: space-between; /* logo left, menu right */
+  gap: var(--space-s);
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-m);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.site-header ul {
+  display: flex;
+  gap: var(--space-m);
+  list-style: none; /* no bullet points */
+}
+
+.site-header nav a {
+  color: var(--color-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-header nav a:hover {
+  color: var(--color-primary);
+}
+
+/* 6. HERO */
+.hero {
+  background-color: var(--color-soft);
+  padding: var(--space-xl) 0;
+  text-align: center;
+}
+
+.hero-company {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+.hero h1 {
+  /* clamp(smallest, preferred, largest): text grows with the screen */
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.2;
+  margin: var(--space-s) 0 var(--space-m);
+}
+
+.hero-text {
+  color: var(--color-muted);
+  font-size: 1.125rem;
+  max-width: 600px;
+  margin: 0 auto var(--space-l); /* centred, with space before the button */
+}
+
+/* 7. SECTIONS */
+.calculator {
+  padding: var(--space-xl) 0;
+}
+
+.calculator h2 {
+  font-size: 1.75rem;
+  margin-bottom: var(--space-m);
+}
+
+/* 8. FOOTER */
+.site-footer {
+  background-color: var(--color-footer);
+  color: var(--color-white);
+  padding: var(--space-l) 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.site-footer p + p {
+  margin-top: var(--space-s); /* space between footer lines */
+}
+
+.site-footer a {
+  color: var(--color-white);
+}
