@@ -26,7 +26,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: clicking Calculate shows the server's price
 - [x] **Task 10 — Validation & errors:** server returns 400 + clear message for bad input; frontend shows friendly errors, "Calculating…" state, "server unreachable" message
   - Done when: bad input never shows `NaN` or crashes the server
-- [ ] **Task 11 — Live updates + Reset:** recalculate on every input change; Reset clears form and result
+- [x] **Task 11 — Live updates + Reset:** recalculate on every input change; Reset clears form and result
   - Done when: the price updates as you click
 - [ ] **Task 12 — Save requests:** "Request this quote" form (name, email) → `POST /api/requests` → saved to `data/requests.json`
   - Done when: a request appears in the JSON file

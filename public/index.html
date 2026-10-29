@@ -86,10 +86,14 @@
             </div>
           </fieldset>
 
-          <button type="submit" id="calculate-button" class="button">Calculate price</button>
+          <div class="form-actions">
+            <button type="submit" id="calculate-button" class="button">Calculate price</button>
+            <!-- type="button" so it doesn't submit the form; script.js handles the reset -->
+            <button type="button" id="reset-button" class="button button-secondary">Reset</button>
+          </div>
         </form>
 
-        <!-- The price appears here (Task 9) -->
+        <!-- The price appears here and updates live as the form changes -->
         <div id="result" class="result">
           <h3>Your estimate</h3>
           <p>Fill in the form and press "Calculate price".</p>

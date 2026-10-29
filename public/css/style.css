@@ -45,8 +45,13 @@ ul {
 }
 
 /* 3. BASE: default text styles */
-html {
-  scroll-behavior: smooth; /* "Get my quote" glides down instead of jumping */
+
+/* "Get my quote" glides down instead of jumping, but only for people who
+   haven't asked their device to reduce motion (some people get dizzy) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -256,7 +261,14 @@ input[type="number"] {
   accent-color: var(--color-primary); /* teal ticks instead of browser blue */
 }
 
-/* The submit button fills the card width */
+/* Calculate + Reset buttons: Calculate is wider (2 parts), Reset smaller (1 part) */
+.form-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-s);
+}
+
+/* The buttons fill their space */
 .quote-form .button {
   width: 100%;
   border: none;
@@ -264,6 +276,21 @@ input[type="number"] {
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Secondary button: white with a teal outline (less important action) */
+.button-secondary {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+}
+
+/* Written as ".quote-form .button-secondary" so it wins over "border: none" above */
+.quote-form .button-secondary {
+  border: 2px solid var(--color-primary);
+}
+
+.button-secondary:hover {
+  background-color: var(--color-soft);
 }
 
 /* FOCUS: a clear outline when using the keyboard (Tab key) */

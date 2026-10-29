@@ -1,7 +1,7 @@
 // QuickQuote frontend
 // This file runs in the visitor's browser. It asks the server for the price
 // list, uses it to fill in the calculator form, and shows the price the
-// server calculates.
+// server calculates. The price updates live whenever the form changes.
 
 // ---------- 1. Find the HTML elements we need ----------
 const form = document.getElementById('quote-form');
@@ -13,6 +13,7 @@ const formMessage = document.getElementById('form-message');
 const resultBox = document.getElementById('result');
 const roomsError = document.getElementById('rooms-error');
 const calculateButton = document.getElementById('calculate-button');
+const resetButton = document.getElementById('reset-button');
 
 // Filled in by loadPrices(); used to check the number of rooms
 let roomLimits = { min: 1, max: 10 };
@@ -76,6 +77,7 @@ function makeChoice(type, name, value, text, checked) {
   input.name = name;
   input.value = value;
   input.checked = checked;
+  input.defaultChecked = checked; // the state the Reset button goes back to
 
   label.appendChild(input);
   label.append(' ' + text);
@@ -92,6 +94,7 @@ async function loadPrices() {
     const prices = await response.json(); // turn the JSON text into an object
     buildForm(prices);
     formMessage.hidden = true; // prices loaded: hide "Loading prices…"
+    calculatePrice(true);      // show a price for the default choices straight away
   } catch (error) {
     console.error('Could not load prices:', error);
     formMessage.textContent = 'Sorry, we could not load our prices. Please refresh the page.';
@@ -132,12 +135,21 @@ function checkRooms() {
 }
 
 // ---------- 7. Send the choices to the server and get the price back ----------
-async function calculatePrice() {
+// Counts requests, so an old, slow answer can't overwrite a newer one
+let latestRequest = 0;
+
+// isLive = true when called by a live update (then we don't move the cursor)
+async function calculatePrice(isLive) {
   if (!checkRooms()) {
     showError('Please fix the number of rooms first.');
-    roomsInput.focus();
+    if (!isLive) {
+      roomsInput.focus();
+    }
     return; // stop here: don't send bad data
   }
+
+  latestRequest = latestRequest + 1;
+  const thisRequest = latestRequest;
 
   // "Calculating…" state: the button can't be clicked twice
   calculateButton.disabled = true;
@@ -150,6 +162,12 @@ async function calculatePrice() {
       body: JSON.stringify(getChoices())               // object -> JSON text
     });
     const data = await response.json();
+
+    // If the customer changed something while we waited, a newer request
+    // is already on its way: ignore this older answer
+    if (thisRequest !== latestRequest) {
+      return;
+    }
 
     if (response.ok) {
       showQuote(data);
@@ -229,14 +247,33 @@ function addRow(list, label, amount, className) {
 // ---------- 9. When the form is submitted, calculate instead of reloading ----------
 form.addEventListener('submit', (event) => {
   event.preventDefault(); // stop the page from reloading
-  calculatePrice();
+  calculatePrice(false);
 });
 
-// Hide the rooms message as soon as the number is fixed
-roomsInput.addEventListener('input', () => {
-  if (!roomsError.hidden) {
-    checkRooms();
-  }
+// ---------- 10. Live updates ----------
+// Every change recalculates the price. We wait 300 milliseconds after the
+// last change, so typing "10" sends one request instead of two.
+let liveTimer = null;
+
+function scheduleLiveUpdate() {
+  clearTimeout(liveTimer); // cancel the previous wait
+  liveTimer = setTimeout(() => calculatePrice(true), 300);
+}
+
+form.addEventListener('change', scheduleLiveUpdate); // dropdown, radios, checkboxes
+roomsInput.addEventListener('input', scheduleLiveUpdate); // every key typed in the rooms box
+
+// ---------- 11. Reset button ----------
+// Puts every input back to its starting value and clears the result.
+resetButton.addEventListener('click', () => {
+  clearTimeout(liveTimer);        // cancel a live update that is still waiting
+  latestRequest = latestRequest + 1; // ignore any answer that is still on its way
+  form.reset();
+
+  roomsError.hidden = true;
+  roomsInput.removeAttribute('aria-invalid');
+  resultBox.classList.remove('has-error');
+  resultBox.innerHTML = '<h3>Your estimate</h3><p>Fill in the form to see your price.</p>';
 });
 
 loadPrices();

@@ -280,3 +280,36 @@ The server is the guard, and the browser checks are just for speed and friendlin
   broken JSON, no body): all bad ones gave 400 with a clear message, and the server stayed up.
   In the browser at 3 widths: rooms 0, 11, 2.5, empty and -3 all showed the red message, never `NaN`.
   "Calculating…" appeared while waiting, and the 400 and unreachable messages showed correctly.
+
+## Task 11: Live updates + Reset
+
+**What changed**
+- `public/js/script.js`:
+  - **Live updates:** any change to the form (dropdown, radio, checkbox, or typing in the rooms box)
+    recalculates the price automatically. A price is also shown as soon as the page loads.
+  - **Waiting 300 ms:** each change restarts a short timer, so typing "10" sends one request instead of two.
+  - **Old answers are ignored:** every request gets a number. If an older, slower answer arrives
+    after a newer one, it is thrown away, so the price always matches what's on screen.
+  - **Reset button:** puts every input back to its starting value (Standard clean, 2 rooms, One-time,
+    no extras), hides error messages and clears the result.
+- `public/index.html`: a white "Reset" button next to "Calculate price" (which still works).
+- `public/css/style.css`: the secondary (white + teal outline) button style. Smooth scrolling now only
+  happens for people who haven't turned on "reduce motion" on their device.
+
+**Why**
+Customers like to play with the options ("what if I add the oven?"). Seeing the price change
+instantly is faster and feels modern. Reset lets them start again in one click.
+
+**What I learned**
+- **Events:** `change` fires when a dropdown, radio or checkbox changes; `input` fires on every key typed.
+  One listener on the whole `form` catches `change` from all its inputs, because events "bubble up" to the parent.
+- **Debounce:** `clearTimeout()` + `setTimeout()` = "wait until the user stops for 300 ms, then act".
+  Tested: typing "10" sent only **1** request.
+- **Race conditions:** network answers can arrive out of order. Tested by making one answer slow on purpose:
+  the page still showed the newest price (Deep clean €120.00), not the old one.
+- **`form.reset()`** returns inputs to their *default* values. Inputs made with JavaScript need
+  `defaultChecked` set, or Reset would leave no "How often?" choice selected.
+- **`type="button"`** stops a button from submitting the form.
+- **`prefers-reduced-motion`:** a media query that respects people who get dizzy from animations.
+- **Tested at 375px, 768px and 1280px:** load = €70, Deep = €120, + weekly = €102, + oven = €123.25,
+  10 rooms = €293.25, rooms 0 = red error, Reset = back to the start, then fridge = €85. No console errors.
