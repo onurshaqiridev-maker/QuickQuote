@@ -66,6 +66,45 @@ a {
   color: var(--color-primary);
 }
 
+/* Hides text on screen but keeps it for screen readers (used for the live total) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Skip link: off-screen until it gets keyboard focus, then it appears top-left */
+.skip-link {
+  position: absolute;
+  left: var(--space-m);
+  top: -100px;
+  z-index: 10;
+  padding: var(--space-s) var(--space-m);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  top: var(--space-m);
+}
+
+/* SMALL TRANSITIONS: colors fade instead of switching instantly.
+   Only for people who haven't asked their device to reduce motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .button,
+  .choice,
+  .site-header nav a,
+  select,
+  input {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+}
+
 /* 4. LAYOUT: .container keeps content centred and not too wide */
 .container {
   width: 100%;
@@ -306,6 +345,7 @@ input:focus-visible {
 
 /* The result card */
 .result {
+  scroll-margin-top: var(--space-m); /* a small gap above it when scrolled into view */
   background-color: var(--color-soft);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius);

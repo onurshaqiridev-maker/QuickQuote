@@ -19,27 +19,37 @@ const nameInput = document.getElementById('customer-name');
 const emailInput = document.getElementById('customer-email');
 const requestButton = document.getElementById('request-button');
 const requestMessage = document.getElementById('request-message');
+const liveTotal = document.getElementById('live-total');
 
 // Filled in by loadPrices(); used to check the number of rooms
 let roomLimits = { min: 1, max: 10 };
 
 // ---------- 2. Helper: show a number as money, e.g. 40 -> "€40.00" ----------
-let currency = 'EUR';
+// The formatters are made once (in setCurrency) and reused, which is faster
+// than making a new one every time we show a price.
+let moneyFormat;
+let shortMoneyFormat;
+
+function setCurrency(currency) {
+  moneyFormat = new Intl.NumberFormat('en-IE', { style: 'currency', currency: currency });
+  // Shorter version for the form labels: 40 -> "€40" (keeps phone labels short)
+  shortMoneyFormat = new Intl.NumberFormat('en-IE', {
+    style: 'currency', currency: currency, minimumFractionDigits: 0
+  });
+}
+setCurrency('EUR');
 
 function formatMoney(amount) {
-  return new Intl.NumberFormat('en-IE', { style: 'currency', currency: currency }).format(amount);
+  return moneyFormat.format(amount);
 }
 
-// Shorter version for the form labels: 40 -> "€40" (keeps phone labels short)
 function formatShortMoney(amount) {
-  return new Intl.NumberFormat('en-IE', {
-    style: 'currency', currency: currency, minimumFractionDigits: 0
-  }).format(amount);
+  return shortMoneyFormat.format(amount);
 }
 
 // ---------- 3. Build the form from the price list ----------
 function buildForm(prices) {
-  currency = prices.currency;
+  setCurrency(prices.currency);
 
   // Room limits come from the server too
   roomLimits = prices.rooms;
@@ -204,6 +214,7 @@ function showError(message) {
   text.textContent = message;
 
   resultBox.append(title, text);
+  liveTotal.textContent = message; // read out loud by screen readers
 }
 
 // ---------- 8. Show the price breakdown in the result card ----------
@@ -236,6 +247,19 @@ function showQuote(quote) {
   }
   addRow(list, 'Total', formatMoney(quote.total), 'total-row');
   resultBox.appendChild(list);
+
+  // Screen readers say e.g. "Estimated total: €144.50" (not the whole bill every time)
+  liveTotal.textContent = `Estimated total: ${formatMoney(quote.total)}`;
+}
+
+// On phones the price card is below the form. After pressing "Calculate price",
+// scroll down to it if it isn't on the screen already.
+function scrollToResultIfHidden() {
+  const box = resultBox.getBoundingClientRect();
+  const isVisible = box.top >= 0 && box.top < window.innerHeight - 100;
+  if (!isVisible) {
+    resultBox.scrollIntoView({ block: 'start' });
+  }
 }
 
 // Adds one row: <li class="..."><span>label</span><span>amount</span></li>
@@ -253,9 +277,14 @@ function addRow(list, label, amount, className) {
 }
 
 // ---------- 9. When the form is submitted, calculate instead of reloading ----------
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault(); // stop the page from reloading
-  calculatePrice(false);
+  await calculatePrice(false);
+  // Only after a button press (never during live updates), and not when there
+  // is an error: then the cursor stays in the field that needs fixing
+  if (!resultBox.classList.contains('has-error')) {
+    scrollToResultIfHidden();
+  }
 });
 
 // ---------- 10. Live updates ----------
@@ -282,6 +311,7 @@ resetButton.addEventListener('click', () => {
   roomsInput.removeAttribute('aria-invalid');
   resultBox.classList.remove('has-error');
   resultBox.innerHTML = '<h3>Your estimate</h3><p>Fill in the form to see your price.</p>';
+  liveTotal.textContent = 'The form has been reset.';
   requestForm.hidden = true;
   requestMessage.hidden = true;
 });

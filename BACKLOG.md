@@ -32,7 +32,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: a request appears in the JSON file
 - [x] **Task 13 — Admin page:** `admin.html` asks for the password, calls `GET /api/requests`, shows a table
   - Done when: wrong password → "Access denied"; right password → table
-- [ ] **Task 14 — Accessibility & polish:** `aria-live` result, visible focus, contrast, meta description, favicon, small transitions
+- [x] **Task 14 — Accessibility & polish:** `aria-live` result, visible focus, contrast, meta description, favicon, small transitions
   - Done when: keyboard-only use works; Lighthouse accessibility ≥ 90
 - [ ] **Task 15 — Final test, README & deploy:** test everything; full README; deploy to Render
   - Done when: live URL works end to end; submission checklist done

@@ -388,3 +388,41 @@ A password keeps strangers out.
 - **Tested:** curl with no password set (503), no header (401), wrong password (401) and right password (list, newest first).
   In the browser at 375px, 768px and 1280px: an empty password and a wrong password showed messages, and the right password showed both
   test requests with correct totals (€55.00 and €157.25). No sideways page scroll, and no code ran from the fake name.
+
+## Task 14: Accessibility & polish
+
+**What changed**
+- **Screen readers:** a hidden `aria-live` area announces "Estimated total: €157.25" every time the price
+  changes (and error messages too), so blind users hear the result without searching for it.
+  The loading message and the request message are announced as well.
+- **Skip link:** the first Tab press shows "Skip to the calculator", which jumps past the menu.
+- **Phones:** after pressing "Calculate price", the page scrolls to the price card if it's off screen.
+  Live updates never move the page, and errors keep the cursor in the field to fix.
+- **Meta description** (the text Google shows under the title), a **theme color**, and a **favicon**
+  (`public/favicon.svg`: a teal "Q" icon). The missing favicon was causing a 404 error in the console.
+- **Small transitions:** button and card colors fade (0.2 s), but only if the visitor hasn't turned on "reduce motion".
+- A "Staff login" link to the admin page in the footer.
+- The money formatters are now made once and reused (`setCurrency()`), instead of being remade for every price.
+
+**Lighthouse scores (Google's website checker)**
+| Page | Performance | Accessibility | Best practices | SEO |
+|------|------|------|------|------|
+| Home, phone (before) | 75 | 100 | 96 | 90 |
+| Home, phone (after) | **100** | **100** | **100** | **100** |
+| Home, desktop (after) | **100** | **100** | **100** | **100** |
+| Admin, phone + desktop (after) | 100 | 100 | 100 | 60* |
+
+\* On purpose: the admin page tells Google *not* to list it (`noindex`), and Lighthouse counts that against SEO.
+(The phone performance score changes a little between runs on this test machine. Our own JavaScript took only about 0.1 s.)
+
+**What I learned**
+- **Accessibility is mostly good HTML:** labels, fieldsets, real buttons and semantic tags had already given 100.
+  The extras (live region, skip link) help real people with screen readers and keyboards.
+- **`aria-live="polite"`** reads changes out loud when the screen reader is free. I announce only
+  the total, not the whole bill, so it doesn't talk too much.
+- **The `.visually-hidden` trick** hides text on screen but keeps it for screen readers (`display: none` would hide it from both).
+- **Keyboard test:** I used the whole site with only Tab, the arrow keys, Space and Enter: skip link → choose
+  Deep clean → 4 rooms → Weekly → tick fridge → Calculate (**€157.25**, correct) → send a request.
+  Every focused element had a clear 3px outline.
+- **`scrollIntoView()`** scrolls to an element, and `scroll-margin-top` leaves a small gap above it.
+- **All earlier tests still pass** (calculator, errors, live updates, requests, admin) with no console errors.
