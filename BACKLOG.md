@@ -20,7 +20,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: the form shows options that come from the server
 - [x] **Task 7 — Form styling + responsive layout:** inputs, buttons, focus states, result card; mobile-first; side by side on wide screens
   - Done when: looks good at 375px, 768px and 1280px; no sideways scroll
-- [ ] **Task 8 — API: calculate:** `calculateQuote()` in `prices.js`; `POST /api/quote` returns breakdown + total
+- [x] **Task 8 — API: calculate:** `calculateQuote()` in `prices.js`; `POST /api/quote` returns breakdown + total
   - Done when: `curl` tests match hand-worked examples
 - [ ] **Task 9 — Connect form to API:** Calculate sends a `fetch` POST; shows itemized breakdown + total in €
   - Done when: clicking Calculate shows the server's price

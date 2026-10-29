@@ -181,3 +181,41 @@ and still uses the space well on a laptop, feels professional.
 - **`position: sticky`** keeps the result card in view while you scroll down the form (wide screens).
 - **`font-size: 1rem` on inputs:** iPhones zoom in on inputs with text smaller than 16px.
 - **`accent-color`** recolors the browser's own checkboxes and radios with a single line.
+
+## Task 8: API: calculate
+
+**What changed**
+- `prices.js` has a new function, `calculateQuote(choices)`. It works in 4 steps:
+  1. Look up the chosen service, frequency and extras in `PRICES` by their `id` (`find` / `filter`).
+  2. Build the bill as a list of **lines**: base price, rooms × price per room, then each extra.
+  3. Add up the lines to get the **subtotal**.
+  4. Take off the frequency **discount** (on the whole subtotal) to get the **total**.
+- `server.js` has a new route, `POST /api/quote`. The browser sends the choices as JSON,
+  and the server answers with the full breakdown. `app.use(express.json())` lets Express read that JSON.
+
+**Why**
+The price is calculated on the **server**. A visitor can't change the maths in their browser,
+and there is only one place where the rules live.
+
+**The formula**
+`total = (basePrice + rooms × pricePerRoom + extras) − discount`, where `discount = subtotal × frequency discount`.
+
+**Hand-worked examples (all 4 matched the API exactly)**
+| # | Choices | Working | Total |
+|---|---------|---------|-------|
+| 1 | Standard, 2 rooms, one-time, no extras | 40 + 2×15 = 70, no discount | **€70.00** |
+| 2 | Deep, 3 rooms, weekly, oven | 70 + 3×25 + 25 = 170; 15% = 25.50 | **€144.50** |
+| 3 | Move-out, 5 rooms, monthly, windows + fridge + laundry | 100 + 5×30 + 20 + 15 + 18 = 303; 5% = 15.15 | **€287.85** |
+| 4 | Standard, 1 room, bi-weekly, all 4 extras | 40 + 15 + 20 + 15 + 25 + 18 = 133; 10% = 13.30 | **€119.70** |
+
+**What I learned**
+- **GET vs POST:** GET *asks for* data. POST *sends* data to the server (here, the customer's choices).
+- **`req.body`:** the data the browser sent. It only works after `app.use(express.json())`.
+- **`find` and `filter`:** `find` returns the first matching item, while `filter` returns all matching items
+  (used for the extras, because a customer can pick several).
+- **Money and decimals:** computers store some decimals slightly wrong (0.1 + 0.2 = 0.30000000000000004),
+  so `roundMoney()` rounds every amount to cents.
+- **Testing with curl:** `curl -X POST … -H "Content-Type: application/json" -d '{…}'` sends JSON
+  without needing a web page.
+- **Not finished yet:** sending a service that doesn't exist currently gives a 500 error (the server stays up).
+  Task 10 adds proper checks and clear 400 error messages.

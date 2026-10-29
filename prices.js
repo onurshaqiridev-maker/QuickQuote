@@ -32,5 +32,52 @@ const PRICES = {
   ]
 };
 
-// "module.exports" lets other files (like server.js) use PRICES with require()
-module.exports = { PRICES };
+// Round money to 2 decimals (cents), e.g. 25.499999 -> 25.5
+function roundMoney(amount) {
+  return Math.round(amount * 100) / 100;
+}
+
+// Works out the price for one quote.
+// "choices" looks like: { service: 'deep', rooms: 3, frequency: 'weekly', extras: ['oven'] }
+// Returns every line of the bill plus the total.
+function calculateQuote(choices) {
+  // 1. Look up the chosen items in the price list by their id
+  const service = PRICES.services.find((s) => s.id === choices.service);
+  const frequency = PRICES.frequencies.find((f) => f.id === choices.frequency);
+  const rooms = Number(choices.rooms);
+  const chosenExtras = PRICES.extras.filter((e) => (choices.extras || []).includes(e.id));
+
+  // 2. Build the bill, one line at a time
+  const lines = [];
+  lines.push({ label: `${service.name} (base price)`, amount: service.basePrice });
+  const roomWord = rooms === 1 ? 'room' : 'rooms';
+  lines.push({ label: `${rooms} ${roomWord} × €${service.pricePerRoom}`, amount: rooms * service.pricePerRoom });
+  chosenExtras.forEach((extra) => {
+    lines.push({ label: extra.name, amount: extra.price });
+  });
+
+  // 3. Add up the lines
+  let subtotal = 0;
+  lines.forEach((line) => {
+    subtotal += line.amount;
+  });
+
+  // 4. Take off the frequency discount (on the whole subtotal)
+  const discount = roundMoney(subtotal * frequency.discount);
+  const total = roundMoney(subtotal - discount);
+
+  return {
+    currency: PRICES.currency,
+    service: service.name,
+    rooms: rooms,
+    frequency: frequency.name,
+    lines: lines,
+    subtotal: roundMoney(subtotal),
+    discountPercent: frequency.discount * 100,
+    discount: discount,
+    total: total
+  };
+}
+
+// "module.exports" lets other files (like server.js) use these with require()
+module.exports = { PRICES, calculateQuote };
