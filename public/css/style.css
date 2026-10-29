@@ -13,6 +13,8 @@
   --color-muted: #4b5563;        /* grey: secondary text */
   --color-white: #ffffff;
   --color-footer: #134e4a;       /* deep teal: footer background */
+  --color-border: #d1d5db;       /* light grey: card borders */
+  --color-input-border: #6b7280; /* darker grey: input borders, easy to see */
 
   --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
@@ -157,6 +159,162 @@ a {
 .calculator h2 {
   font-size: 1.75rem;
   margin-bottom: var(--space-m);
+}
+
+.form-message {
+  color: var(--color-muted);
+  margin-bottom: var(--space-m);
+}
+
+/* MOBILE FIRST: on phones the form and the result are stacked (one column).
+   The media query near the end puts them side by side on wider screens. */
+.calculator-layout {
+  display: grid;
+  gap: var(--space-l);
+}
+
+/* The form card */
+.quote-form {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.form-group {
+  margin-bottom: var(--space-l);
+}
+
+/* fieldsets have a border and padding by default: remove them */
+fieldset.form-group {
+  border: none;
+  padding: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+label,
+legend {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-s);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+/* Dropdown and number box: full width, comfortable to tap */
+select,
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  font: inherit;      /* use the page font instead of the browser's */
+  font-size: 1rem;    /* 16px or more stops iPhones zooming in when tapped */
+  color: var(--color-text);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius);
+}
+
+/* Radio buttons and checkboxes: one per row on phones */
+.choice-list {
+  display: grid;
+  gap: var(--space-s);
+}
+
+/* Each choice looks like a small clickable card */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0.75rem;
+  font-weight: 400;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.choice:hover {
+  border-color: var(--color-primary);
+}
+
+/* :has() styles the card when the input inside it is ticked */
+.choice:has(input:checked) {
+  border-color: var(--color-primary);
+  background-color: var(--color-soft);
+}
+
+.choice input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  flex-shrink: 0;                     /* box never gets squashed by long text */
+  accent-color: var(--color-primary); /* teal ticks instead of browser blue */
+}
+
+/* The submit button fills the card width */
+.quote-form .button {
+  width: 100%;
+  border: none;
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* FOCUS: a clear outline when using the keyboard (Tab key) */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The result card */
+.result {
+  background-color: var(--color-soft);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.result h3 {
+  margin: 0 0 var(--space-s);
+  font-size: 1.25rem;
+}
+
+.result p {
+  color: var(--color-muted);
+}
+
+/* TABLET (480px and wider): choices sit in two columns */
+@media (min-width: 480px) {
+  .choice-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* DESKTOP (768px and wider): form on the left, result on the right */
+@media (min-width: 768px) {
+  .calculator-layout {
+    grid-template-columns: 3fr 2fr; /* form gets 3 parts of the width, result 2 */
+    align-items: start;
+  }
+
+  .quote-form,
+  .result {
+    padding: var(--space-l);
+  }
+
+  /* The result card stays in view while you scroll down the form */
+  .result {
+    position: sticky;
+    top: var(--space-m);
+  }
 }
 
 /* 8. FOOTER */

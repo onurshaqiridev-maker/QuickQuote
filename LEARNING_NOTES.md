@@ -153,3 +153,31 @@ If a price changes, the form updates by itself.
 - **`event.preventDefault()`** stops a form from reloading the page when you submit it.
 - **`defer`** on the script tag waits until the HTML is loaded, so `getElementById` finds the elements.
 - **`Intl.NumberFormat`** formats money properly: `40` becomes `€40.00`.
+
+## Task 7: Form styling + responsive layout
+
+**What changed**
+- `public/css/style.css` got a big new part for the calculator:
+  - The form is a white **card**, and the result is a light-teal card with a teal border.
+  - Inputs are full width with 16px text and big padding, so they're easy to tap on a phone.
+  - Each radio/checkbox is a small clickable card that turns teal when it's chosen.
+  - The button fills the card, and every input shows a thick teal **focus outline** when you use the Tab key.
+- `public/index.html`: a new `<div class="calculator-layout">` wraps the form and the result.
+- `public/js/script.js`: shorter price labels ("€40 + €15/room") so they fit on phone screens.
+
+**Why**
+Most visitors use a phone. A form that is comfortable to tap and easy to read on a small screen,
+and still uses the space well on a laptop, feels professional.
+
+**What I learned**
+- **Mobile first:** write the phone layout as the normal CSS, then add `@media (min-width: …)` rules
+  for bigger screens. Phones get simple one-column CSS; bigger screens get the extras.
+- **CSS Grid:** `display: grid` + `grid-template-columns: 3fr 2fr` puts the form (3 parts) and the
+  result (2 parts) side by side. Without columns, grid simply stacks things.
+- **Breakpoints:** at 480px the choices move into 2 columns, and at 768px the form and result sit side by side.
+  Tested at 375px (stacked), 768px and 1280px (side by side), with no sideways scrolling at any width.
+- **`:has()`:** `.choice:has(input:checked)` styles the card when the box *inside* it is ticked.
+- **`:focus-visible`** shows the outline for keyboard users without showing it on every mouse click.
+- **`position: sticky`** keeps the result card in view while you scroll down the form (wide screens).
+- **`font-size: 1rem` on inputs:** iPhones zoom in on inputs with text smaller than 16px.
+- **`accent-color`** recolors the browser's own checkboxes and radios with a single line.

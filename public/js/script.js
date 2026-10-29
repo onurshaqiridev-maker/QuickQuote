@@ -17,6 +17,13 @@ function formatMoney(amount) {
   return new Intl.NumberFormat('en-IE', { style: 'currency', currency: currency }).format(amount);
 }
 
+// Shorter version for the form labels: 40 -> "€40" (keeps phone labels short)
+function formatShortMoney(amount) {
+  return new Intl.NumberFormat('en-IE', {
+    style: 'currency', currency: currency, minimumFractionDigits: 0
+  }).format(amount);
+}
+
 // ---------- 3. Build the form from the price list ----------
 function buildForm(prices) {
   currency = prices.currency;
@@ -29,7 +36,7 @@ function buildForm(prices) {
   prices.services.forEach((service) => {
     const option = document.createElement('option');
     option.value = service.id;
-    option.textContent = `${service.name} (${formatMoney(service.basePrice)} + ${formatMoney(service.pricePerRoom)} per room)`;
+    option.textContent = `${service.name} (${formatShortMoney(service.basePrice)} + ${formatShortMoney(service.pricePerRoom)}/room)`;
     serviceSelect.appendChild(option);
   });
 
@@ -45,7 +52,7 @@ function buildForm(prices) {
 
   // Extras -> checkboxes (any number can be chosen)
   prices.extras.forEach((extra) => {
-    const text = `${extra.name} (+${formatMoney(extra.price)})`;
+    const text = `${extra.name} (+${formatShortMoney(extra.price)})`;
     extrasBox.appendChild(makeChoice('checkbox', 'extras', extra.id, text, false));
   });
 }
