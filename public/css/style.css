@@ -44,6 +44,12 @@ ul {
   padding: 0;
 }
 
+/* Elements with the "hidden" attribute stay hidden, even if a class
+   (like .button) gives them a display value */
+[hidden] {
+  display: none !important;
+}
+
 /* 3. BASE: default text styles */
 
 /* "Get my quote" glides down instead of jumping, but only for people who
@@ -167,6 +173,31 @@ a {
   color: var(--color-primary);
 }
 
+/* The menu has two lists: the page links and the account links */
+.site-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-s) var(--space-m);
+}
+
+/* "Sign up" in the menu looks like a small teal button */
+.site-header nav a.nav-button {
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.site-header nav a.nav-button:hover {
+  background-color: var(--color-primary-dark);
+  color: var(--color-white);
+}
+
+textarea {
+  resize: vertical; /* can be made taller, not wider */
+}
+
 /* 6. HERO */
 .hero {
   background-color: var(--color-soft);
@@ -254,7 +285,10 @@ legend {
 select,
 input[type="number"],
 input[type="text"],
-input[type="email"] {
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea {
   width: 100%;
   padding: 0.75rem;
   font: inherit;      /* use the page font instead of the browser's */
@@ -446,53 +480,177 @@ input:focus-visible {
   font-weight: 600;
 }
 
-/* ADMIN PAGE */
+/* DASHBOARD, LOG IN and SIGN UP PAGES */
 .admin-main {
   padding: var(--space-xl) 0;
   min-height: 60vh; /* keeps the footer near the bottom on a short page */
 }
 
-.admin-main h1 {
+.admin-main h1,
+.auth-card h1 {
   font-size: 2rem;
-  margin-bottom: var(--space-s);
+  line-height: 1.2;
+  margin-bottom: var(--space-m);
 }
 
-.admin-intro {
-  color: var(--color-muted);
-  margin-bottom: var(--space-l);
-}
-
-.login-form {
-  max-width: 480px;
-  margin-bottom: var(--space-l);
-}
-
-/* Password box and button: stacked on phones, side by side from 480px */
-.login-row {
-  display: grid;
-  gap: var(--space-s);
-}
-
-.login-form input[type="password"] {
-  width: 100%;
-  padding: 0.75rem;
-  font: inherit;
-  font-size: 1rem;
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius);
-}
-
-.login-form .button {
+/* Every <button class="button">: no browser border, page font, hand cursor */
+button.button {
   border: none;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
-.admin-message {
-  margin-top: var(--space-s);
-  color: var(--color-error);
-  font-weight: 600;
+/* The white "secondary" button has a teal outline everywhere */
+.button.button-secondary {
+  border: 2px solid var(--color-primary);
+}
+
+.button-full {
+  width: 100%;
+}
+
+.button-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+}
+
+/* A row of buttons that wraps onto new lines on small phones */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+}
+
+/* A button that looks like a link (Log out, Remove) */
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A highlighted information message */
+.notice {
+  background-color: var(--color-soft);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: var(--space-s) var(--space-m);
+  margin: var(--space-m) 0;
+}
+
+/* The log in / sign up card: narrow and centred */
+.auth-main {
+  padding: var(--space-xl) 0;
+  min-height: 60vh;
+}
+
+.auth-card {
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.auth-card .form-group {
+  margin-bottom: var(--space-m);
+}
+
+/* On the sign up page the two account types sit under each other */
+.auth-card .choice-list {
+  grid-template-columns: 1fr;
+}
+
+.auth-switch {
+  margin-top: var(--space-m);
+  text-align: center;
+  color: var(--color-muted);
+}
+
+/* Dashboard sections */
+.dash-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+  margin-bottom: var(--space-l);
+}
+
+.dash-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: var(--space-m);
+}
+
+.dash-card > p {
+  margin-bottom: var(--space-m);
+}
+
+/* Status label: green "Active", orange "Not paid yet" */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.badge-good {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Price editor: each service/extra is a row of small boxes */
+.editor-list {
+  display: grid;
+  gap: var(--space-s);
+  margin-bottom: var(--space-s);
+}
+
+.editor-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* phones: name on its own line, prices below */
+  gap: var(--space-s);
+  align-items: end;
+  padding: var(--space-s);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.editor-row .field-name {
+  grid-column: 1 / -1; /* the name box takes the whole row on phones */
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-s);
+}
+
+.mini-field {
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.mini-field span {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.remove-button {
+  justify-self: start;
+  padding: 0.75rem 0;
 }
 
 .requests-count {
@@ -526,9 +684,9 @@ input:focus-visible {
   font-weight: 700;
 }
 
-/* Name (3rd column) and Extras (8th column) can be long: let them wrap */
+/* Long text (names, extras) may wrap onto a second line */
 .requests-table td:nth-child(3),
-.requests-table td:nth-child(8) {
+.requests-table td:nth-last-child(2) {
   white-space: normal;
   min-width: 8rem;
 }
@@ -538,18 +696,136 @@ input:focus-visible {
   background-color: #f9fafb;
 }
 
-/* TABLET (480px and wider): choices sit in two columns */
+/* HOME PAGE: search box and company cards */
+.search-form {
+  display: grid;
+  gap: var(--space-s);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.company-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-m);
+}
+
+.company-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.company-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.company-city {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+.company-description {
+  color: var(--color-muted);
+  flex-grow: 1; /* pushes the price and button to the bottom of the card */
+}
+
+.company-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.company-card .button {
+  text-align: center;
+}
+
+/* "Run a cleaning company?" section */
+.for-companies {
+  background-color: var(--color-soft);
+  padding: var(--space-xl) 0;
+  text-align: center;
+}
+
+.for-companies h2 {
+  font-size: 1.75rem;
+  margin-bottom: var(--space-s);
+}
+
+.plan-card {
+  max-width: 420px;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.plan-price {
+  font-size: 1.25rem;
+  color: var(--color-muted);
+}
+
+.plan-price span {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.plan-features {
+  text-align: left;
+  margin: var(--space-m) 0 var(--space-l);
+  padding-left: 1.25rem;
+}
+
+.plan-features li + li {
+  margin-top: var(--space-s);
+}
+
+.company-hero .notice {
+  max-width: 600px;
+  margin: var(--space-m) auto 0;
+  text-align: left;
+}
+
+/* TABLET (480px and wider) */
 @media (min-width: 480px) {
   .choice-list {
     grid-template-columns: 1fr 1fr;
   }
 
-  .login-row {
+  .search-form {
     grid-template-columns: 1fr auto; /* box takes the space, button fits its text */
+  }
+
+  .editor-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* name, two prices and Remove in one row */
+  .editor-row {
+    grid-template-columns: 2fr 1fr 1fr auto;
+  }
+
+  .editor-row .field-name {
+    grid-column: auto;
+  }
+
+  /* extras have one price box fewer */
+  #extras-editor .editor-row {
+    grid-template-columns: 2fr 1fr auto;
   }
 }
 
-/* DESKTOP (768px and wider): form on the left, result on the right */
+/* DESKTOP (768px and wider) */
 @media (min-width: 768px) {
   .calculator-layout {
     grid-template-columns: 3fr 2fr; /* form gets 3 parts of the width, result 2 */
@@ -558,14 +834,27 @@ input:focus-visible {
 
   .quote-form,
   .result,
-  .request-form {
+  .request-form,
+  .dash-card,
+  .auth-card {
     padding: var(--space-l);
   }
 
-  /* The price and request form stay in view while you scroll down the form */
+  /* The price and request box stay in view while you scroll down the form */
   .result-column {
     position: sticky;
     top: var(--space-m);
+  }
+
+  /* Company cards: 2 per row on tablets, 3 on desktops (see below) */
+  .company-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .company-list {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

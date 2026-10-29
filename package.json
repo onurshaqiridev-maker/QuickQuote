@@ -1,17 +1,19 @@
 {
   "name": "quickquote",
   "version": "1.0.0",
-  "description": "QuickQuote: instant price estimates for Sparkle Home Cleaning (student project).",
+  "description": "QuickQuote: a marketplace where cleaning companies list their prices and customers get instant quotes (student project).",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js"
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "seed": "node --disable-warning=ExperimentalWarning seed.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.5"
   },
   "license": "MIT",
   "dependencies": {
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "pg": "^8.13.0"
   }
 }

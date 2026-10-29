@@ -4,6 +4,10 @@ node_modules/
 # Saved quote requests (real customer data, never commit it)
 data/requests.json
 
+# The local database (accounts and requests: private data)
+data/*.db
+data/*.db-*
+
 # Secrets and system files
 .env
 .DS_Store

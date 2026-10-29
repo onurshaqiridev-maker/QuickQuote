@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log in | QuickQuote</title>
+  <meta name="description" content="Log in to your QuickQuote customer or company account.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/login.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">QuickQuote</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#companies">Find a company</a></li>
+        </ul>
+        <ul id="account-menu"></ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="container">
+      <form id="login-form" class="auth-card" novalidate>
+        <h1>Log in</h1>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" id="login-button" class="button button-full">Log in</button>
+        <p id="login-message" class="request-message error-message" role="alert" hidden></p>
+
+        <p class="auth-switch">New here? <a id="signup-link" href="/signup.html">Create an account</a></p>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 QuickQuote · A student project</p>
+    </div>
+  </footer>
+
+</body>
+</html>

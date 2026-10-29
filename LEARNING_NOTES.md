@@ -426,3 +426,51 @@ A password keeps strangers out.
   Every focused element had a clear 3px outline.
 - **`scrollIntoView()`** scrolls to an element, and `scroll-margin-top` leaves a small gap above it.
 - **All earlier tests still pass** (calculator, errors, live updates, requests, admin) with no console errors.
+
+## Task 15: Final test, README & deploy
+
+**What changed**
+- The site went live on **Vercel** instead of Render: https://quick-quote-nu.vercel.app
+- `server.js` exports the app (`module.exports = app`) and only calls `app.listen()` when you run it yourself.
+- `storage.js` saved requests in the temporary folder on Vercel, because the project folder is read-only there.
+- The README got the full story: how to run it, the API, the price formula and honest limitations.
+
+**What I learned**
+- **Serverless hosting:** Vercel starts the server only when a visitor arrives and can stop it any time.
+  That's why files saved on the server disappear, and why a real website needs a database.
+- **Plans change:** switching host was fine because the code didn't depend on Render. Only `PORT` and the file folder mattered.
+
+## Task 16: The marketplace (accounts, payments, search)
+
+**What changed**
+QuickQuote is no longer one company's calculator. It's a marketplace:
+- **Companies** sign up, pay **€9/month** with Stripe, and only then appear in the search. In their dashboard
+  they set their own services, prices, discounts and extras, and see the requests they receive.
+- **Customers** sign up for free, search companies, use each company's calculator and send requests.
+- New files: `db.js` (database), `auth.js` (passwords + sessions), `billing.js` (Stripe), `seed.js` (demo data),
+  `routes/` (the API in 3 parts) and the pages `company.html`, `signup.html`, `login.html`, `dashboard.html`.
+- Removed: `admin.html` + `ADMIN_PASSWORD` (each company now has its own login) and `storage.js` (replaced by the database).
+
+**What I learned**
+- **Databases and tables:** `users`, `sessions`, `companies` and `requests`. Rows point to each other with ids
+  (`requests.company_id` → `companies.id`), and `JOIN` puts them back together in one query.
+- **`$1, $2` in SQL:** values are sent separately from the SQL, so a name like `'; DROP TABLE users;--` is just text.
+  This prevents **SQL injection**.
+- **One SQL, two databases:** SQLite (one file, built into Node) on my computer, PostgreSQL online.
+  I kept the SQL simple so it works on both: JSON as text, dates as text, money in **cents** (14450 = €144.50).
+- **Passwords:** never saved. `scrypt` + a random **salt** makes a hash that can't be turned back.
+  "Wrong email or password" is the same message for both mistakes, so strangers can't test which emails exist.
+- **Sessions and cookies:** after logging in, the browser keeps a random token in a cookie. `HttpOnly`,
+  `SameSite=Lax` and `Secure` protect it. The database stores only a hash of the token.
+- **Roles:** `requireUser('company')` is **middleware**: it runs before the route and answers 401 (not logged in)
+  or 403 (wrong kind of account).
+- **Stripe Checkout:** the server asks Stripe for a payment page, the company pays there (never on our site, so we
+  never touch card numbers), and Stripe sends them back. Then the server asks Stripe itself if it was paid,
+  because the browser could lie.
+- **Webhooks:** Stripe calls our server when a subscription is cancelled or a payment fails. Each message is
+  signed with a secret (HMAC). We check the signature and refuse messages older than 5 minutes.
+- **Search:** `LOWER(name) LIKE '%skopje%'`. `%` means "any text"; a `%` typed by the user is escaped with `\`.
+- **`[hidden]` and CSS:** a class with `display: inline-block` beat the `hidden` attribute, so the Pay button stayed
+  visible. `[hidden] { display: none !important; }` fixed it everywhere.
+- **Tested:** 91 API checks (including a fake Stripe server) and the full customer and company flows in Chromium at
+  375px, 768px and 1280px, with no sideways scrolling.

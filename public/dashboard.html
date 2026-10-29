@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- A private page: ask search engines not to list it -->
+  <meta name="robots" content="noindex">
+  <title>My account | QuickQuote</title>
+  <meta name="description" content="Your QuickQuote account: requests, company profile, prices and subscription.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">QuickQuote</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#companies">Find a company</a></li>
+        </ul>
+        <ul id="account-menu"></ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="container">
+      <h1 id="hello">My account</h1>
+      <!-- Messages after a payment ("Payment received!") appear here -->
+      <p id="page-message" class="notice" role="status" hidden></p>
+
+      <!-- ================= COMPANY ACCOUNTS ================= -->
+      <div id="company-area" hidden>
+
+        <section class="dash-card" aria-labelledby="plan-title">
+          <h2 id="plan-title">Subscription</h2>
+          <p><span id="status-badge" class="badge"></span></p>
+          <p id="status-text"></p>
+          <div class="button-row">
+            <button type="button" id="pay-button" class="button" hidden>Pay €9/month</button>
+            <button type="button" id="portal-button" class="button button-secondary" hidden>Manage subscription</button>
+            <a id="public-link" class="button button-secondary" href="#">View my company page</a>
+          </div>
+          <p id="plan-message" class="request-message error-message" role="alert" hidden></p>
+        </section>
+
+        <form id="profile-form" class="dash-card" novalidate aria-labelledby="profile-title">
+          <h2 id="profile-title">Company profile and prices</h2>
+
+          <div class="form-group">
+            <label for="profile-name">Company name</label>
+            <input type="text" id="profile-name" maxlength="60" required>
+          </div>
+          <div class="form-group">
+            <label for="profile-city">City</label>
+            <input type="text" id="profile-city" maxlength="60" required>
+          </div>
+          <div class="form-group">
+            <label for="profile-description">Short description <span class="optional">(shown in the search, up to 500 characters)</span></label>
+            <textarea id="profile-description" rows="3" maxlength="500"></textarea>
+          </div>
+
+          <fieldset class="form-group">
+            <legend>Services <span class="optional">(1 to 10)</span></legend>
+            <div id="services-editor" class="editor-list"></div>
+            <button type="button" id="add-service" class="button button-secondary button-small">+ Add a service</button>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Discounts for regular customers <span class="optional">(0 to 50%)</span></legend>
+            <div id="frequencies-editor" class="editor-grid"></div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Extras <span class="optional">(up to 10)</span></legend>
+            <div id="extras-editor" class="editor-list"></div>
+            <button type="button" id="add-extra" class="button button-secondary button-small">+ Add an extra</button>
+          </fieldset>
+
+          <button type="submit" id="save-button" class="button button-full">Save changes</button>
+          <p id="save-message" class="request-message" aria-live="polite" hidden></p>
+        </form>
+      </div>
+
+      <!-- ================= REQUESTS (both kinds of account) ================= -->
+      <section id="requests-area" class="dash-card" aria-labelledby="requests-title" hidden>
+        <h2 id="requests-title">Quote requests</h2>
+        <p id="requests-count" class="requests-count"></p>
+        <div class="table-wrapper" id="requests-wrapper" hidden>
+          <table class="requests-table">
+            <thead><tr id="requests-head"></tr></thead>
+            <tbody id="requests-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 QuickQuote · A student project</p>
+    </div>
+  </footer>
+
+</body>
+</html>

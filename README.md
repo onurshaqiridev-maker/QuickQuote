@@ -1,101 +1,133 @@
 # QuickQuote
 
-**Instant price estimates for Sparkle Home Cleaning** (a made-up local business).
-A student project: a responsive website with a small Node.js + Express backend.
+**A cleaning marketplace.** Cleaning companies pay **€9/month** to be listed. Customers search the companies,
+see each company's real prices, get an instant quote and send a quote request.
+A student project: a responsive website with a Node.js + Express backend, a database and Stripe payments.
 
-🔗 **Live site:** _added after deploying to Vercel (see [Deploy](#deploy-to-vercel-free))_
+🔗 **Live site:** https://quick-quote-nu.vercel.app
 📁 **Code:** https://github.com/onurshaqiridev-maker/QuickQuote
-
-| Desktop | Phone |
-|---------|-------|
-| ![QuickQuote on a laptop: the form on the left, the price breakdown on the right](docs/screenshot-desktop.png) | ![QuickQuote on a phone: the hero section and the start of the form](docs/screenshot-mobile.png) |
 
 ---
 
 ## What it does
 
-1. A visitor chooses a **type of cleaning**, the **number of rooms**, **how often**, and any **extras**.
-2. The **server** calculates the price and the page shows a clear breakdown. The price updates live as you click.
-3. The visitor can **request the quote** with their name and email. The server saves it.
-4. The business owner opens the password-protected **admin page** to see all requests.
+**Customers** (free account)
+1. Search companies by name, city or description on the home page.
+2. Open a company and use its price calculator. The price updates live, with a full breakdown.
+3. Sign up or log in, then send the quote request with one click.
+4. See all their requests under **My account**.
 
-### Features
-- Live price updates, with an itemized bill (subtotal, discount, total)
-- Prices calculated **on the server**, so the browser can't change them
-- Clear error messages for bad input; the server never crashes on bad data
-- Quote requests saved to a JSON file
-- Admin page protected by a password stored in an environment variable
-- Responsive: phone, tablet and desktop
-- Accessible: keyboard-friendly, screen-reader announcements, skip link, visible focus
-- Lighthouse scores: **100 / 100 / 100 / 100** (performance, accessibility, best practices, SEO)
+**Companies** (€9/month)
+1. Sign up as a company (company name + city), then pay with **Stripe** (test mode: no real money).
+2. As soon as the payment goes through, the company appears in the search.
+3. Set their own services, prices per room, discounts and extras in the dashboard.
+4. See the requests customers sent them, with the customer's name and email.
+5. If they cancel or a payment fails, Stripe tells the server and the company is hidden again.
 
 ## Tech
 
 | Part | Tool |
 |------|------|
 | Frontend | HTML, CSS, JavaScript (no frameworks) |
-| Backend | Node.js + Express 5 |
-| Storage | A JSON file (`data/requests.json`) |
+| Backend | Node.js 22.5+ and Express 5 |
+| Database | SQLite (built into Node) on your computer; PostgreSQL online (`DATABASE_URL`) |
+| Accounts | Passwords hashed with `scrypt`, login sessions in a secure cookie (built-in `crypto`) |
+| Payments | Stripe Checkout (monthly subscription), called with `fetch`, plus webhooks |
 | Hosting | Vercel (free Hobby plan) |
 
 ## Run it on your computer
 
-1. Install [Node.js](https://nodejs.org) (version 18 or newer).
-2. Download the code and open a terminal in the project folder.
-3. Install the packages:
+1. Install [Node.js](https://nodejs.org) **version 22.5 or newer** (`node -v` shows your version).
+2. Open a terminal in the project folder and install the packages:
    ```
    npm install
    ```
-4. Start the server **with an admin password** of your choice:
-   - Mac / Linux:
-     ```
-     ADMIN_PASSWORD=choose-a-secret npm start
-     ```
-   - Windows (PowerShell):
-     ```
-     $env:ADMIN_PASSWORD="choose-a-secret"; npm start
-     ```
-5. Open **http://localhost:3000** for the website and **http://localhost:3000/admin.html** for the admin page.
-6. Stop the server with `Ctrl + C`.
+3. Add the demo companies and a demo customer (only once):
+   ```
+   npm run seed
+   ```
+4. Start the server. Pick **one**:
+   - **Demo payments** (no Stripe account needed; "Pay" just switches the company on):
+     - Mac / Linux: `DEMO_PAYMENTS=true npm start`
+     - Windows (PowerShell): `$env:DEMO_PAYMENTS="true"; npm start`
+   - **Stripe test mode**: see [Set up Stripe](#set-up-stripe-test-mode) below.
+5. Open **http://localhost:3000**. Stop the server with `Ctrl + C`.
 
-(Without `ADMIN_PASSWORD`, the website works but the admin page stays locked.)
+The data is saved in `data/quickquote.db` (not on GitHub). Delete that file to start again.
+
+**Demo accounts** (all use the password `demo-password`):
+`customer@demo.quickquote` (customer), `sparkle@demo.quickquote`, `fresh@demo.quickquote`, `shine@demo.quickquote` (companies).
+
+## Set up Stripe (test mode)
+
+1. Create a free account at [stripe.com](https://stripe.com). Stay in **Test mode** (the switch at the top).
+2. **Developers → API keys**: copy the **Secret key** (`sk_test_...`).
+3. Start the server with it:
+   ```
+   STRIPE_SECRET_KEY=sk_test_... npm start
+   ```
+4. Sign up as a company and press **Pay €9/month**. On Stripe's page use the test card
+   **4242 4242 4242 4242**, any future date, any 3 digits.
+5. Stripe sends you back to the dashboard, and the server checks the payment with Stripe. Your company is live.
+
+**For cancelling and failed payments (webhooks):**
+- **Online:** Stripe → **Developers → Webhooks → Add endpoint**. URL: `https://<your-site>/api/billing/webhook`.
+  Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`,
+  `customer.subscription.deleted`. Copy the **Signing secret** (`whsec_...`) into `STRIPE_WEBHOOK_SECRET`.
+- **"Manage subscription" button:** in Stripe test mode, open **Settings → Billing → Customer portal** once and press **Save**.
+
+## Put it online (Vercel)
+
+Vercel's computers forget files, so online the site needs a real database:
+
+1. In your Vercel project: **Storage → Create Database → Neon (Postgres)** (free) and connect it to the project.
+   Vercel adds `DATABASE_URL` for you.
+2. **Settings → Environment Variables**: add `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`.
+   (You can delete the old `ADMIN_PASSWORD`; it isn't used any more.)
+3. Push to GitHub. Vercel redeploys automatically. The tables are created on the first visit.
+4. Optional, demo companies online: run `npm run seed` on your computer with `DATABASE_URL` set to the same
+   connection string.
 
 ## Project structure
 
 ```
 QuickQuote/
-├── server.js            ← Express server: serves the website + the API routes
-├── prices.js            ← price list, input checks and the price calculation
-├── storage.js           ← saves/reads quote requests in data/requests.json
-├── public/              ← everything the browser downloads
-│   ├── index.html       ← the main page
-│   ├── admin.html       ← the staff page
-│   ├── css/style.css    ← all the styles
-│   ├── js/script.js     ← calculator, live updates, request form
-│   ├── js/admin.js      ← admin page logic
-│   └── favicon.svg      ← the tab icon
-├── data/                ← requests.json is created here (not on GitHub)
-├── docs/                ← screenshots for this README
-├── PLAN.md              ← the project plan
-├── BACKLOG.md           ← the 15 tasks (all ticked)
-└── LEARNING_NOTES.md    ← what I learned in every task
+├── server.js            ← starts Express, connects all the routes
+├── db.js                ← query(): SQLite on your computer, PostgreSQL online
+├── auth.js              ← password hashing, login sessions, requireUser()
+├── billing.js           ← Stripe: checkout, subscriptions, webhook signature check
+├── prices.js            ← default prices, price list checks, the price calculation
+├── seed.js              ← demo companies and a demo customer (npm run seed)
+├── routes/
+│   ├── auth.js          ← /api/auth: sign up, log in, log out, me
+│   ├── companies.js     ← /api/companies: list, search, prices, quote, send request
+│   └── account.js       ← /api/my and /api/billing: dashboard and payments
+└── public/              ← everything the browser downloads
+    ├── index.html       ← home: search + company list + "for companies"
+    ├── company.html     ← one company's price calculator
+    ├── signup.html, login.html
+    ├── dashboard.html   ← "My account" for customers and companies
+    ├── css/style.css
+    └── js/              ← common.js (shared helpers) + one file per page
 ```
 
 ## API
 
-| Method & URL | What it does | Answers |
+| Method & URL | Who | What it does |
 |---|---|---|
-| `GET /api/services` | The price list (the form is built from it) | `200` + JSON |
-| `POST /api/quote` | Checks the choices and calculates the price | `200` + breakdown, or `400` + error message |
-| `POST /api/requests` | Checks name, email and choices; saves the request | `201` + request number, or `400` + error message |
-| `GET /api/requests` | All saved requests, newest first (needs the `x-admin-password` header) | `200`, `401` wrong password, `503` no password set |
-
-Example:
-```
-curl -X POST http://localhost:3000/api/quote \
-  -H "Content-Type: application/json" \
-  -d '{"service":"deep","rooms":3,"frequency":"weekly","extras":["oven"]}'
-```
+| `POST /api/auth/signup` | anyone | Create a customer or company account (and log in) |
+| `POST /api/auth/login` · `POST /api/auth/logout` | anyone | Log in / out (session cookie) |
+| `GET /api/auth/me` | anyone | Who is logged in |
+| `GET /api/companies?search=…` | anyone | Paid companies only, searched by name, city, description |
+| `GET /api/companies/:slug` | anyone | One company with its price list |
+| `POST /api/companies/:slug/quote` | anyone | Calculate a price with that company's prices |
+| `POST /api/companies/:slug/requests` | customer | Send a quote request (price calculated on the server) |
+| `GET /api/my/requests` | logged in | A customer's sent requests, or a company's received requests |
+| `GET /api/my/company` · `PUT /api/my/company` | company | Read / save profile and prices |
+| `POST /api/billing/checkout` | company | Get a Stripe payment page address |
+| `POST /api/billing/confirm` | company | Check with Stripe that the payment went through |
+| `POST /api/billing/portal` | company | Stripe page to change the card or cancel |
+| `POST /api/billing/webhook` | Stripe | Signed messages about payments and cancellations |
 
 ## How the price is calculated
 
@@ -104,60 +136,37 @@ subtotal = base price + (rooms × price per room) + extras
 total    = subtotal − (subtotal × frequency discount)
 ```
 
-| Service | Base | Per room | | Frequency | Discount | | Extra | Price |
-|---|---|---|---|---|---|---|---|---|
-| Standard clean | €40 | €15 | | One-time | 0% | | Inside windows | €20 |
-| Deep clean | €70 | €25 | | Monthly | 5% | | Inside fridge | €15 |
-| Move-out clean | €100 | €30 | | Bi-weekly | 10% | | Inside oven | €25 |
-| | | | | Weekly | 15% | | Laundry | €18 |
+Every company sets its own numbers. Example with the default prices: Deep clean, 3 rooms, weekly, inside oven
+→ 70 + 3×25 + 25 = **€170**, minus 15% (€25.50) = **€144.50**.
 
-**Example:** Deep clean, 3 rooms, weekly, inside oven → 70 + 3×25 + 25 = **€170**, minus 15% (€25.50) = **€144.50**.
+## Security, in plain words
 
-All prices live in one place: [`prices.js`](prices.js). Change a number there and the whole site follows.
-
-## How it was built
-
-The project was built in **15 small tasks, one per hour**, each building on the one before.
-Every task is one commit on GitHub ("Task 1: Project setup" … "Task 15: Final test, README & deploy").
-
-- [BACKLOG.md](BACKLOG.md): the 15 tasks with their "done when" checks
-- [LEARNING_NOTES.md](LEARNING_NOTES.md): a plain-English note for every task (what changed, why, what I learned)
-- [PLAN.md](PLAN.md): the original plan
+- Passwords are never saved, only a salted `scrypt` hash.
+- The login cookie is `HttpOnly` (page scripts can't read it), `SameSite=Lax` (other sites can't use it) and `Secure` online.
+- Prices are always calculated on the server; a price sent by the browser is ignored.
+- A company is only shown when **Stripe** says it has paid: the server asks Stripe itself, and checks the signature of every webhook.
+- Text typed by visitors is shown with `textContent`, so it can never run as code.
 
 ## Testing
 
-Every task was tested before it was saved:
-- **In a real browser (Chromium)** at phone (375px), tablet (768px) and desktop (1280px) widths, with no console errors and no sideways scrolling
-- **The API with curl**, including bad input (unknown service, rooms 0 / 11 / 2.5 / "abc", broken JSON, fake prices)
-- **Price maths** against hand-worked examples (see Task 8 in the learning notes)
-- **Keyboard only** (Tab, arrows, Space, Enter) and **Lighthouse** (Task 14)
-- **Final check:** a fresh copy of the repo, clean install, 36/36 end-to-end checks passed
-
-## Deploy to Vercel (free)
-
-1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub (Hobby plan: free, no card).
-2. Next to **QuickQuote**, click **Import**.
-3. Vercel detects **Express** automatically. Leave the build settings as they are.
-4. Open **Environment Variables** and add `ADMIN_PASSWORD` with a secret value.
-5. Click **Deploy**. After about a minute the site is live at `https://<name>.vercel.app`.
-
-Vercel redeploys automatically every time new code is pushed to `main`.
-
-**How the code supports Vercel:** `server.js` exports the Express `app` (`module.exports = app`) and only
-calls `app.listen()` when you run it yourself. Vercel serves the `public/` folder from its fast network (CDN),
-and `storage.js` saves requests in the temporary folder, because the project folder is read-only on Vercel.
+- **API:** 91 automated checks (search, quotes, bad input, sign up, log in, roles, price editor, Stripe checkout,
+  confirm, webhook signatures, cancel/past-due, demo mode).
+- **Browser (Chromium)** at 375px, 768px and 1280px: the full customer flow (search → prices → sign up → send request
+  → my requests) and company flow (sign up → pay → edit prices → page shows new prices → see requests).
+  No sideways scrolling on any page.
+- Stripe was tested against a fake Stripe server, and PostgreSQL was not tested here: please check both once with
+  your own Stripe test key and database (see "Set up Stripe").
 
 ## Limitations & next steps
 
-This is a student project. These are the honest limits, and how a real version would fix them:
-
 | Limitation | Next step |
 |---|---|
-| On Vercel, requests are saved in a **temporary folder**. They disappear when Vercel restarts the server (after a quiet period or a new deploy), and the admin page may not show a request handled by a different server copy. On your own computer they are kept in `data/requests.json`. | Use a real database (for example PostgreSQL, or Vercel's free storage add-ons). |
-| After a quiet period, the first visit can take a second or two longer while Vercel wakes the server. | This is normal for free hosting. |
-| The admin page uses **one shared password** and doesn't limit guesses. | Proper user accounts, secure login cookies and rate limiting. |
-| No emails are sent. | Email the customer and the business when a request arrives. |
+| No "forgot password" and no email confirmation | Send emails (password reset, new request alerts) |
+| No limit on login attempts | Rate limiting |
+| Companies can't upload a logo or photos | File uploads |
+| Requests have no status (new / done) | Let companies mark and answer requests |
+| The demo accounts share a public password | Don't run `npm run seed` on a real site |
 
 ---
 
-© 2026 QuickQuote · A student project by onurshaqiridev-maker. Sparkle Home Cleaning is a made-up business.
+© 2026 QuickQuote · A student project by onurshaqiridev-maker. The demo companies are made up.

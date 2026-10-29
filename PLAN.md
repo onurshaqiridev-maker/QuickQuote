@@ -1,5 +1,9 @@
 # QuickQuote — Project Plan, Backlog & Hourly Schedule
 
+> **Update:** in Task 15 the hosting changed from Render to **Vercel**, and in Task 16 QuickQuote became a
+> marketplace with company and customer accounts (see README.md and LEARNING_NOTES.md). This plan is kept as
+> the original record of the first 15 tasks.
+
 ## Context
 You need a student website, **QuickQuote**: a service price calculator built in 15 small steps,
 one step per hour, each building on the last and saved. It has to be beginner-friendly, responsive,
