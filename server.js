@@ -2,6 +2,7 @@
 // Express turns Node.js into a web server that answers browser requests.
 const express = require('express');
 const { PRICES, validateChoices, calculateQuote } = require('./prices');
+const { saveRequest } = require('./storage');
 
 const app = express();
 
@@ -36,6 +37,47 @@ app.post('/api/quote', (req, res) => {
 
   const quote = calculateQuote(req.body);
   res.json(quote);
+});
+
+// POST /api/requests: the customer sends their name, email and choices.
+// The server checks everything, calculates the price again and saves it.
+app.post('/api/requests', (req, res) => {
+  const body = req.body || {};
+  const name = typeof body.name === 'string' ? body.name.trim() : '';
+  const email = typeof body.email === 'string' ? body.email.trim() : '';
+
+  if (name.length < 2 || name.length > 100) {
+    return res.status(400).json({ error: 'Please enter your name (2 to 100 characters).' });
+  }
+  // A simple email check: something@something.something, with no spaces
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email) || email.length > 200) {
+    return res.status(400).json({ error: 'Please enter a valid email address, like name@example.com.' });
+  }
+  const choicesError = validateChoices(body.choices);
+  if (choicesError) {
+    return res.status(400).json({ error: choicesError });
+  }
+
+  // Calculate the price on the server: never trust a price sent by the browser
+  const quote = calculateQuote(body.choices);
+
+  const saved = saveRequest({
+    createdAt: new Date().toISOString(), // e.g. "2026-10-29T07:30:00.000Z"
+    name: name,
+    email: email,
+    service: quote.service,
+    rooms: quote.rooms,
+    frequency: quote.frequency,
+    // turn extra ids (like 'oven') into their names (like 'Inside oven')
+    extras: PRICES.extras
+      .filter((extra) => (body.choices.extras || []).includes(extra.id))
+      .map((extra) => extra.name),
+    total: quote.total
+  });
+
+  // 201 = "Created": a new item was saved
+  res.status(201).json({ id: saved.id, message: 'Request saved.' });
 });
 
 // ---------- Error handler ----------

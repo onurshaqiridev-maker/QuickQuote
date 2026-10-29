@@ -28,7 +28,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: bad input never shows `NaN` or crashes the server
 - [x] **Task 11 — Live updates + Reset:** recalculate on every input change; Reset clears form and result
   - Done when: the price updates as you click
-- [ ] **Task 12 — Save requests:** "Request this quote" form (name, email) → `POST /api/requests` → saved to `data/requests.json`
+- [x] **Task 12 — Save requests:** "Request this quote" form (name, email) → `POST /api/requests` → saved to `data/requests.json`
   - Done when: a request appears in the JSON file
 - [ ] **Task 13 — Admin page:** `admin.html` asks for the password, calls `GET /api/requests`, shows a table
   - Done when: wrong password → "Access denied"; right password → table

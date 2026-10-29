@@ -93,10 +93,36 @@
           </div>
         </form>
 
-        <!-- The price appears here and updates live as the form changes -->
-        <div id="result" class="result">
-          <h3>Your estimate</h3>
-          <p>Fill in the form and press "Calculate price".</p>
+        <!-- Right-hand column: the price, and the request form below it -->
+        <div class="result-column">
+
+          <!-- The price appears here and updates live as the form changes -->
+          <div id="result" class="result">
+            <h3>Your estimate</h3>
+            <p>Fill in the form and press "Calculate price".</p>
+          </div>
+
+          <!-- Shown by script.js once there is a valid price -->
+          <form id="request-form" class="request-form" novalidate hidden>
+            <h3>Request this quote</h3>
+            <p class="request-intro">Leave your details and we'll confirm a date within 24 hours.</p>
+
+            <div class="form-group">
+              <label for="customer-name">Your name</label>
+              <input type="text" id="customer-name" name="name" autocomplete="name" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+              <label for="customer-email">Email</label>
+              <input type="email" id="customer-email" name="email" autocomplete="email" required maxlength="200">
+            </div>
+
+            <button type="submit" id="request-button" class="button">Send request</button>
+
+            <!-- Success or error message after sending -->
+            <p id="request-message" class="request-message" hidden></p>
+          </form>
+
         </div>
 
         </div> <!-- end .calculator-layout -->

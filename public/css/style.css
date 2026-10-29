@@ -213,7 +213,9 @@ legend {
 
 /* Dropdown and number box: full width, comfortable to tap */
 select,
-input[type="number"] {
+input[type="number"],
+input[type="text"],
+input[type="email"] {
   width: 100%;
   padding: 0.75rem;
   font: inherit;      /* use the page font instead of the browser's */
@@ -358,6 +360,52 @@ input:focus-visible {
   font-weight: 800;
 }
 
+/* The request form card, under the result card */
+.request-form {
+  margin-top: var(--space-m);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-l) var(--space-m);
+}
+
+.request-form h3 {
+  margin: 0 0 var(--space-s);
+  font-size: 1.25rem;
+}
+
+.request-intro {
+  color: var(--color-muted);
+  margin-bottom: var(--space-m);
+}
+
+.request-form .form-group {
+  margin-bottom: var(--space-m);
+}
+
+.request-form .button {
+  width: 100%;
+  border: none;
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.request-message {
+  margin-top: var(--space-m);
+}
+
+.success-message {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.request-message.error-message {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
 /* TABLET (480px and wider): choices sit in two columns */
 @media (min-width: 480px) {
   .choice-list {
@@ -373,12 +421,13 @@ input:focus-visible {
   }
 
   .quote-form,
-  .result {
+  .result,
+  .request-form {
     padding: var(--space-l);
   }
 
-  /* The result card stays in view while you scroll down the form */
-  .result {
+  /* The price and request form stay in view while you scroll down the form */
+  .result-column {
     position: sticky;
     top: var(--space-m);
   }

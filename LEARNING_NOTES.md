@@ -313,3 +313,35 @@ instantly is faster and feels modern. Reset lets them start again in one click.
 - **`prefers-reduced-motion`:** a media query that respects people who get dizzy from animations.
 - **Tested at 375px, 768px and 1280px:** load = €70, Deep = €120, + weekly = €102, + oven = €123.25,
   10 rooms = €293.25, rooms 0 = red error, Reset = back to the start, then fridge = €85. No console errors.
+
+## Task 12: Save requests
+
+**What changed**
+- New file `storage.js`: a tiny "database" that keeps requests in `data/requests.json`.
+  - `readRequests()` reads the file and returns the list (an empty list if the file doesn't exist yet).
+  - `saveRequest()` adds a request with the next number (`id`) and writes the whole list back.
+- `server.js`: a new route, `POST /api/requests`. It checks the name (2–100 characters), the email
+  (`something@something.something`) and the choices, **calculates the price again on the server**,
+  saves it with the date, and answers **201 Created** with the request number.
+- `public/index.html` + `script.js` + `style.css`: a "Request this quote" card under the price.
+  - It only appears when there is a valid price, and it hides on errors and on Reset.
+  - After sending: "Thank you, Maria! Your request #3 has been sent…", and the boxes are cleared.
+  - The browser uses the same email rule as the server.
+
+**Why**
+A price calculator becomes useful for a business when customers can actually **ask for the job**.
+The saved requests are what the owner will see on the admin page in Task 13.
+
+**What I learned**
+- **`fs` (file system):** `fs.readFileSync` reads a file and `fs.writeFileSync` writes one.
+  `JSON.parse` turns text into a list, and `JSON.stringify(list, null, 2)` turns it back into nicely indented text.
+- **`path.join(__dirname, 'data', 'requests.json')`** builds the file path so it works on any computer.
+- **Never trust the price from the browser:** I sent `"total": 1` with curl, and the server ignored it and saved €144.50.
+- **201 Created** is the status code for "a new thing was saved".
+- **`.trim()`** removes spaces at the start and end, so a name of only spaces counts as empty.
+- **Customer data stays private:** `data/requests.json` is in `.gitignore`, so it is never pushed to GitHub
+  (checked with `git check-ignore`).
+- **Tested:** 11 curl checks (good request, fake total, missing/short/space-only name, bad emails,
+  missing choices, rooms 99, no body). Only the good ones were saved, and the bad ones got clear 400 messages.
+  In the browser at 3 widths: an empty form and bad emails showed messages, a valid request showed the thank-you
+  message with its number, and the card hid on errors and on Reset. No console errors.

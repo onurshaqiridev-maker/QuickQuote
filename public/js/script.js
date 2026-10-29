@@ -14,6 +14,11 @@ const resultBox = document.getElementById('result');
 const roomsError = document.getElementById('rooms-error');
 const calculateButton = document.getElementById('calculate-button');
 const resetButton = document.getElementById('reset-button');
+const requestForm = document.getElementById('request-form');
+const nameInput = document.getElementById('customer-name');
+const emailInput = document.getElementById('customer-email');
+const requestButton = document.getElementById('request-button');
+const requestMessage = document.getElementById('request-message');
 
 // Filled in by loadPrices(); used to check the number of rooms
 let roomLimits = { min: 1, max: 10 };
@@ -190,6 +195,7 @@ async function calculatePrice(isLive) {
 function showError(message) {
   resultBox.innerHTML = '';
   resultBox.classList.add('has-error');
+  requestForm.hidden = true; // no valid price, so nothing to request
 
   const title = document.createElement('h3');
   title.textContent = 'Your estimate';
@@ -204,6 +210,8 @@ function showError(message) {
 function showQuote(quote) {
   resultBox.innerHTML = ''; // clear the old result
   resultBox.classList.remove('has-error');
+  requestForm.hidden = false; // there is a price, so the customer can request it
+  requestMessage.hidden = true; // a new price: hide the old "sent" message
 
   const title = document.createElement('h3');
   title.textContent = 'Your estimate';
@@ -274,6 +282,61 @@ resetButton.addEventListener('click', () => {
   roomsInput.removeAttribute('aria-invalid');
   resultBox.classList.remove('has-error');
   resultBox.innerHTML = '<h3>Your estimate</h3><p>Fill in the form to see your price.</p>';
+  requestForm.hidden = true;
+  requestMessage.hidden = true;
+});
+
+// ---------- 12. Send a quote request (name + email + choices) ----------
+function showRequestMessage(text, isError) {
+  requestMessage.textContent = text;
+  requestMessage.className = isError ? 'request-message error-message' : 'request-message success-message';
+  requestMessage.hidden = false;
+}
+
+requestForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  // Quick checks in the browser (the server checks again)
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  if (name.length < 2) {
+    showRequestMessage('Please enter your name.', true);
+    nameInput.focus();
+    return;
+  }
+  // Same rule as the server: something@something.something, with no spaces
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    showRequestMessage('Please enter a valid email address, like name@example.com.', true);
+    emailInput.focus();
+    return;
+  }
+
+  requestButton.disabled = true;
+  requestButton.textContent = 'Sending…';
+
+  try {
+    const response = await fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // We send the choices, not the price: the server works the price out itself
+      body: JSON.stringify({ name: name, email: email, choices: getChoices() })
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      showRequestMessage(`Thank you, ${name}! Your request #${data.id} has been sent. We'll email you at ${email} within 24 hours.`, false);
+      requestForm.reset(); // clear the name and email boxes
+    } else {
+      showRequestMessage(data.error || 'Sorry, we could not send your request.', true);
+    }
+  } catch (error) {
+    console.error('Could not send the request:', error);
+    showRequestMessage("We can't reach our server right now. Please try again in a moment.", true);
+  } finally {
+    requestButton.disabled = false;
+    requestButton.textContent = 'Send request';
+  }
 });
 
 loadPrices();
