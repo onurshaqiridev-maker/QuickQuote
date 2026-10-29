@@ -14,7 +14,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: all sections visible; button jumps to the calculator
 - [x] **Task 4 — Base CSS:** CSS variables, reset, fonts, `.container`, header/hero/footer styling
   - Done when: page looks clean and branded
-- [ ] **Task 5 — API: price list:** prices in `prices.js`, `GET /api/services` returns them as JSON
+- [x] **Task 5 — API: price list:** prices in `prices.js`, `GET /api/services` returns them as JSON
   - Done when: `/api/services` shows the JSON in the browser
 - [ ] **Task 6 — Calculator form:** form HTML; JS `fetch`es `/api/services` and fills in the options
   - Done when: the form shows options that come from the server

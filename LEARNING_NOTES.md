@@ -95,3 +95,30 @@ Putting the colors and spacing in **variables** means the look can be changed in
   a minimum and maximum.
 - **`scroll-behavior: smooth`** makes the "Get my quote" jump glide instead of snapping.
 - Tested at 375px, 768px and 1280px: no sideways scrolling, no console errors, and the CSS file loads (200 OK).
+
+## Task 5: API: price list
+
+**What changed**
+- New file `prices.js`: the whole price list in one object called `PRICES`:
+  - 3 services, each with a `basePrice` and a `pricePerRoom` (for example, Standard clean: €40 + €15 per room)
+  - 4 frequencies with a discount (Weekly = `0.15` = 15% off)
+  - 4 extras with a fixed price (for example, Inside oven: €25)
+  - room limits (1 to 10) and the currency (EUR)
+- `server.js` has its **first API route**: `GET /api/services` sends `PRICES` back as JSON.
+
+**Why**
+The prices belong on the **server**, not in the browser. In Task 6 the form builds itself from
+this data, and in Task 8 the server calculates the price from the same list, so there is only
+ever one copy of each price.
+
+**What I learned**
+- **API = a menu for programs.** A web page is for people. An API route answers with **data** (JSON) that
+  JavaScript can read. Open http://localhost:3000/api/services in the browser to see it.
+- **JSON** looks like a JavaScript object, but it's text that can travel over the internet.
+  `res.json(PRICES)` turns the object into JSON and sets `Content-Type: application/json`.
+- **`module.exports` and `require()`** split code into files: `prices.js` exports `PRICES`,
+  and `server.js` imports it with `const { PRICES } = require('./prices');`.
+- **GET** means "give me data". A route only answers the method it was made for. Tested:
+  `GET /api/services` gives 200 OK with JSON, `POST /api/services` gives 404, an unknown `/api/nope` gives 404,
+  and the homepage still works.
+- Storing a discount as `0.15` instead of `15` makes the maths simple later: `price × 0.15` = the discount.
