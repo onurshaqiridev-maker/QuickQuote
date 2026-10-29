@@ -37,7 +37,46 @@ function roundMoney(amount) {
   return Math.round(amount * 100) / 100;
 }
 
+// Checks the customer's choices BEFORE calculating.
+// Returns an error message (text) if something is wrong, or null if all is fine.
+function validateChoices(choices) {
+  if (!choices || typeof choices !== 'object') {
+    return 'Please send your choices.';
+  }
+
+  const service = PRICES.services.find((s) => s.id === choices.service);
+  if (!service) {
+    return 'Please choose a type of cleaning.';
+  }
+
+  // Rooms must be a whole number inside the allowed range (1 to 10)
+  const rooms = Number(choices.rooms);
+  const { min, max } = PRICES.rooms;
+  if (choices.rooms === '' || choices.rooms === null || !Number.isInteger(rooms) || rooms < min || rooms > max) {
+    return `Number of rooms must be a whole number from ${min} to ${max}.`;
+  }
+
+  const frequency = PRICES.frequencies.find((f) => f.id === choices.frequency);
+  if (!frequency) {
+    return 'Please choose how often you want the cleaning.';
+  }
+
+  // Extras are optional, but if they are sent they must be a list of known ids
+  if (choices.extras !== undefined) {
+    if (!Array.isArray(choices.extras)) {
+      return 'Extras must be a list.';
+    }
+    const unknown = choices.extras.find((id) => !PRICES.extras.some((e) => e.id === id));
+    if (unknown !== undefined) {
+      return `Unknown extra: ${unknown}.`;
+    }
+  }
+
+  return null; // no problems found
+}
+
 // Works out the price for one quote.
+// Always call validateChoices() first, so the choices are known to be correct.
 // "choices" looks like: { service: 'deep', rooms: 3, frequency: 'weekly', extras: ['oven'] }
 // Returns every line of the bill plus the total.
 function calculateQuote(choices) {
@@ -80,4 +119,4 @@ function calculateQuote(choices) {
 }
 
 // "module.exports" lets other files (like server.js) use these with require()
-module.exports = { PRICES, calculateQuote };
+module.exports = { PRICES, validateChoices, calculateQuote };

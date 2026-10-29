@@ -11,6 +11,11 @@ const frequencyBox = document.getElementById('frequency-options');
 const extrasBox = document.getElementById('extras-options');
 const formMessage = document.getElementById('form-message');
 const resultBox = document.getElementById('result');
+const roomsError = document.getElementById('rooms-error');
+const calculateButton = document.getElementById('calculate-button');
+
+// Filled in by loadPrices(); used to check the number of rooms
+let roomLimits = { min: 1, max: 10 };
 
 // ---------- 2. Helper: show a number as money, e.g. 40 -> "€40.00" ----------
 let currency = 'EUR';
@@ -31,8 +36,9 @@ function buildForm(prices) {
   currency = prices.currency;
 
   // Room limits come from the server too
-  roomsInput.min = prices.rooms.min;
-  roomsInput.max = prices.rooms.max;
+  roomLimits = prices.rooms;
+  roomsInput.min = roomLimits.min;
+  roomsInput.max = roomLimits.max;
 
   // Services -> <option> elements in the dropdown
   prices.services.forEach((service) => {
@@ -89,6 +95,7 @@ async function loadPrices() {
   } catch (error) {
     console.error('Could not load prices:', error);
     formMessage.textContent = 'Sorry, we could not load our prices. Please refresh the page.';
+    calculateButton.disabled = true; // the form is empty, so there is nothing to calculate
   }
 }
 
@@ -106,25 +113,79 @@ function getChoices() {
   };
 }
 
-// ---------- 6. Send the choices to the server and get the price back ----------
+// ---------- 6. Check the form before sending it ----------
+// The server checks everything too, but checking here gives instant feedback.
+function checkRooms() {
+  const rooms = Number(roomsInput.value);
+  const isValid = roomsInput.value !== '' && Number.isInteger(rooms)
+    && rooms >= roomLimits.min && rooms <= roomLimits.max;
+
+  if (isValid) {
+    roomsError.hidden = true;
+    roomsInput.removeAttribute('aria-invalid');
+  } else {
+    roomsError.textContent = `Please enter a whole number of rooms from ${roomLimits.min} to ${roomLimits.max}.`;
+    roomsError.hidden = false;
+    roomsInput.setAttribute('aria-invalid', 'true'); // tells screen readers the field is wrong
+  }
+  return isValid;
+}
+
+// ---------- 7. Send the choices to the server and get the price back ----------
 async function calculatePrice() {
+  if (!checkRooms()) {
+    showError('Please fix the number of rooms first.');
+    roomsInput.focus();
+    return; // stop here: don't send bad data
+  }
+
+  // "Calculating…" state: the button can't be clicked twice
+  calculateButton.disabled = true;
+  calculateButton.textContent = 'Calculating…';
+
   try {
     const response = await fetch('/api/quote', {
       method: 'POST',                                  // POST = we are sending data
       headers: { 'Content-Type': 'application/json' }, // the data is JSON
       body: JSON.stringify(getChoices())               // object -> JSON text
     });
-    const quote = await response.json();
-    showQuote(quote);
+    const data = await response.json();
+
+    if (response.ok) {
+      showQuote(data);
+    } else {
+      // The server said no (status 400) and explained why in data.error
+      showError(data.error || 'Sorry, we could not calculate that price.');
+    }
   } catch (error) {
-    console.error('Could not calculate the price:', error);
-    resultBox.innerHTML = '<h3>Your estimate</h3><p>Sorry, something went wrong. Please try again.</p>';
+    // fetch itself failed: no internet, or the server is down
+    console.error('Could not reach the server:', error);
+    showError("We can't reach our server right now. Please check your internet connection and try again.");
+  } finally {
+    // "finally" runs whether it worked or not: put the button back
+    calculateButton.disabled = false;
+    calculateButton.textContent = 'Calculate price';
   }
 }
 
-// ---------- 7. Show the price breakdown in the result card ----------
+// Shows an error message in the result card
+function showError(message) {
+  resultBox.innerHTML = '';
+  resultBox.classList.add('has-error');
+
+  const title = document.createElement('h3');
+  title.textContent = 'Your estimate';
+  const text = document.createElement('p');
+  text.className = 'error-message';
+  text.textContent = message;
+
+  resultBox.append(title, text);
+}
+
+// ---------- 8. Show the price breakdown in the result card ----------
 function showQuote(quote) {
   resultBox.innerHTML = ''; // clear the old result
+  resultBox.classList.remove('has-error');
 
   const title = document.createElement('h3');
   title.textContent = 'Your estimate';
@@ -165,10 +226,17 @@ function addRow(list, label, amount, className) {
   list.appendChild(row);
 }
 
-// ---------- 8. When the form is submitted, calculate instead of reloading ----------
+// ---------- 9. When the form is submitted, calculate instead of reloading ----------
 form.addEventListener('submit', (event) => {
   event.preventDefault(); // stop the page from reloading
   calculatePrice();
+});
+
+// Hide the rooms message as soon as the number is fixed
+roomsInput.addEventListener('input', () => {
+  if (!roomsError.hidden) {
+    checkRooms();
+  }
 });
 
 loadPrices();

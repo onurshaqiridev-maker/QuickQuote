@@ -15,6 +15,7 @@
   --color-footer: #134e4a;       /* deep teal: footer background */
   --color-border: #d1d5db;       /* light grey: card borders */
   --color-input-border: #6b7280; /* darker grey: input borders, easy to see */
+  --color-error: #b91c1c;        /* dark red: error messages */
 
   --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
@@ -371,4 +372,31 @@ input:focus-visible {
 
 .site-footer a {
   color: var(--color-white);
+}
+
+/* ERRORS: dark red text, easy to read on white and light teal */
+.field-error,
+.result .error-message {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.field-error {
+  margin-top: var(--space-s);
+}
+
+/* A red border on the rooms box when it is wrong */
+input[aria-invalid="true"] {
+  border: 2px solid var(--color-error);
+}
+
+/* The result card turns red-bordered when it shows an error */
+.result.has-error {
+  border-color: var(--color-error);
+}
+
+/* The button while "Calculating…" */
+.button:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }

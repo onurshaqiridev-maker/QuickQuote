@@ -246,3 +246,37 @@ and the browser **shows** the result. The browser never does the price maths its
 - **Tested in the browser** at 375px, 768px and 1280px: Deep clean, 3 rooms, weekly, oven showed
   **€144.50** (same as the hand-worked example in Task 8). The default choices showed **€70.00**.
   No console errors, and the page didn't reload.
+
+## Task 10: Validation & errors
+
+**What changed**
+- **Server (`prices.js` + `server.js`):**
+  - New `validateChoices()` checks every choice *before* calculating: the service exists, rooms is a
+    whole number from 1 to 10, the frequency exists, and extras is a list of known extras.
+  - If something is wrong, `POST /api/quote` answers **400 Bad Request** with a clear message, e.g.
+    `{"error":"Number of rooms must be a whole number from 1 to 10."}`
+  - A new **error handler** at the end of `server.js` turns broken JSON into a 400 message and any
+    unexpected problem into a short 500 message, instead of a long error page.
+- **Browser (`script.js`, `index.html`, `style.css`):**
+  - `checkRooms()` checks the rooms box before sending and shows a red message right under it.
+  - While waiting for the server, the button says **"Calculating…"** and can't be clicked twice.
+  - Server error messages (400) and "server unreachable" errors appear in red in the result card.
+  - If the prices can't load at all, the Calculate button is switched off.
+  - `novalidate` on the form replaces the browser's own pop-ups with these friendlier messages.
+
+**Why**
+Never trust input from the browser: anyone can send anything to an API (I did, with curl).
+The server is the guard, and the browser checks are just for speed and friendliness.
+
+**What I learned**
+- **Status codes:** 200 = OK, **400 = your request was wrong**, 500 = the server had a problem.
+  `res.status(400).json({ error: ... })` sends both the code and a message.
+- **`response.ok`** is `true` for 200–299. When it's `false`, I read `data.error` and show it.
+- **`try / catch / finally`:** `catch` handles "can't reach the server", and `finally` always runs, so it's
+  the right place to put the button back to normal.
+- **`Number.isInteger()`** rejects `2.5`, `NaN` (from text like "abc") and empty values in one check.
+- **`aria-invalid="true"`** and **`aria-describedby`** let screen readers announce that the field is wrong and read the message.
+- **Tested:** 14 curl checks (good input, unknown service/frequency/extra, rooms 0, 11, 2.5, "abc", empty and missing,
+  broken JSON, no body): all bad ones gave 400 with a clear message, and the server stayed up.
+  In the browser at 3 widths: rooms 0, 11, 2.5, empty and -3 all showed the red message, never `NaN`.
+  "Calculating…" appeared while waiting, and the 400 and unreachable messages showed correctly.

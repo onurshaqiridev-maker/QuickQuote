@@ -1,7 +1,7 @@
 // QuickQuote server
 // Express turns Node.js into a web server that answers browser requests.
 const express = require('express');
-const { PRICES, calculateQuote } = require('./prices');
+const { PRICES, validateChoices, calculateQuote } = require('./prices');
 
 const app = express();
 
@@ -27,8 +27,26 @@ app.get('/api/services', (req, res) => {
 // POST /api/quote: the browser sends the customer's choices, the server
 // calculates the price and sends back the full breakdown
 app.post('/api/quote', (req, res) => {
+  // Never trust data from the browser: check it first
+  const error = validateChoices(req.body);
+  if (error) {
+    // 400 = "Bad Request": the problem is in what was sent, not in the server
+    return res.status(400).json({ error: error });
+  }
+
   const quote = calculateQuote(req.body);
   res.json(quote);
+});
+
+// ---------- Error handler ----------
+// Express sends any unexpected error here (for example, broken JSON).
+// We answer with a short JSON message instead of a long error page.
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'The data sent was not valid JSON.' });
+  }
+  console.error(err);
+  res.status(500).json({ error: 'Something went wrong on the server. Please try again.' });
 });
 
 // Start listening for requests.

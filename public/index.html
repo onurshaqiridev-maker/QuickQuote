@@ -53,7 +53,8 @@
         <!-- Wraps the form and the result: stacked on phones, side by side on wider screens -->
         <div class="calculator-layout">
 
-        <form id="quote-form" class="quote-form">
+        <!-- "novalidate" turns off the browser's own pop-up messages: script.js shows friendlier ones -->
+        <form id="quote-form" class="quote-form" novalidate>
 
           <div class="form-group">
             <label for="service">Type of cleaning</label>
@@ -64,7 +65,10 @@
 
           <div class="form-group">
             <label for="rooms">Number of rooms</label>
-            <input type="number" id="rooms" name="rooms" value="2" min="1" max="10" required>
+            <input type="number" id="rooms" name="rooms" value="2" min="1" max="10" required
+                   aria-describedby="rooms-error">
+            <!-- Shown by script.js when the number of rooms is not valid -->
+            <p id="rooms-error" class="field-error" hidden></p>
           </div>
 
           <!-- fieldset + legend group related radio buttons under one title -->
@@ -82,7 +86,7 @@
             </div>
           </fieldset>
 
-          <button type="submit" class="button">Calculate price</button>
+          <button type="submit" id="calculate-button" class="button">Calculate price</button>
         </form>
 
         <!-- The price appears here (Task 9) -->
