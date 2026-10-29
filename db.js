@@ -6,6 +6,7 @@
 //   data/quickquote.db, and there's nothing to install or sign up for.
 // - Online (Vercel): PostgreSQL, a real database server. Set DATABASE_URL to the
 //   connection string you get from your database provider (for example Neon).
+//   (storage_DATABASE_URL also works: that is the name Vercel gave it for us.)
 //
 // The SQL in this project is written so it works on both: we write "$1, $2..."
 // for values, keep JSON as text, keep dates as text and keep money in cents.
@@ -60,11 +61,15 @@ function schema(idColumn) {
 let runQuery; // set up the first time query() is called
 let ready;    // a promise that finishes when the tables exist
 
+// The database address. Vercel adds a prefix if you typed one when connecting
+// the database (we used "storage", so Vercel made "storage_DATABASE_URL").
+const databaseUrl = process.env.DATABASE_URL || process.env.storage_DATABASE_URL;
+
 async function setUp() {
-  if (process.env.DATABASE_URL) {
+  if (databaseUrl) {
     // ---- PostgreSQL (online) ----
     const { Pool } = require('pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 });
+    const pool = new Pool({ connectionString: databaseUrl, max: 3 });
     runQuery = async (sql, params) => (await pool.query(sql, params)).rows;
     for (const sql of schema('SERIAL PRIMARY KEY')) {
       await pool.query(sql);
