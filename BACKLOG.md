@@ -22,7 +22,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: looks good at 375px, 768px and 1280px; no sideways scroll
 - [x] **Task 8 — API: calculate:** `calculateQuote()` in `prices.js`; `POST /api/quote` returns breakdown + total
   - Done when: `curl` tests match hand-worked examples
-- [ ] **Task 9 — Connect form to API:** Calculate sends a `fetch` POST; shows itemized breakdown + total in €
+- [x] **Task 9 — Connect form to API:** Calculate sends a `fetch` POST; shows itemized breakdown + total in €
   - Done when: clicking Calculate shows the server's price
 - [ ] **Task 10 — Validation & errors:** server returns 400 + clear message for bad input; frontend shows friendly errors, "Calculating…" state, "server unreachable" message
   - Done when: bad input never shows `NaN` or crashes the server

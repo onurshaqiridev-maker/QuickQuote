@@ -291,6 +291,45 @@ input:focus-visible {
   color: var(--color-muted);
 }
 
+.result .summary {
+  margin-bottom: var(--space-m);
+}
+
+/* The price breakdown: label on the left, amount on the right */
+.breakdown {
+  list-style: none;
+}
+
+.breakdown li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-m);
+  padding: var(--space-s) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.breakdown li span:last-child {
+  white-space: nowrap; /* keep "€144.50" on one line */
+}
+
+.breakdown .subtotal-row {
+  font-weight: 600;
+}
+
+.breakdown .discount-row {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.breakdown .total-row {
+  border-bottom: none;
+  border-top: 2px solid var(--color-primary);
+  margin-top: var(--space-s);
+  padding-top: var(--space-m);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
 /* TABLET (480px and wider): choices sit in two columns */
 @media (min-width: 480px) {
   .choice-list {

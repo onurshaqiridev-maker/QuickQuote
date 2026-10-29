@@ -219,3 +219,30 @@ and there is only one place where the rules live.
   without needing a web page.
 - **Not finished yet:** sending a service that doesn't exist currently gives a 500 error (the server stays up).
   Task 10 adds proper checks and clear 400 error messages.
+
+## Task 9: Connect form to API
+
+**What changed**
+- `public/js/script.js`, 3 new parts:
+  1. `getChoices()` reads the form: the chosen service, rooms (as a number), the checked frequency,
+     and a list of the ticked extras.
+  2. `calculatePrice()` sends those choices to `POST /api/quote` with `fetch` and waits for the answer.
+  3. `showQuote()` draws the answer in the "Your estimate" card: a summary line, one row per bill line,
+     the subtotal and discount (only when there is a discount), and a big **Total**.
+- `public/css/style.css`: styles for the breakdown (label left, amount right, teal discount, big bold total).
+
+**Why**
+This is where the frontend and backend finally meet. The browser **asks**, the server **calculates**,
+and the browser **shows** the result. The browser never does the price maths itself.
+
+**What I learned**
+- **Sending data with fetch:** a POST needs 3 extra things: `method: 'POST'`, a
+  `Content-Type: application/json` header, and `body: JSON.stringify(data)`, which turns the object into JSON text.
+- **Reading checked inputs:** `querySelector('input[name="frequency"]:checked')` finds the chosen
+  radio, and `querySelectorAll(...)` + `Array.from(...).map(...)` turns the ticked checkboxes into a list of ids.
+- **`Number(roomsInput.value)`:** input values are always **text** ("3"), so I convert them to a number.
+- **`textContent` instead of `innerHTML`** for data: it shows text exactly as it is and can never
+  run hidden code, which makes it the safe choice.
+- **Tested in the browser** at 375px, 768px and 1280px: Deep clean, 3 rooms, weekly, oven showed
+  **€144.50** (same as the hand-worked example in Task 8). The default choices showed **€70.00**.
+  No console errors, and the page didn't reload.
