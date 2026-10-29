@@ -1,108 +1,40 @@
 // QuickQuote server
-// Express turns Node.js into a web server that answers browser requests.
+// A marketplace: cleaning companies pay a monthly fee to be listed, and
+// customers search the companies, see their prices and send quote requests.
 const express = require('express');
 const path = require('path');
-const { PRICES, validateChoices, calculateQuote } = require('./prices');
-const { readRequests, saveRequest } = require('./storage');
+const authRoutes = require('./routes/auth');
+const companyRoutes = require('./routes/companies');
+const accountRoutes = require('./routes/account');
 
 const app = express();
 
-// Hosting services like Render tell us which port to use through the PORT
+// Hosting services like Vercel tell us which port to use through the PORT
 // environment variable. On your own computer it isn't set, so we use 3000.
 const PORT = process.env.PORT || 3000;
 
-// The admin password also comes from an environment variable, so it is never
-// written in the code (and never ends up on GitHub). Set it when starting:
-//   ADMIN_PASSWORD=your-secret npm start
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+// Online, the site runs behind Vercel's servers. This line makes Express trust
+// them, so req.secure and req.protocol show "https" correctly (needed for cookies).
+app.set('trust proxy', 1);
 
 // Send every file in the "public" folder (HTML, CSS, JS) to the browser as-is.
-// Visiting "/" automatically shows public/index.html.
-// path.join(__dirname, ...) finds the folder next to this file, so it works
-// no matter which folder the server is started from (important on Render).
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Read JSON sent by the browser (for POST requests) and put it in req.body
+// The Stripe webhook needs the RAW body (exact bytes) to check the signature,
+// so it is set up BEFORE express.json() turns bodies into objects.
+app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), accountRoutes.stripeWebhook);
+
+// Read JSON sent by the browser and put it in req.body
 app.use(express.json());
 
 // ---------- API routes ----------
-// The API answers with data (JSON) instead of web pages.
+app.use('/api/auth', authRoutes.router);           // sign up, log in, log out, me
+app.use('/api/companies', companyRoutes.router);   // list, search, prices, quote, request
+app.use('/api', accountRoutes.router);             // dashboard and payments
 
-// GET /api/services: the full price list, used to build the calculator form
-app.get('/api/services', (req, res) => {
-  res.json(PRICES);
-});
-
-// POST /api/quote: the browser sends the customer's choices, the server
-// calculates the price and sends back the full breakdown
-app.post('/api/quote', (req, res) => {
-  // Never trust data from the browser: check it first
-  const error = validateChoices(req.body);
-  if (error) {
-    // 400 = "Bad Request": the problem is in what was sent, not in the server
-    return res.status(400).json({ error: error });
-  }
-
-  const quote = calculateQuote(req.body);
-  res.json(quote);
-});
-
-// POST /api/requests: the customer sends their name, email and choices.
-// The server checks everything, calculates the price again and saves it.
-app.post('/api/requests', (req, res) => {
-  const body = req.body || {};
-  const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const email = typeof body.email === 'string' ? body.email.trim() : '';
-
-  if (name.length < 2 || name.length > 100) {
-    return res.status(400).json({ error: 'Please enter your name (2 to 100 characters).' });
-  }
-  // A simple email check: something@something.something, with no spaces
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email) || email.length > 200) {
-    return res.status(400).json({ error: 'Please enter a valid email address, like name@example.com.' });
-  }
-  const choicesError = validateChoices(body.choices);
-  if (choicesError) {
-    return res.status(400).json({ error: choicesError });
-  }
-
-  // Calculate the price on the server: never trust a price sent by the browser
-  const quote = calculateQuote(body.choices);
-
-  const saved = saveRequest({
-    createdAt: new Date().toISOString(), // e.g. "2026-10-29T07:30:00.000Z"
-    name: name,
-    email: email,
-    service: quote.service,
-    rooms: quote.rooms,
-    frequency: quote.frequency,
-    // turn extra ids (like 'oven') into their names (like 'Inside oven')
-    extras: PRICES.extras
-      .filter((extra) => (body.choices.extras || []).includes(extra.id))
-      .map((extra) => extra.name),
-    total: quote.total
-  });
-
-  // 201 = "Created": a new item was saved
-  res.status(201).json({ id: saved.id, message: 'Request saved.' });
-});
-
-// GET /api/requests: the list of saved requests, for the admin page only.
-// The browser must send the password in a header called "x-admin-password".
-app.get('/api/requests', (req, res) => {
-  if (!ADMIN_PASSWORD) {
-    // No password set on the server: keep the data locked
-    return res.status(503).json({ error: 'The admin page is not set up yet (ADMIN_PASSWORD is missing on the server).' });
-  }
-  if (req.get('x-admin-password') !== ADMIN_PASSWORD) {
-    // 401 = "Unauthorized": you need the right password
-    return res.status(401).json({ error: 'Access denied: wrong password.' });
-  }
-
-  // Newest requests first
-  const requests = readRequests().reverse();
-  res.json(requests);
+// Any other /api address doesn't exist
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not found.' });
 });
 
 // ---------- Error handler ----------
@@ -113,12 +45,15 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ error: 'The data sent was not valid JSON.' });
   }
   console.error(err);
+  if (err.isStripeError) {
+    // 502 = "a service we depend on (Stripe) had a problem"
+    return res.status(502).json({ error: 'The payment service had a problem. Please try again.' });
+  }
   res.status(500).json({ error: 'Something went wrong on the server. Please try again.' });
 });
 
-// Start listening for requests, but only when this file is run directly
-// ("npm start" / "node server.js"). On Vercel, Vercel loads the app itself
-// and handles the listening, so we just hand the app over (module.exports).
+// Start listening only when this file is run directly ("npm start").
+// On Vercel, Vercel loads the app itself (module.exports) and handles the listening.
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`QuickQuote running at http://localhost:${PORT}`);

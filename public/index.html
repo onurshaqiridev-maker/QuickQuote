@@ -2,156 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Makes the page fit phone screens instead of showing a zoomed-out desktop page -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickQuote | Sparkle Home Cleaning</title>
-  <!-- The short text Google shows under the page title in search results -->
-  <meta name="description" content="Get an instant price for home cleaning. Choose your service, rooms and extras, and QuickQuote shows your price in seconds.">
-  <!-- Colors the browser bar on some phones -->
+  <title>QuickQuote | Find a cleaning company and get your price</title>
+  <meta name="description" content="Search local cleaning companies, compare their prices and get an instant quote. Cleaning companies can list themselves for €9 a month.">
   <meta name="theme-color" content="#0f766e">
-  <!-- The little icon in the browser tab -->
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/style.css">
-  <!-- "defer" runs the script after the whole page has loaded -->
-  <script src="js/script.js" defer></script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- common.js first: it has the helpers home.js uses -->
+  <script src="/js/common.js" defer></script>
+  <script src="/js/home.js" defer></script>
 </head>
 <body>
 
-  <!-- SKIP LINK: hidden until a keyboard user presses Tab, then it lets them
-       jump straight to the calculator without tabbing through the menu -->
-  <a href="#calculator" class="skip-link">Skip to the calculator</a>
+  <a href="#companies" class="skip-link">Skip to the companies</a>
 
-  <!-- HEADER: logo + navigation, shown at the top of every page -->
   <header class="site-header">
     <div class="container">
-      <a href="#top" class="logo">QuickQuote</a>
+      <a href="/" class="logo">QuickQuote</a>
       <nav aria-label="Main navigation">
         <ul>
-          <li><a href="#top">Home</a></li>
-          <li><a href="#calculator">Get a quote</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#companies">Find a company</a></li>
+          <li><a href="#for-companies">For companies</a></li>
         </ul>
+        <!-- "Log in / Sign up" or "My account / Log out", filled in by common.js -->
+        <ul id="account-menu"></ul>
       </nav>
     </div>
   </header>
 
   <main id="top">
 
-    <!-- HERO: the first thing visitors see, with one clear action -->
     <section class="hero">
       <div class="container">
-        <p class="hero-company">Sparkle Home Cleaning</p>
-        <h1>Know your cleaning price in 30 seconds</h1>
+        <p class="hero-company">Cleaning marketplace</p>
+        <h1>Find a cleaning company and know your price in 30 seconds</h1>
         <p class="hero-text">
-          Choose your service, number of rooms and any extras.
-          QuickQuote shows your price instantly, with no phone calls and no surprises.
+          Search local cleaning companies, see their real prices and request a quote.
+          No phone calls and no surprises.
         </p>
-        <!-- href="#calculator" jumps to the element with id="calculator" below -->
-        <a href="#calculator" class="button">Get my quote</a>
+
+        <!-- The search box. role="search" tells screen readers what this form is for -->
+        <form id="search-form" class="search-form" role="search">
+          <label for="search-input" class="visually-hidden">Search companies by name or city</label>
+          <input type="search" id="search-input" name="search" placeholder="Company name or city, e.g. Skopje" maxlength="60">
+          <button type="submit" class="button">Search</button>
+        </form>
       </div>
     </section>
 
-    <!-- CALCULATOR: the options inside the form are filled in by js/script.js,
-         using the price list from the server (GET /api/services) -->
-    <section id="calculator" class="calculator">
+    <section id="companies" class="calculator">
       <div class="container">
-        <h2>Get your quote</h2>
+        <h2 id="companies-title">All cleaning companies</h2>
+        <!-- "Loading…", "3 companies found" or an error. Read out loud by screen readers -->
+        <p id="companies-message" class="form-message" role="status">Loading companies…</p>
+        <ul id="company-list" class="company-list"></ul>
+      </div>
+    </section>
 
-        <!-- Shows "Loading prices…" or an error if the server can't be reached -->
-        <p id="form-message" class="form-message" role="status">Loading prices…</p>
-
-        <!-- Wraps the form and the result: stacked on phones, side by side on wider screens -->
-        <div class="calculator-layout">
-
-        <!-- "novalidate" turns off the browser's own pop-up messages: script.js shows friendlier ones -->
-        <form id="quote-form" class="quote-form" novalidate>
-
-          <div class="form-group">
-            <label for="service">Type of cleaning</label>
-            <select id="service" name="service" required>
-              <!-- options added by JavaScript -->
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="rooms">Number of rooms</label>
-            <input type="number" id="rooms" name="rooms" value="2" min="1" max="10" required
-                   aria-describedby="rooms-error">
-            <!-- Shown by script.js when the number of rooms is not valid -->
-            <p id="rooms-error" class="field-error" hidden></p>
-          </div>
-
-          <!-- fieldset + legend group related radio buttons under one title -->
-          <fieldset class="form-group">
-            <legend>How often?</legend>
-            <div id="frequency-options" class="choice-list">
-              <!-- radio buttons added by JavaScript -->
-            </div>
-          </fieldset>
-
-          <fieldset class="form-group">
-            <legend>Extras <span class="optional">(optional)</span></legend>
-            <div id="extras-options" class="choice-list">
-              <!-- checkboxes added by JavaScript -->
-            </div>
-          </fieldset>
-
-          <div class="form-actions">
-            <button type="submit" id="calculate-button" class="button">Calculate price</button>
-            <!-- type="button" so it doesn't submit the form; script.js handles the reset -->
-            <button type="button" id="reset-button" class="button button-secondary">Reset</button>
-          </div>
-        </form>
-
-        <!-- Invisible on screen: screen readers announce the new total here
-             each time it changes ("aria-live" = read changes out loud) -->
-        <p id="live-total" class="visually-hidden" aria-live="polite"></p>
-
-        <!-- Right-hand column: the price, and the request form below it -->
-        <div class="result-column">
-
-          <!-- The price appears here and updates live as the form changes -->
-          <div id="result" class="result">
-            <h3>Your estimate</h3>
-            <p>Fill in the form and press "Calculate price".</p>
-          </div>
-
-          <!-- Shown by script.js once there is a valid price -->
-          <form id="request-form" class="request-form" novalidate hidden>
-            <h3>Request this quote</h3>
-            <p class="request-intro">Leave your details and we'll confirm a date within 24 hours.</p>
-
-            <div class="form-group">
-              <label for="customer-name">Your name</label>
-              <input type="text" id="customer-name" name="name" autocomplete="name" required maxlength="100">
-            </div>
-
-            <div class="form-group">
-              <label for="customer-email">Email</label>
-              <input type="email" id="customer-email" name="email" autocomplete="email" required maxlength="200">
-            </div>
-
-            <button type="submit" id="request-button" class="button">Send request</button>
-
-            <!-- Success or error message after sending -->
-            <p id="request-message" class="request-message" aria-live="polite" hidden></p>
-          </form>
-
+    <section id="for-companies" class="for-companies">
+      <div class="container">
+        <h2>Run a cleaning company?</h2>
+        <p class="hero-text">Get found by customers who already know your price. List your company on QuickQuote.</p>
+        <div class="plan-card">
+          <p class="plan-price"><span>€9</span> / month</p>
+          <ul class="plan-features">
+            <li>Your own page with an instant price calculator</li>
+            <li>Set your own services, prices, discounts and extras</li>
+            <li>Receive quote requests from customers</li>
+            <li>Cancel any time</li>
+          </ul>
+          <a href="/signup.html?role=company" class="button">List my company</a>
         </div>
-
-        </div> <!-- end .calculator-layout -->
       </div>
     </section>
 
   </main>
 
-  <!-- FOOTER: contact details and copyright -->
   <footer id="contact" class="site-footer">
     <div class="container">
-      <p><strong>Sparkle Home Cleaning</strong></p>
-      <p>Email: <a href="mailto:hello@sparkle-cleaning.example">hello@sparkle-cleaning.example</a></p>
-      <p>&copy; 2026 QuickQuote · A student project</p>
-      <p><a href="admin.html">Staff login</a></p>
+      <p><strong>QuickQuote</strong></p>
+      <p>&copy; 2026 QuickQuote · A student project. The demo companies are made up.</p>
     </div>
   </footer>
 

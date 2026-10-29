@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- company.js changes the title to the company's name -->
+  <title>Company prices | QuickQuote</title>
+  <meta name="description" content="See this cleaning company's prices and get an instant quote on QuickQuote.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/company.js" defer></script>
+</head>
+<body>
+
+  <a href="#calculator" class="skip-link">Skip to the calculator</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">QuickQuote</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#companies">Find a company</a></li>
+          <li><a href="/#for-companies">For companies</a></li>
+        </ul>
+        <ul id="account-menu"></ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- The company's name, city and description (filled in by company.js) -->
+    <section class="hero company-hero">
+      <div class="container">
+        <p class="hero-company" id="company-city"></p>
+        <h1 id="company-name">Loading…</h1>
+        <p class="hero-text" id="company-description"></p>
+        <!-- Shown to the owner while the company has not paid yet -->
+        <p id="preview-note" class="notice" hidden>
+          Preview: customers can't see this page until your subscription is active.
+          <a href="/dashboard.html">Go to your dashboard</a>.
+        </p>
+      </div>
+    </section>
+
+    <section id="calculator" class="calculator">
+      <div class="container">
+        <h2>Get your quote</h2>
+
+        <p id="form-message" class="form-message" role="status">Loading prices…</p>
+
+        <div class="calculator-layout" id="calculator-layout">
+
+        <form id="quote-form" class="quote-form" novalidate>
+          <div class="form-group">
+            <label for="service">Type of cleaning</label>
+            <select id="service" name="service" required></select>
+          </div>
+
+          <div class="form-group">
+            <label for="rooms">Number of rooms</label>
+            <input type="number" id="rooms" name="rooms" value="2" min="1" max="10" required
+                   aria-describedby="rooms-error">
+            <p id="rooms-error" class="field-error" hidden></p>
+          </div>
+
+          <fieldset class="form-group">
+            <legend>How often?</legend>
+            <div id="frequency-options" class="choice-list"></div>
+          </fieldset>
+
+          <!-- Hidden by company.js if the company has no extras -->
+          <fieldset class="form-group" id="extras-group">
+            <legend>Extras <span class="optional">(optional)</span></legend>
+            <div id="extras-options" class="choice-list"></div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit" id="calculate-button" class="button">Calculate price</button>
+            <button type="button" id="reset-button" class="button button-secondary">Reset</button>
+          </div>
+        </form>
+
+        <!-- Invisible: screen readers announce the new total here -->
+        <p id="live-total" class="visually-hidden" aria-live="polite"></p>
+
+        <div class="result-column">
+          <div id="result" class="result">
+            <h3>Your estimate</h3>
+            <p>Fill in the form and press "Calculate price".</p>
+          </div>
+
+          <!-- Request this quote: what's inside depends on who is logged in -->
+          <div id="request-box" class="request-form" hidden>
+            <h3>Request this quote</h3>
+            <div id="request-content"></div>
+            <p id="request-message" class="request-message" aria-live="polite" hidden></p>
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>QuickQuote</strong></p>
+      <p>&copy; 2026 QuickQuote · A student project</p>
+    </div>
+  </footer>
+
+</body>
+</html>

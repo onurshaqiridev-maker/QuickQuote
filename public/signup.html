@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign up | QuickQuote</title>
+  <meta name="description" content="Create a free customer account, or list your cleaning company on QuickQuote for €9 a month.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js" defer></script>
+  <script src="/js/signup.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">QuickQuote</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#companies">Find a company</a></li>
+        </ul>
+        <ul id="account-menu"></ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="container">
+      <form id="signup-form" class="auth-card" novalidate>
+        <h1>Create your account</h1>
+
+        <!-- Two kinds of account. The company fields below appear only for "company". -->
+        <fieldset class="form-group">
+          <legend>I am…</legend>
+          <div class="choice-list">
+            <label class="choice"><input type="radio" name="role" value="customer" checked> A customer (free)</label>
+            <label class="choice"><input type="radio" name="role" value="company"> A cleaning company (€9/month)</label>
+          </div>
+        </fieldset>
+
+        <div id="company-fields" hidden>
+          <div class="form-group">
+            <label for="company-name">Company name</label>
+            <input type="text" id="company-name" name="companyName" maxlength="60" autocomplete="organization">
+          </div>
+          <div class="form-group">
+            <label for="company-city">City</label>
+            <input type="text" id="company-city" name="city" maxlength="60" autocomplete="address-level2">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" maxlength="100" autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" maxlength="200" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password <span class="optional">(at least 8 characters)</span></label>
+          <input type="password" id="password" name="password" minlength="8" autocomplete="new-password" required>
+        </div>
+
+        <!-- For companies: explains the payment step -->
+        <p id="company-note" class="notice" hidden>
+          After signing up you'll pay €9/month with Stripe (test mode: no real money).
+          Your company appears in the search as soon as the payment goes through.
+        </p>
+
+        <button type="submit" id="signup-button" class="button button-full">Create account</button>
+        <p id="signup-message" class="request-message error-message" role="alert" hidden></p>
+
+        <p class="auth-switch">Already have an account? <a id="login-link" href="/login.html">Log in</a></p>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 QuickQuote · A student project</p>
+    </div>
+  </footer>
+
+</body>
+</html>

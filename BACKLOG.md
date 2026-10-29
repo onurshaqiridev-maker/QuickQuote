@@ -34,5 +34,11 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: wrong password → "Access denied"; right password → table
 - [x] **Task 14 — Accessibility & polish:** `aria-live` result, visible focus, contrast, meta description, favicon, small transitions
   - Done when: keyboard-only use works; Lighthouse accessibility ≥ 90
-- [ ] **Task 15 — Final test, README & deploy:** test everything; full README; deploy to Render
+- [x] **Task 15 — Final test, README & deploy:** test everything; full README; deploy to Vercel (changed from Render)
   - Done when: live URL works end to end; submission checklist done
+
+## Version 2: the marketplace
+
+- [x] **Task 16 — Marketplace with accounts and payments:** companies sign up and pay €9/month (Stripe test mode) to be listed;
+  customers sign up, search companies, see each company's prices and send requests; dashboards for both
+  - Done when: a paid company appears in the search, an unpaid or cancelled one doesn't, and a customer's request shows on both dashboards
