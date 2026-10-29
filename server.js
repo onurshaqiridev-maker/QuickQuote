@@ -1,6 +1,7 @@
 // QuickQuote server
 // Express turns Node.js into a web server that answers browser requests.
 const express = require('express');
+const path = require('path');
 const { PRICES, validateChoices, calculateQuote } = require('./prices');
 const { readRequests, saveRequest } = require('./storage');
 
@@ -17,7 +18,9 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Send every file in the "public" folder (HTML, CSS, JS) to the browser as-is.
 // Visiting "/" automatically shows public/index.html.
-app.use(express.static('public'));
+// path.join(__dirname, ...) finds the folder next to this file, so it works
+// no matter which folder the server is started from (important on Render).
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Read JSON sent by the browser (for POST requests) and put it in req.body
 app.use(express.json());
