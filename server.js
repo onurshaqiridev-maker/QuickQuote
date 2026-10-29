@@ -2,13 +2,18 @@
 // Express turns Node.js into a web server that answers browser requests.
 const express = require('express');
 const { PRICES, validateChoices, calculateQuote } = require('./prices');
-const { saveRequest } = require('./storage');
+const { readRequests, saveRequest } = require('./storage');
 
 const app = express();
 
 // Hosting services like Render tell us which port to use through the PORT
 // environment variable. On your own computer it isn't set, so we use 3000.
 const PORT = process.env.PORT || 3000;
+
+// The admin password also comes from an environment variable, so it is never
+// written in the code (and never ends up on GitHub). Set it when starting:
+//   ADMIN_PASSWORD=your-secret npm start
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Send every file in the "public" folder (HTML, CSS, JS) to the browser as-is.
 // Visiting "/" automatically shows public/index.html.
@@ -78,6 +83,23 @@ app.post('/api/requests', (req, res) => {
 
   // 201 = "Created": a new item was saved
   res.status(201).json({ id: saved.id, message: 'Request saved.' });
+});
+
+// GET /api/requests: the list of saved requests, for the admin page only.
+// The browser must send the password in a header called "x-admin-password".
+app.get('/api/requests', (req, res) => {
+  if (!ADMIN_PASSWORD) {
+    // No password set on the server: keep the data locked
+    return res.status(503).json({ error: 'The admin page is not set up yet (ADMIN_PASSWORD is missing on the server).' });
+  }
+  if (req.get('x-admin-password') !== ADMIN_PASSWORD) {
+    // 401 = "Unauthorized": you need the right password
+    return res.status(401).json({ error: 'Access denied: wrong password.' });
+  }
+
+  // Newest requests first
+  const requests = readRequests().reverse();
+  res.json(requests);
 });
 
 // ---------- Error handler ----------

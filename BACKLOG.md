@@ -30,7 +30,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: the price updates as you click
 - [x] **Task 12 — Save requests:** "Request this quote" form (name, email) → `POST /api/requests` → saved to `data/requests.json`
   - Done when: a request appears in the JSON file
-- [ ] **Task 13 — Admin page:** `admin.html` asks for the password, calls `GET /api/requests`, shows a table
+- [x] **Task 13 — Admin page:** `admin.html` asks for the password, calls `GET /api/requests`, shows a table
   - Done when: wrong password → "Access denied"; right password → table
 - [ ] **Task 14 — Accessibility & polish:** `aria-live` result, visible focus, contrast, meta description, favicon, small transitions
   - Done when: keyboard-only use works; Lighthouse accessibility ≥ 90

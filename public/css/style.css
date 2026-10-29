@@ -406,10 +406,106 @@ input:focus-visible {
   font-weight: 600;
 }
 
+/* ADMIN PAGE */
+.admin-main {
+  padding: var(--space-xl) 0;
+  min-height: 60vh; /* keeps the footer near the bottom on a short page */
+}
+
+.admin-main h1 {
+  font-size: 2rem;
+  margin-bottom: var(--space-s);
+}
+
+.admin-intro {
+  color: var(--color-muted);
+  margin-bottom: var(--space-l);
+}
+
+.login-form {
+  max-width: 480px;
+  margin-bottom: var(--space-l);
+}
+
+/* Password box and button: stacked on phones, side by side from 480px */
+.login-row {
+  display: grid;
+  gap: var(--space-s);
+}
+
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  font: inherit;
+  font-size: 1rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius);
+}
+
+.login-form .button {
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-message {
+  margin-top: var(--space-s);
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.requests-count {
+  color: var(--color-muted);
+  margin-bottom: var(--space-s);
+}
+
+/* On small screens the table scrolls sideways inside this box */
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse; /* one line between cells instead of two */
+  font-size: 0.95rem;
+}
+
+.requests-table th,
+.requests-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap; /* keep each value on one line */
+}
+
+.requests-table th {
+  background-color: var(--color-soft);
+  font-weight: 700;
+}
+
+/* Name (3rd column) and Extras (8th column) can be long: let them wrap */
+.requests-table td:nth-child(3),
+.requests-table td:nth-child(8) {
+  white-space: normal;
+  min-width: 8rem;
+}
+
+/* Every second row slightly shaded, so rows are easy to follow */
+.requests-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
 /* TABLET (480px and wider): choices sit in two columns */
 @media (min-width: 480px) {
   .choice-list {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .login-row {
+    grid-template-columns: 1fr auto; /* box takes the space, button fits its text */
   }
 }
 

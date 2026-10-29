@@ -345,3 +345,46 @@ The saved requests are what the owner will see on the admin page in Task 13.
   missing choices, rooms 99, no body). Only the good ones were saved, and the bad ones got clear 400 messages.
   In the browser at 3 widths: an empty form and bad emails showed messages, a valid request showed the thank-you
   message with its number, and the card hid on errors and on Reset. No console errors.
+
+## Task 13: Admin page
+
+**What changed**
+- `server.js`: a new route, `GET /api/requests`, that returns the saved requests (newest first), but **only**
+  if the browser sends the right password in a header called `x-admin-password`.
+  - The password comes from the `ADMIN_PASSWORD` **environment variable**, never from the code.
+  - No password set on the server → **503** ("not set up yet"), so the data stays locked by default.
+  - Missing or wrong password → **401 Access denied**.
+- New page `public/admin.html` + `public/js/admin.js`:
+  - A password box and a "Show requests" button.
+  - Wrong password: a red "Access denied: wrong password." and the table stays hidden.
+  - Right password: a table with #, date, name, email, service, rooms, how often, extras and total.
+  - `<meta name="robots" content="noindex">` asks Google not to list this page.
+- `public/css/style.css`: admin styles. On phones the table scrolls sideways inside its own box,
+  so the page itself never scrolls sideways.
+
+**How to run it with a password (on your computer)**
+```
+ADMIN_PASSWORD=choose-a-secret npm start
+```
+(On Windows PowerShell: `$env:ADMIN_PASSWORD="choose-a-secret"; npm start`.) Then open http://localhost:3000/admin.html.
+
+**Why**
+The business owner needs to see who asked for a quote, but customer names and emails are private.
+A password keeps strangers out.
+
+**What I learned**
+- **Environment variables** keep secrets out of the code: `process.env.ADMIN_PASSWORD`.
+  I searched the repo with `git grep` and the test password isn't in it anywhere.
+- **Headers:** extra information sent with a request. The password goes in a header, not in the URL,
+  because URLs get saved in browser history and server logs.
+- **401 vs 503:** 401 = "you're not allowed" (wrong password), 503 = "this isn't available right now".
+- **XSS (cross-site scripting):** I saved a request with the "name" `<img src=x onerror=alert(1)>`.
+  The table shows it as plain text, and no code ran, because every cell uses `textContent`, not `innerHTML`.
+- **`<input type="password">`** hides what you type, and `autocomplete="current-password"` lets password managers help.
+- **Tables:** `<thead>`/`<tbody>`, `scope="col"` on headings for screen readers, `border-collapse`,
+  and zebra stripes with `tr:nth-child(even)`.
+- **Honest limits:** this is a simple, student-level lock. A real business would add proper logins,
+  HTTPS-only cookies and a limit on password guesses.
+- **Tested:** curl with no password set (503), no header (401), wrong password (401) and right password (list, newest first).
+  In the browser at 375px, 768px and 1280px: an empty password and a wrong password showed messages, and the right password showed both
+  test requests with correct totals (€55.00 and €157.25). No sideways page scroll, and no code ran from the fake name.
