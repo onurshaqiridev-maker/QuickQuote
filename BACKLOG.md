@@ -16,7 +16,7 @@ Full details for every task are in [PLAN.md](PLAN.md).
   - Done when: page looks clean and branded
 - [x] **Task 5 — API: price list:** prices in `prices.js`, `GET /api/services` returns them as JSON
   - Done when: `/api/services` shows the JSON in the browser
-- [ ] **Task 6 — Calculator form:** form HTML; JS `fetch`es `/api/services` and fills in the options
+- [x] **Task 6 — Calculator form:** form HTML; JS `fetch`es `/api/services` and fills in the options
   - Done when: the form shows options that come from the server
 - [ ] **Task 7 — Form styling + responsive layout:** inputs, buttons, focus states, result card; mobile-first; side by side on wide screens
   - Done when: looks good at 375px, 768px and 1280px; no sideways scroll

@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuickQuote | Sparkle Home Cleaning</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- "defer" runs the script after the whole page has loaded -->
+  <script src="js/script.js" defer></script>
 </head>
 <body>
 
@@ -39,11 +41,52 @@
       </div>
     </section>
 
-    <!-- CALCULATOR: the form is added in Task 6 -->
+    <!-- CALCULATOR: the options inside the form are filled in by js/script.js,
+         using the price list from the server (GET /api/services) -->
     <section id="calculator" class="calculator">
       <div class="container">
         <h2>Get your quote</h2>
-        <p>The price calculator is coming soon.</p>
+
+        <!-- Shows "Loading prices…" or an error if the server can't be reached -->
+        <p id="form-message" class="form-message">Loading prices…</p>
+
+        <form id="quote-form" class="quote-form">
+
+          <div class="form-group">
+            <label for="service">Type of cleaning</label>
+            <select id="service" name="service" required>
+              <!-- options added by JavaScript -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="rooms">Number of rooms</label>
+            <input type="number" id="rooms" name="rooms" value="2" min="1" max="10" required>
+          </div>
+
+          <!-- fieldset + legend group related radio buttons under one title -->
+          <fieldset class="form-group">
+            <legend>How often?</legend>
+            <div id="frequency-options" class="choice-list">
+              <!-- radio buttons added by JavaScript -->
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Extras <span class="optional">(optional)</span></legend>
+            <div id="extras-options" class="choice-list">
+              <!-- checkboxes added by JavaScript -->
+            </div>
+          </fieldset>
+
+          <button type="submit" class="button">Calculate price</button>
+        </form>
+
+        <!-- The price appears here (Task 9) -->
+        <div id="result" class="result">
+          <h3>Your estimate</h3>
+          <p>Fill in the form and press "Calculate price".</p>
+        </div>
       </div>
     </section>
 

@@ -122,3 +122,34 @@ ever one copy of each price.
   `GET /api/services` gives 200 OK with JSON, `POST /api/services` gives 404, an unknown `/api/nope` gives 404,
   and the homepage still works.
 - Storing a discount as `0.15` instead of `15` makes the maths simple later: `price × 0.15` = the discount.
+
+## Task 6: Calculator form
+
+**What changed**
+- `public/index.html`: the calculator now has a real `<form>` with:
+  - a dropdown (`<select>`) for the type of cleaning
+  - a number box for rooms (1–10)
+  - radio buttons for "How often?" and checkboxes for extras, each group inside a `<fieldset>` with a `<legend>` title
+  - a "Calculate price" button and an empty "Your estimate" box (the price arrives in Task 9)
+- New file `public/js/script.js` (linked with `<script src="js/script.js" defer>`):
+  1. `fetch('/api/services')` asks the server for the price list.
+  2. `buildForm()` loops over the data and creates the options, radios and checkboxes.
+  3. If the server can't be reached, it shows "Sorry, we could not load our prices."
+
+**Why**
+The HTML contains **no prices at all**. Everything shown comes from `prices.js` on the server.
+If a price changes, the form updates by itself.
+
+**What I learned**
+- **`fetch()` + `async/await`:** `await fetch(url)` waits for the server's answer, and
+  `await response.json()` turns the JSON text into a JavaScript object.
+- **`try { } catch { }`:** if anything fails (no internet, server down), the `catch` part runs
+  instead of the page breaking. Tested by blocking the request: the friendly message appeared.
+- **Creating HTML with JavaScript:** `document.createElement('option')`, set `.value` and
+  `.textContent`, then `appendChild()` puts it on the page. `forEach` repeats this for every item.
+- **Radio vs. checkbox:** radios with the same `name` let you pick only one; checkboxes let you pick many.
+- **Label wrapping:** putting the `<input>` inside its `<label>` means clicking the text ticks the box.
+  This makes bigger tap targets on phones.
+- **`event.preventDefault()`** stops a form from reloading the page when you submit it.
+- **`defer`** on the script tag waits until the HTML is loaded, so `getElementById` finds the elements.
+- **`Intl.NumberFormat`** formats money properly: `40` becomes `€40.00`.
