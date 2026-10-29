@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "QuickQuote: instant price estimates for Sparkle Home Cleaning (student project).",
   "main": "server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node server.js"
   },

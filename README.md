@@ -3,7 +3,7 @@
 **Instant price estimates for Sparkle Home Cleaning** (a made-up local business).
 A student project: a responsive website with a small Node.js + Express backend.
 
-🔗 **Live site:** _added after deploying to Render (see [Deploy](#deploy-to-render))_
+🔗 **Live site:** _added after deploying to Vercel (see [Deploy](#deploy-to-vercel-free))_
 📁 **Code:** https://github.com/onurshaqiridev-maker/QuickQuote
 
 | Desktop | Phone |
@@ -36,7 +36,7 @@ A student project: a responsive website with a small Node.js + Express backend.
 | Frontend | HTML, CSS, JavaScript (no frameworks) |
 | Backend | Node.js + Express 5 |
 | Storage | A JSON file (`data/requests.json`) |
-| Hosting | Render (free web service) |
+| Hosting | Vercel (free Hobby plan) |
 
 ## Run it on your computer
 
@@ -133,19 +133,19 @@ Every task was tested before it was saved:
 - **Keyboard only** (Tab, arrows, Space, Enter) and **Lighthouse** (Task 14)
 - **Final check:** a fresh copy of the repo, clean install, 36/36 end-to-end checks passed
 
-## Deploy to Render
+## Deploy to Vercel (free)
 
-1. Sign in at [render.com](https://render.com) with your GitHub account (free).
-2. **New** → **Web Service** → choose the **QuickQuote** repository.
-3. Settings:
-   - **Language/Runtime:** Node
-   - **Build command:** `npm install`
-   - **Start command:** `npm start`
-   - **Instance type:** Free
-4. **Environment variables** → add `ADMIN_PASSWORD` with a secret value.
-5. **Create Web Service**. After a few minutes the site is live at `https://<name>.onrender.com`.
+1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub (Hobby plan: free, no card).
+2. Next to **QuickQuote**, click **Import**.
+3. Vercel detects **Express** automatically. Leave the build settings as they are.
+4. Open **Environment Variables** and add `ADMIN_PASSWORD` with a secret value.
+5. Click **Deploy**. After about a minute the site is live at `https://<name>.vercel.app`.
 
-Render redeploys automatically every time new code is pushed to `main`.
+Vercel redeploys automatically every time new code is pushed to `main`.
+
+**How the code supports Vercel:** `server.js` exports the Express `app` (`module.exports = app`) and only
+calls `app.listen()` when you run it yourself. Vercel serves the `public/` folder from its fast network (CDN),
+and `storage.js` saves requests in the temporary folder, because the project folder is read-only on Vercel.
 
 ## Limitations & next steps
 
@@ -153,8 +153,8 @@ This is a student project. These are the honest limits, and how a real version w
 
 | Limitation | Next step |
 |---|---|
-| On Render's free plan the server **sleeps after ~15 minutes** without visitors, so the first visit can take 30–60 seconds. | Open the site once before showing it, or use a paid plan. |
-| Requests are saved in a **JSON file**, which is **wiped when Render restarts or redeploys**. | Use a real database (for example PostgreSQL). |
+| On Vercel, requests are saved in a **temporary folder**. They disappear when Vercel restarts the server (after a quiet period or a new deploy), and the admin page may not show a request handled by a different server copy. On your own computer they are kept in `data/requests.json`. | Use a real database (for example PostgreSQL, or Vercel's free storage add-ons). |
+| After a quiet period, the first visit can take a second or two longer while Vercel wakes the server. | This is normal for free hosting. |
 | The admin page uses **one shared password** and doesn't limit guesses. | Proper user accounts, secure login cookies and rate limiting. |
 | No emails are sent. | Email the customer and the business when a request arrives. |
 

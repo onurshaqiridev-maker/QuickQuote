@@ -2,10 +2,14 @@
 // Saves quote requests in a JSON file: a very simple "database".
 // fs = "file system": Node's built-in tool for reading and writing files.
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
-// The full path to data/requests.json, wherever the project folder is
-const DATA_FILE = path.join(__dirname, 'data', 'requests.json');
+// The full path to data/requests.json, wherever the project folder is.
+// On Vercel the project folder is read-only, so there we use the temporary
+// folder instead (Vercel sets the VERCEL environment variable automatically).
+const DATA_FOLDER = process.env.VERCEL ? path.join(os.tmpdir(), 'quickquote-data') : path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_FOLDER, 'requests.json');
 
 // Returns every saved request as a list (an empty list if there are none yet)
 function readRequests() {

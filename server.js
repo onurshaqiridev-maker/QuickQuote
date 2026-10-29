@@ -116,7 +116,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on the server. Please try again.' });
 });
 
-// Start listening for requests.
-app.listen(PORT, () => {
-  console.log(`QuickQuote running at http://localhost:${PORT}`);
-});
+// Start listening for requests, but only when this file is run directly
+// ("npm start" / "node server.js"). On Vercel, Vercel loads the app itself
+// and handles the listening, so we just hand the app over (module.exports).
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`QuickQuote running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
