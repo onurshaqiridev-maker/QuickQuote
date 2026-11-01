@@ -69,8 +69,8 @@ backend/
 │   │       ├── authenticate.ts          # Reads the session cookie → req.user
 │   │       ├── require-role.ts          # requireRole('admin')
 │   │       ├── require-verified-email.ts
-│   │       ├── load-business.ts         # Business owner → req.businessId
-│   │       ├── upload.ts                # Multer: images only, max 5 MB
+│   │       ├── upload.ts                # Multer: one image in memory, max 5 MB
+│   │       ├── load-business.ts         # Finds the logged-in owner's business -> req.businessId
 │   │       ├── rate-limit.ts            # express-rate-limit settings
 │   │       ├── request-logger.ts        # One log line per request
 │   │       ├── error-handler.ts         # Domain error code → HTTP status + JSON error
@@ -110,7 +110,7 @@ backend/
 │   │   │       ├── layout.ts            # Shared header/footer/styles
 │   │   │       ├── index.ts             # Template name → template function
 │   │   │       └── *.templates.ts       # The emails, grouped by topic (account, contact, …)
-│   │   ├── storage.service.ts           # Saves/deletes uploaded files (local disk now, S3 later)
+│   │   ├── storage.service.ts           # Checks (real file type, size) and saves/deletes uploaded images
 │   │   ├── contact.service.ts           # Contact form → email job
 │   │   ├── activity.service.ts          # Writes activity log entries
 │   │   ├── admin.service.ts             # Admin overview numbers
@@ -129,8 +129,7 @@ backend/
 │   │       ├── category.repository.ts
 │   │       ├── photo.repository.ts
 │   │       ├── offering.repository.ts          # SQL for the "services" table
-│   │       ├── working-hours.repository.ts
-│   │       ├── blocked-time.repository.ts
+│   │       ├── schedule.repository.ts          # working_hours + blocked_times
 │   │       ├── reservation.repository.ts
 │   │       ├── quote.repository.ts
 │   │       ├── plan.repository.ts
@@ -212,6 +211,7 @@ frontend/
     │   ├── client.ts              # fetch wrapper: JSON, login cookie, ApiError with field errors
     │   ├── auth.api.ts            # register, login, logout, me, verify email, passwords, account settings
     │   ├── public.api.ts          # categories, plans, contact form
+    │   ├── business.api.ts        # business dashboard: overview, profile, photos, services, hours, settings
     │   └── admin.api.ts           # email queue stats, list, retry
     ├── context/
     │   ├── auth-context.ts        # The shape of the auth context
@@ -221,10 +221,11 @@ frontend/
     │   └── useApi.ts              # const { data, loading, error, reload } = useApi('plans', () => publicApi.plans())
     ├── components/
     │   ├── ui/                    # Button, TextField/SelectField/TextAreaField, Card, Alert, Badge/StatusBadge,
-    │   │                          # Spinner, PageHeader, ComingSoon, Logo
+    │   │                          # Spinner, PageHeader, ComingSoon, Logo, CategoryIcon (lucide icons)
     │   ├── layout/                # PublicLayout, DashboardLayout, Navbar, Footer, AuthCard,
     │   │                          # EmailVerificationBanner, ScrollToTop
     │   ├── guards/                # ProtectedRoute (login + role), GuestOnlyRoute
+    │   ├── business/              # GoLiveChecklist, CategoryPicker, UsageMeter, ImageUploadButton
     │   └── account/               # AccountSettings (name, phone, password), shared by customers and owners
     ├── pages/
     │   ├── public/                # HomePage, ExplorePage, BusinessDetailsPage, AboutPage, ContactPage, PricingPage
@@ -239,7 +240,7 @@ frontend/
     │   │                          # ManageCategoriesPage
     │   └── NotFoundPage.tsx
     ├── types/api.ts               # TypeScript types matching the API responses
-    ├── utils/                     # formatPrice(), formatDateTime(), homePathForRole()
+    ├── utils/                     # format.ts (prices, durations, dates), roles.ts, timezones.ts
     ├── styles/index.css           # Tailwind + brand colours
     └── test/setup.ts              # Test helpers (jest-dom matchers)
 ```

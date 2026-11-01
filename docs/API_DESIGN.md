@@ -174,10 +174,11 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/business/overview` | Business | Stats, today's appointments, pending items, subscription status, **go-live checklist** |
+| `GET` | `/api/business/overview` | Business | **Go-live checklist** (each item: `key`, `label`, `done`, `requiredToPublish`), `canPublish`, `isVisible`, plan usage (services and photos used / limit), subscription summary. Today's appointments and pending items are added in phases 8 and 9. |
 | `GET` | `/api/business/profile` | Business | My profile (including unpublished data), categories and photos |
 | `PUT` | `/api/business/profile` | Business | Update name, description, contact details and address |
-| `POST` | `/api/business/profile/logo` | Business | Upload or replace the logo (`multipart/form-data`, field `file`) |
+| `POST` | `/api/business/profile/logo` | Business | Upload or replace the logo (`multipart/form-data`, field `file`). The old file is deleted. |
+| `DELETE` | `/api/business/profile/logo` | Business | Remove the logo |
 | `PUT` | `/api/business/categories` | Business | Set my categories: `{ "categoryIds": [...] }` (1 to 3) |
 | `POST` | `/api/business/photos` | Business | Upload a photo (`multipart/form-data`, fields `file`, `caption`). Checks the plan limit. |
 | `PUT` | `/api/business/photos/order` | Business | Reorder photos: `{ "photoIds": [...] }` |
@@ -678,6 +679,12 @@ GET /health
 No login is needed, the response is never cached and the endpoint is not rate-limited.
 
 ---
+
+### 7.14 Uploaded images
+
+- Logos and photos are sent as `multipart/form-data` with the image in the field `file` (photos may also send `caption`).
+- The backend checks the size (at most 5 MB) and the **real** file type from the file's first bytes (JPEG, PNG or WebP), never just the file name. Files get random names.
+- The response contains the image address, for example `"logoUrl": "/uploads/businesses/<business id>/<random>.png"`. The API serves these files at `/uploads/...`; the frontend puts its API base address in front.
 
 ## 8. Validation rules
 
