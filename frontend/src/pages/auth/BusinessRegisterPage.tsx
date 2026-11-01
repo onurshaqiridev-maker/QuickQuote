@@ -2,22 +2,19 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { ApiError, errorMessage } from '../../api/client';
 import { publicApi } from '../../api/public.api';
+import { CategoryPicker } from '../../components/business/CategoryPicker';
 import { AuthCard } from '../../components/layout/AuthCard';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { SelectField, TextField } from '../../components/ui/FormField';
 import { Spinner } from '../../components/ui/Spinner';
 import { useApi } from '../../hooks/useApi';
 import { useAuth } from '../../hooks/useAuth';
+import { TIMEZONES } from '../../utils/timezones';
 
-const MAX_CATEGORIES = 3;
 const ACCOUNT_FIELDS = ['fullName', 'email', 'password', 'phone'];
 
-// All time zones the browser knows, e.g. "Europe/Berlin" (built once).
-const ALL_ZONES = Intl.supportedValuesOf('timeZone');
-const TIMEZONES = ALL_ZONES.includes('UTC') ? ALL_ZONES : ['UTC', ...ALL_ZONES];
 
 export function BusinessRegisterPage() {
   const { registerBusiness } = useAuth();
@@ -37,11 +34,6 @@ export function BusinessRegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const toggleCategory = (id: string) =>
-    setCategoryIds((current) =>
-      current.includes(id) ? current.filter((c) => c !== id) : current.length < MAX_CATEGORIES ? [...current, id] : current,
-    );
 
   const goToStep2 = (event: FormEvent) => {
     event.preventDefault();
@@ -109,24 +101,9 @@ export function BusinessRegisterPage() {
               {TIMEZONES.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
             </SelectField>
           </div>
-          <fieldset>
-            <legend className="mb-1.5 text-sm font-medium text-slate-700">Categories <span className="text-slate-500">(choose 1 to {MAX_CATEGORIES})</span></legend>
-            {categories.loading && <Spinner label="Loading categories…" />}
-            {categories.error && <Alert tone="error">{categories.error}</Alert>}
-            <div className="grid gap-2 sm:grid-cols-2">
-              {categories.data?.map((category) => {
-                const checked = categoryIds.includes(category.id);
-                const disabled = !checked && categoryIds.length >= MAX_CATEGORIES;
-                return (
-                  <label key={category.id} className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 text-sm ring-1 ${checked ? 'bg-brand-50 ring-brand-500' : 'ring-slate-200'} ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}>
-                    <input type="checkbox" checked={checked} disabled={disabled} onChange={() => toggleCategory(category.id)} className="h-4 w-4 accent-brand-600" />
-                    <CategoryIcon name={category.icon} className="h-4 w-4 text-brand-600" /> {category.name}
-                  </label>
-                );
-              })}
-            </div>
-            {errors.categoryIds && <p className="mt-1.5 text-sm text-red-600">{errors.categoryIds}</p>}
-          </fieldset>
+          {categories.loading && <Spinner label="Loading categories…" />}
+          {categories.error && <Alert tone="error">{categories.error}</Alert>}
+          {categories.data && <CategoryPicker categories={categories.data} selected={categoryIds} onChange={setCategoryIds} error={errors.categoryIds} />}
           <div className="flex gap-3">
             <Button type="button" variant="secondary" onClick={() => setStep(1)}>Back</Button>
             <Button type="submit" loading={loading} className="flex-1">Create business account</Button>

@@ -7,10 +7,11 @@ export default defineConfig({
   server: {
     port: 5173,
     // In development, the browser talks to http://localhost:5173 only.
-    // Vite forwards /api and /health to the backend, so cookies "just work" (same origin).
+    // Vite forwards /api, /health and /uploads (images) to the backend, so cookies "just work" (same origin).
     proxy: {
       '/api': 'http://localhost:4000',
       '/health': 'http://localhost:4000',
+      '/uploads': 'http://localhost:4000',
     },
   },
   test: {

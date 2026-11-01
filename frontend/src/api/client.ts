@@ -35,14 +35,21 @@ export class ApiError extends Error {
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
+/** Full address of a file served by the backend, e.g. "/uploads/businesses/1/logo.png". */
+export function assetUrl(path: string | null): string | null {
+  return path ? `${BASE_URL}${path}` : null;
+}
+
 export async function apiRequest<T>(method: Method, path: string, body?: unknown): Promise<T> {
+  // Files are sent as FormData; the browser sets the right Content-Type itself.
+  const isForm = body instanceof FormData;
   let response: Response;
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
       credentials: 'include',
-      headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      headers: body === undefined || isForm ? undefined : { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError('NETWORK_ERROR', 'Cannot reach the server. Please check your connection and try again.', 0);
@@ -67,6 +74,9 @@ export const api = {
   get: <T>(path: string) => apiRequest<T>('GET', path),
   post: <T>(path: string, body?: unknown) => apiRequest<T>('POST', path, body ?? {}),
   put: <T>(path: string, body?: unknown) => apiRequest<T>('PUT', path, body ?? {}),
+  delete: <T>(path: string) => apiRequest<T>('DELETE', path),
+  /** Upload a file (multipart/form-data). */
+  upload: <T>(path: string, form: FormData) => apiRequest<T>('POST', path, form),
 };
 
 /** A readable message for any error (ApiError or something unexpected). */

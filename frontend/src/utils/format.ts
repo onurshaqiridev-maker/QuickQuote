@@ -13,3 +13,29 @@ export function formatPrice(cents: number, currency = 'EUR'): string {
 export function formatDateTime(iso: string): string {
   return new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
 }
+
+/** "45.50" (what the user typed) -> 4550 cents. Returns null for empty or invalid input. */
+export function parsePriceToCents(text: string): number | null {
+  const normalised = text.trim().replace(',', '.');
+  if (!/^\d+(\.\d{1,2})?$/.test(normalised)) return null;
+  return Math.round(Number(normalised) * 100);
+}
+
+/** 4550 -> "45.50" (to fill a price input). */
+export function centsToInput(cents: number | null): string {
+  return cents === null ? '' : (cents / 100).toFixed(2);
+}
+
+/** "€45", "from €25" or "Price on request". */
+export function priceLabel(priceType: 'fixed' | 'starting_from' | 'on_request', priceCents: number | null): string {
+  if (priceType === 'on_request' || priceCents === null) return 'Price on request';
+  return priceType === 'starting_from' ? `from ${formatPrice(priceCents)}` : formatPrice(priceCents);
+}
+
+/** 90 -> "1 h 30 min" */
+export function formatDuration(minutes: number | null): string {
+  if (!minutes) return '';
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return [hours ? `${hours} h` : '', rest ? `${rest} min` : ''].filter(Boolean).join(' ');
+}

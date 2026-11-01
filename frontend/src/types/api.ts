@@ -90,3 +90,92 @@ export interface FieldErrorDetail {
   field: string;
   message: string;
 }
+
+// ---------------------------------------------------------------------------
+// Business dashboard
+// ---------------------------------------------------------------------------
+
+export type PriceType = 'fixed' | 'starting_from' | 'on_request';
+export type SubscriptionStatus = 'pending_payment' | 'active' | 'past_due' | 'cancelled' | 'expired';
+
+export interface Photo {
+  id: string;
+  imageUrl: string;
+  caption: string | null;
+  sortOrder: number;
+}
+
+export interface BusinessProfile {
+  id: string;
+  status: BusinessStatus;
+  slug: string;
+  displayName: string;
+  description: string | null;
+  logoUrl: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  websiteUrl: string | null;
+  addressLine: string | null;
+  city: string | null;
+  postalCode: string | null;
+  country: string | null;
+  isPublished: boolean;
+  publishedAt: string | null;
+  categories: Category[];
+  photos: Photo[];
+}
+
+export interface Offering {
+  id: string;
+  name: string;
+  description: string | null;
+  priceType: PriceType;
+  priceCents: number | null;
+  durationMinutes: number | null;
+  isBookable: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface WorkingHoursRange {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
+export interface BlockedTime {
+  id: string;
+  startsAt: string;
+  endsAt: string;
+  reason: string | null;
+}
+
+export interface BookingSettings {
+  timezone: string;
+  slotIntervalMinutes: number;
+  minNoticeHours: number;
+  maxAdvanceDays: number;
+  cancellationNoticeHours: number;
+}
+
+export type ChecklistKey = 'email_verified' | 'subscription' | 'profile' | 'categories' | 'services' | 'working_hours' | 'approved' | 'published';
+
+export interface ChecklistItem {
+  key: ChecklistKey;
+  label: string;
+  done: boolean;
+  requiredToPublish: boolean;
+}
+
+export interface BusinessOverview {
+  business: BusinessSummary;
+  checklist: ChecklistItem[];
+  canPublish: boolean;
+  isVisible: boolean;
+  usage: {
+    planName: string | null;
+    services: { used: number; limit: number | null };
+    photos: { used: number; limit: number };
+  };
+  subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
+}
