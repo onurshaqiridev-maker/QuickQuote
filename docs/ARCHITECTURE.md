@@ -522,7 +522,7 @@ The worker has no web endpoint, so we watch it in other ways:
 
 ## 15. Deployment and monitoring plan
 
-The backend is deployed **early**, right after the email queue works (phase 3 of the [roadmap](PROJECT_OVERVIEW.md#9-implementation-roadmap)). That way the health check is monitored by Asniher from the start, not only at the end.
+The step-by-step guide is in [DEPLOYMENT.md](DEPLOYMENT.md). The backend is deployed **early**, right after the email queue works (phase 3 of the [roadmap](PROJECT_OVERVIEW.md#9-implementation-roadmap)). That way the health check is monitored by Asniher from the start, not only at the end.
 
 ### 15.1 Where things run
 
@@ -543,7 +543,7 @@ The backend is deployed **early**, right after the email queue works (phase 3 of
 2. Create the PostgreSQL database on the host and copy its connection string.
 3. Create the API service (build: `npm ci && npm run build`, start: `npm run start`) and the worker (start: `npm run start:worker`).
 4. Set the environment variables in the host's dashboard. Never put them in Git. The important ones: `DATABASE_URL`, `DATABASE_SSL=true`, `JWT_SECRET`, `EMAIL_DRIVER=resend`, `RESEND_API_KEY`, `EMAIL_FROM`, `FRONTEND_URL`.
-5. Run `npm run migrate:up` and `npm run seed` on each deploy, before the new version starts (the "pre-deploy command").
+5. Apply migrations and the seed on each deploy, before the app starts. In our `render.yaml` this is part of the start command: `npm run migrate:deploy && npm run seed:deploy && exec node dist/src/all.js`.
 6. Open `https://<api-host>/health` and check that it returns `200`.
 
 ### 15.3 Monitoring with Asniher

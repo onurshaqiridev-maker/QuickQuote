@@ -10,7 +10,7 @@ This repository contains the **backend**: a small monolithic Node.js + TypeScrip
 
 | | |
 |---|---|
-| **Status** | Phases 1–2 done: four-layer backend, migrations, seed script, `GET /health`, email queue and worker, and accounts. Next: deployment and Asniher monitoring (phase 3). |
+| **Status** | Phases 1–2 done: four-layer backend, migrations, seed script, `GET /health`, email queue and worker, and accounts. Phase 3 (deployment on Render + Asniher monitoring) is ready to deploy: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Tech** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 
 ---
@@ -365,6 +365,7 @@ curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
+| `GET` | `/` | public | Short API info (name, where the health check is) |
 | `GET` | `/health` | public | App + database status (200 / 503) |
 | `POST` | `/api/auth/register/customer` | public | Create a customer account (queues `customer_welcome`) |
 | `POST` | `/api/auth/register/business` | public | Create a business account (queues `business_welcome` + `admin_new_business`) |
@@ -403,6 +404,7 @@ Run these in `backend/`:
 | `npm run migrate:down` | Undo the last migration |
 | `npm run migrate:create -- <name>` | Create a new SQL migration file |
 | `npm run seed` | Insert categories, plans and the first admin (safe to run again) |
+| `npm run migrate:deploy` / `npm run seed:deploy` | The same, using the compiled code (used on Render after `npm run build`) |
 | `npm test` | Run all tests |
 | `npm run lint` | Code style **and the layer rules** |
 | `npm run typecheck` | TypeScript type check |
@@ -429,18 +431,21 @@ The tests use a separate database, `quickquote_test` (override it with `TEST_DAT
 
 ## Deployment and monitoring
 
-The backend runs as **two processes from the same code**: the API (`npm run start`) and the worker (`npm run start:worker`). On a plan without background workers, use `npm run start:all`. You also need a managed PostgreSQL database.
+The backend is deployed on **[Render](https://render.com)** using the Blueprint in [`render.yaml`](render.yaml). It creates:
+- a **PostgreSQL** database,
+- one **web service** that runs the API and the email worker together (`node dist/src/all.js`), because Render's free plan has no background workers.
 
-**Deployment steps** (details in [docs/ARCHITECTURE.md §15](docs/ARCHITECTURE.md#15-deployment-and-monitoring-plan)):
+On every start, the service applies new migrations (`npm run migrate:deploy`), makes sure the seed data exists (`npm run seed:deploy`), and then starts. Render also uses `GET /health` as its own health check.
 
-1. **Build:** `npm ci && npm run build`
-2. **Before each release:** `npm run migrate:up && npm run seed`
-3. **Environment:** `NODE_ENV=production`, `DATABASE_URL`, `DATABASE_SSL=true`, `JWT_SECRET`, `EMAIL_DRIVER=resend`, `RESEND_API_KEY`, `EMAIL_FROM`
-4. **Monitoring:** an Asniher HTTP monitor on `https://<your-api-host>/health`, checking every minute. It alerts when the answer is not 200.
+**Asniher** monitors `GET /health` every minute and alerts when the answer is not `200`.
 
-**Live URL:** *(added after deployment in phase 3)*
+**Step-by-step guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
-**Asniher monitor:** *(screenshot added after deployment: `docs/images/asniher-monitor.png`)*
+| | |
+|---|---|
+| **Live URL** | *(added after the first deploy)* |
+| **Health check** | `<live URL>/health` |
+| **Asniher monitor** | *(screenshot added after setup: `docs/images/asniher-monitor.png`)* |
 
 ---
 
@@ -449,6 +454,7 @@ The backend runs as **two processes from the same code**: the API (`npm run star
 ```
 QuickQuote/
 ├── docker-compose.yml        # Local PostgreSQL (+ test database)
+├── render.yaml               # Render Blueprint: database + web service (deployment)
 ├── docs/                     # Planning documents
 └── backend/
     ├── migrations/           # 001_… to 011_… SQL migrations (the full database design)
@@ -483,3 +489,4 @@ Full explanation: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
 | [Subscription Model](docs/SUBSCRIPTION_MODEL.md) | Plans, payments, renewal, expiration |
 | [Email Workflow](docs/EMAIL_WORKFLOW.md) | Email queue, worker, retries, email catalog |
 | [Project Structure](docs/PROJECT_STRUCTURE.md) | Where code lives and naming conventions |
+| [Deployment](docs/DEPLOYMENT.md) | Step-by-step: Render, Resend and the Asniher monitor |

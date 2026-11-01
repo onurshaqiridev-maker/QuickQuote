@@ -15,6 +15,7 @@ QuickQuote/
 ├── README.md                 # Project introduction, setup, env vars, diagram, example requests
 ├── docs/                     # These planning documents (+ images such as the monitor screenshot)
 ├── docker-compose.yml        # Starts PostgreSQL on your computer for development
+├── render.yaml               # Render Blueprint: how the app is deployed (see DEPLOYMENT.md)
 ├── .gitignore                # Keeps node_modules, .env, build output and uploads out of Git
 ├── backend/                  # Node.js + Express + TypeScript (API server + email worker)
 └── frontend/                 # React + Vite + TypeScript + Tailwind
@@ -325,6 +326,8 @@ Each step only talks to the layer directly below it.
 | `npm run start` | Runs the compiled API server (production) |
 | `npm run start:worker` | Runs the compiled worker (production) |
 | `npm run start:all` | Runs API + worker in one process (for hosting plans without a separate worker) |
+| `npm run migrate:deploy` | Applies migrations with the compiled code (production, after `npm run build`) |
+| `npm run seed:deploy` | Runs the seed with the compiled code (production) |
 | `npm run migrate:up` | Applies new migrations |
 | `npm run migrate:down` | Undoes the last migration |
 | `npm run migrate:create -- <name>` | Creates a new, empty migration file |
