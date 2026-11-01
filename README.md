@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -228,6 +228,7 @@ Every setting comes from environment variables. In development they are read fro
 | `EMAIL_MAX_ATTEMPTS` | no | `5` | Attempts per email (minimum `4` = at least 3 retries) |
 | `EMAIL_SEND_TIMEOUT_MS` | no | `10000` | A send taking longer than this counts as a failed attempt |
 | `EMAIL_LOCK_TIMEOUT_MINUTES` | no | `10` | After this, a job claimed by a crashed worker can be claimed again |
+| `SUBSCRIPTIONS_REQUIRED` | no | `false` | `false` = free launch: businesses publish without paying. `true` once paid plans exist. |
 | `UPLOAD_DIR` | no | `./uploads` | Folder for uploaded logos and photos (served at `/uploads/...`) |
 | `HEALTH_DB_TIMEOUT_MS` | no | `2000` | `/health` reports the database as unreachable after this time |
 | `SEED_ADMIN_EMAIL` | for seed | — | Email of the first admin, created by `npm run seed` |
@@ -396,6 +397,7 @@ curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>
 | `POST` | `/api/account/change-password` | logged in | Change password |
 | `GET` | `/api/categories` | public | Active business categories |
 | `POST` | `/api/contact` | public | Contact form (queues `contact_message_admin`) |
+| `GET` | `/api/config` | public | Platform settings, e.g. `subscriptionsRequired` (free launch) |
 | `GET` | `/api/plans` | public | Active subscription plans (pricing page) |
 | `GET` | `/api/business/overview` | business | Go-live checklist, plan usage, visibility |
 | `GET` / `PUT` | `/api/business/profile` | business | Read / update the profile details |

@@ -147,6 +147,7 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
+| `GET` | `/api/config` | Public | Platform settings for the website: `{ "subscriptionsRequired": false }` during the free launch |
 | `GET` | `/api/categories` | Public | Active categories, for filters and homepage tiles |
 | `GET` | `/api/cities` | Public | Cities that have visible businesses, for the location filter |
 | `GET` | `/api/plans` | Public | Active subscription plans, for the pricing page |

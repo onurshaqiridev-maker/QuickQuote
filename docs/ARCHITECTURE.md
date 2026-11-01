@@ -393,7 +393,8 @@ A file called `.env.example` (committed to Git) lists every variable. Each devel
 | `EMAIL_MAX_ATTEMPTS` | `5` | API | Attempts per email before it is marked `failed` (1 try + 4 retries). Must be at least 4 (that is, at least 3 retries). |
 | `EMAIL_SEND_TIMEOUT_MS` | `10000` | worker | How long to wait for Resend before counting the attempt as failed |
 | `EMAIL_LOCK_TIMEOUT_MINUTES` | `10` | worker | After this time, a claimed but unfinished job can be claimed again |
-| `PAYMENT_PROVIDER` | `mock` | API | `mock` or `manual` (`stripe` later) |
+| `SUBSCRIPTIONS_REQUIRED` | `false` | API | `false` = free launch (no payment step). `true` = businesses need an active subscription to go live. |
+| `PAYMENT_PROVIDER` | `mock` | API | `mock` or `manual` (`stripe` later), used once payments exist |
 | `MANUAL_PAYMENT_INSTRUCTIONS` | `Bank: ..., IBAN: ...` | API | Bank transfer details shown to businesses when `PAYMENT_PROVIDER=manual` |
 | `STORAGE_DRIVER` | `local` | API | `local` (`s3` later) |
 | `UPLOAD_DIR` | `./uploads` | API | Folder for uploaded files when `STORAGE_DRIVER=local` |

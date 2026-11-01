@@ -345,8 +345,8 @@ Yes = allowed · — = not allowed · "own" = only their own data
 
 1. One business per business-owner account.
 2. 1 to 3 categories.
-3. **Publishing** needs: confirmed email, active subscription, name + description + city, at least 1 category, at least 1 active service, and working hours if any service is bookable.
-4. **Visible** = published + approved by an admin + active (or grace-period) subscription + active owner account.
+3. **Publishing** needs: confirmed email, name + description + city, at least 1 category, at least 1 active service, and working hours if any service is bookable. When paid plans are switched on (`SUBSCRIPTIONS_REQUIRED=true`), also an active subscription.
+4. **Visible** = published + approved by an admin + active owner account (+ an active or grace-period subscription once paid plans are on).
 5. Service and photo limits come from the plan.
 6. Services are archived, never deleted, so old reservations stay correct.
 

@@ -148,7 +148,7 @@ Each phase ends with something you can run and try. **Phases 1–3 build and dep
 | 3 (in progress) | **Deploy + monitor** ([guide](DEPLOYMENT.md)) | API, worker and PostgreSQL running online. An Asniher monitor on `/health`, its screenshot in the README, example `curl` requests. **Backend requirements complete.** |
 | 4 (done) | Frontend foundation | React app with layouts, navigation, and the login and registration pages connected to the API |
 | 5 (done) | Business profile | Edit profile, logo, photos, categories, services and prices, working hours and booking settings |
-| 6 | Subscriptions | Pricing page, choosing a plan, mock checkout, manual payments, admin approval, go-live checklist and publishing |
+| 6 (postponed: free launch) | Subscriptions | Pricing page, choosing a plan, mock checkout, manual payments, admin approval, go-live checklist and publishing |
 | 7 | Discovery | Homepage, Explore page with search and filters, and public business profiles |
 | 8 | Reservations | Available time slots, booking, double-booking protection, and reservation pages for businesses and customers |
 | 9 | Quotations | Quote request form, business responses, and customer quote history |
@@ -185,7 +185,7 @@ These choices shape everything else. Please confirm or change them before implem
 |---|---|---|
 | 1 | Tech stack | React + Vite + Tailwind for the frontend. Node.js + Express + TypeScript for the backend. PostgreSQL with plain SQL. |
 | 2 | Pricing | Starter €19, Professional €39 and Premium €59 per month. The admin can change these. |
-| 3 | Payments in version 1 | Mock payments for development. Manual bank transfer, confirmed by the admin, for early production. Stripe later. |
+| 3 | Payments in version 1 | **Decided: free launch.** No payments at the start (`SUBSCRIPTIONS_REQUIRED=false`): businesses publish for free with the Starter limits. Paid plans (phase 6) come later. |
 | 4 | Businesses per account | One business per business-owner account |
 | 5 | Appointments | One appointment at a time per business (no staff or parallel bookings in version 1) |
 | 6 | Admin approval | New businesses must be approved by an admin before they appear publicly |
