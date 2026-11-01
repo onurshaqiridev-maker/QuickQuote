@@ -65,6 +65,10 @@ const envSchema = z
     EMAIL_SEND_TIMEOUT_MS: z.coerce.number().int().min(1000).default(10000),
     EMAIL_LOCK_TIMEOUT_MINUTES: z.coerce.number().int().min(1).default(10),
 
+    // Paid plans. false = FREE LAUNCH: businesses can publish without a subscription
+    // (the Starter limits apply). Set to true once payments are introduced.
+    SUBSCRIPTIONS_REQUIRED: booleanFromString,
+
     // Uploaded images (logos, photos). Local folder for now; cloud storage later.
     UPLOAD_DIR: z.string().min(1).default('./uploads'),
 

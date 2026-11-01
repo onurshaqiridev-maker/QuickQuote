@@ -236,39 +236,31 @@ describe('working hours, blocked times and settings', () => {
   });
 });
 
-describe('go-live checklist and publishing', () => {
+describe('go-live checklist and publishing (free launch: no subscription needed)', () => {
   it('lists what is missing, publishes when ready, and is visible only after approval', async () => {
     const { cookie, businessId } = await registerOwner();
 
     const blocked = await request(app).post('/api/business/profile/publish').set('Cookie', cookie);
     expect(blocked.status).toBe(409);
     expect(blocked.body.error.code).toBe('GO_LIVE_REQUIREMENTS_NOT_MET');
-    expect(blocked.body.error.details.map((d: { field: string }) => d.field)).toEqual(
-      expect.arrayContaining(['email_verified', 'subscription', 'profile', 'services']),
-    );
+    const missing = blocked.body.error.details.map((d: { field: string }) => d.field);
+    expect(missing).toEqual(expect.arrayContaining(['email_verified', 'profile', 'services']));
+    expect(missing).not.toContain('subscription');
 
-    // Do everything an owner can do in phase 5:
+    // Do everything an owner can do:
     await pool.query('UPDATE users SET email_verified_at = now() WHERE email = $1', ['lena@bellahair.example']);
     await request(app).put('/api/business/profile').set('Cookie', cookie).send({ displayName: 'Bella Hair Studio', description: 'Cuts and colour.', city: 'Berlin' });
     await request(app).post('/api/business/services').set('Cookie', cookie).send(haircut);
     await request(app).put('/api/business/working-hours').set('Cookie', cookie).send({ ranges: [{ dayOfWeek: 1, startTime: '09:00', endTime: '17:00' }] });
 
-    const onlySubscription = await request(app).post('/api/business/profile/publish').set('Cookie', cookie);
-    expect(onlySubscription.body.error.details.map((d: { field: string }) => d.field)).toEqual(['subscription']);
-
-    // Subscriptions arrive in phase 6; simulate a paid one.
-    await pool.query(
-      `INSERT INTO subscriptions (business_id, plan_id, status, current_period_start, current_period_end)
-       SELECT $1, id, 'active', now(), now() + interval '1 month' FROM subscription_plans WHERE code = 'starter'`,
-      [businessId],
-    );
     const published = await request(app).post('/api/business/profile/publish').set('Cookie', cookie);
     expect(published.status).toBe(200);
     expect(published.body.data.isPublished).toBe(true);
 
     let overview = await request(app).get('/api/business/overview').set('Cookie', cookie);
-    expect(overview.body.data).toMatchObject({ canPublish: true, isVisible: false }); // waiting for approval
-    expect(overview.body.data.usage).toMatchObject({ planName: 'Starter', services: { used: 1, limit: 10 } });
+    expect(overview.body.data).toMatchObject({ canPublish: true, isVisible: false, subscriptionsRequired: false }); // waiting for approval
+    expect(overview.body.data.checklist.map((item: { key: string }) => item.key)).not.toContain('subscription');
+    expect(overview.body.data.usage).toMatchObject({ planName: null, services: { used: 1, limit: 10 } }); // Starter limits
 
     await pool.query("UPDATE businesses SET status = 'approved' WHERE id = $1", [businessId]);
     overview = await request(app).get('/api/business/overview').set('Cookie', cookie);
@@ -277,5 +269,10 @@ describe('go-live checklist and publishing', () => {
 
     const unpublished = await request(app).post('/api/business/profile/unpublish').set('Cookie', cookie);
     expect(unpublished.body.data.isPublished).toBe(false);
+  });
+
+  it('GET /api/config tells the website that listing is free', async () => {
+    const response = await request(app).get('/api/config');
+    expect(response.body.data).toEqual({ subscriptionsRequired: false });
   });
 });

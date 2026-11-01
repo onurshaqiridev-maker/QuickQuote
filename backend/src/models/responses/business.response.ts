@@ -91,8 +91,10 @@ export interface BusinessOverviewResponse {
   business: BusinessSummaryResponse;
   checklist: ChecklistItemResponse[];
   canPublish: boolean;
-  /** Visible to the public right now (published + approved + subscription). */
+  /** Visible to the public right now (published + approved + subscription, if required). */
   isVisible: boolean;
+  /** false = free launch: no plan needed to go live. */
+  subscriptionsRequired: boolean;
   usage: PlanUsageResponse;
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
 }

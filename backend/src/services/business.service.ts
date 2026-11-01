@@ -1,4 +1,5 @@
 /** The business account: overview + go-live checklist, booking settings. */
+import { env } from '../config/env';
 import * as businessRepository from '../data/repositories/business.repository';
 import * as offeringRepository from '../data/repositories/offering.repository';
 import * as photoRepository from '../data/repositories/photo.repository';
@@ -34,9 +35,15 @@ const MISSING_MESSAGES: Record<string, string> = {
  * The go-live checklist (see docs/USER_FLOWS.md, flow 2).
  * Items with requiredToPublish must be done before "Publish" works.
  * Admin approval is needed to be VISIBLE, but not to click "Publish".
+ * During the free launch (SUBSCRIPTIONS_REQUIRED=false) there is no "choose a plan" step.
  */
-export function buildChecklist(facts: GoLiveFacts, approved: boolean, published: boolean): ChecklistItemResponse[] {
-  return [
+export function buildChecklist(
+  facts: GoLiveFacts,
+  approved: boolean,
+  published: boolean,
+  subscriptionsRequired: boolean = env.SUBSCRIPTIONS_REQUIRED,
+): ChecklistItemResponse[] {
+  const items: ChecklistItemResponse[] = [
     { key: 'email_verified', label: 'Confirm your email address', done: facts.emailVerified, requiredToPublish: true },
     { key: 'subscription', label: 'Choose a plan and pay', done: facts.hasActiveSubscription, requiredToPublish: true },
     { key: 'profile', label: 'Complete your profile (description and city)', done: facts.hasDescription && facts.hasCity, requiredToPublish: true },
@@ -52,6 +59,12 @@ export function buildChecklist(facts: GoLiveFacts, approved: boolean, published:
     { key: 'approved', label: 'Approved by the Quick Quote team', done: approved, requiredToPublish: false },
     { key: 'published', label: 'Publish your profile', done: published, requiredToPublish: false },
   ];
+  return subscriptionsRequired ? items : items.filter((item) => item.key !== 'subscription');
+}
+
+/** Has the business paid, or is paying not needed (free launch)? */
+export function subscriptionSatisfied(hasActiveSubscription: boolean): boolean {
+  return hasActiveSubscription || !env.SUBSCRIPTIONS_REQUIRED;
 }
 
 /** Throws GO_LIVE_REQUIREMENTS_NOT_MET listing what is missing. */
@@ -93,7 +106,8 @@ export async function getOverview(businessId: string): Promise<BusinessOverviewR
     business: toBusinessSummaryResponse(business, profile),
     checklist,
     canPublish: checklist.every((item) => !item.requiredToPublish || item.done),
-    isVisible: profile.isPublished && business.status === 'approved' && facts.hasActiveSubscription,
+    isVisible: profile.isPublished && business.status === 'approved' && subscriptionSatisfied(facts.hasActiveSubscription),
+    subscriptionsRequired: env.SUBSCRIPTIONS_REQUIRED,
     usage: {
       planName: limits.planName,
       services: { used: serviceCount, limit: limits.maxServices },

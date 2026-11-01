@@ -36,7 +36,7 @@ export function GoLiveChecklist({ items }: { items: ChecklistItem[] }) {
               </span>
               <span className={item.done ? 'text-slate-500 line-through' : 'text-slate-800'}>
                 {item.label}
-                {!item.requiredToPublish && <span className="ml-2 text-xs text-slate-400">(after publishing)</span>}
+                {item.key === 'approved' && !item.done && <span className="ml-2 text-xs text-slate-400">(needed to be visible)</span>}
               </span>
               <span className="ml-auto shrink-0 text-xs text-slate-500">
                 {!item.done && link ? (

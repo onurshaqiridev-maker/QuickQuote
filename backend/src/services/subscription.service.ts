@@ -21,7 +21,8 @@ export async function hasActiveSubscription(businessId: string): Promise<boolean
 
 /**
  * What the business may use. With an active subscription: its plan's limits.
- * Without one: the cheapest plan's limits, so a new business can prepare its profile before paying.
+ * Without one: the cheapest plan's limits. That covers both a new business preparing its
+ * profile before paying, and every business during the free launch (SUBSCRIPTIONS_REQUIRED=false).
  */
 export async function getPlanLimits(businessId: string): Promise<PlanLimits> {
   const subscription = await subscriptionRepository.findCurrent(businessId);

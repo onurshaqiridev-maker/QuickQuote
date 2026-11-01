@@ -18,6 +18,8 @@ export function HomePage() {
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
   const categories = useApi('categories', () => publicApi.categories());
+  const config = useApi('config', () => publicApi.config());
+  const freeLaunch = config.data?.subscriptionsRequired === false;
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -103,7 +105,7 @@ export function HomePage() {
             <h2 className="text-2xl font-bold sm:text-3xl">Own a business? Get found by new customers.</h2>
             <p className="mt-3 max-w-2xl text-slate-300">
               Create your public profile, list your services and prices, and receive quote requests and bookings,
-              from €19 per month.
+              {freeLaunch ? ' free during our launch.' : ' from €19 per month.'}
             </p>
           </div>
           <div className="flex shrink-0 gap-3">

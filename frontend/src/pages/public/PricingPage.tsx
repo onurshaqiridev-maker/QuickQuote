@@ -29,10 +29,21 @@ const FAQ = [
 
 export function PricingPage() {
   const { data: plans, loading, error } = useApi('plans', () => publicApi.plans());
+  const config = useApi('config', () => publicApi.config());
+  const freeLaunch = config.data?.subscriptionsRequired === false;
 
   return (
     <Container className="space-y-12">
       <PageHeader title="Simple monthly plans" description="Customers use Quick Quote for free. Businesses choose the plan that fits them." />
+      {freeLaunch && (
+        <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-brand-600 p-6 text-white sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-lg font-bold">Free for businesses during our launch</h2>
+            <p className="mt-1 text-sm text-brand-100">List your business, publish your profile and receive customers at no cost. The plans below will start later; we will tell you well in advance.</p>
+          </div>
+          <ButtonLink to="/register/business" variant="secondary" className="shrink-0">List your business for free</ButtonLink>
+        </div>
+      )}
       {loading && <Spinner label="Loading plans…" />}
       {error && <Alert tone="error">{error}</Alert>}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -44,7 +55,10 @@ export function PricingPage() {
             {plan.isFeatured && (
               <span className="absolute -top-3 left-8 rounded-full bg-brand-600 px-3 py-1 text-xs font-bold text-white">Most visibility</span>
             )}
-            <h2 className="text-lg font-semibold text-slate-900">{plan.name}</h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+              {plan.name}
+              {freeLaunch && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">after launch</span>}
+            </h2>
             <p className="mt-2 min-h-10 text-sm text-slate-600">{plan.description}</p>
             <p className="mt-6">
               <span className="text-4xl font-bold tracking-tight">{formatPrice(plan.priceCents, plan.currency)}</span>
@@ -58,9 +72,11 @@ export function PricingPage() {
                 </li>
               ))}
             </ul>
-            <ButtonLink to={`/register/business?plan=${plan.code}`} variant={plan.isFeatured ? 'primary' : 'secondary'} className="mt-8">
-              Get started with {plan.name}
-            </ButtonLink>
+            {!freeLaunch && (
+              <ButtonLink to={`/register/business?plan=${plan.code}`} variant={plan.isFeatured ? 'primary' : 'secondary'} className="mt-8">
+                Get started with {plan.name}
+              </ButtonLink>
+            )}
           </div>
         ))}
       </div>

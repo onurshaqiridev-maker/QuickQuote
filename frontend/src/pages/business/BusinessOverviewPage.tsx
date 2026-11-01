@@ -36,9 +36,11 @@ export function BusinessOverviewPage() {
         </div>
         <div className="space-y-6">
           <Card>
-            <h2 className="font-semibold">Your plan</h2>
+            <h2 className="font-semibold">{overview.subscriptionsRequired ? 'Your plan' : 'Free launch'}</h2>
             <p className="mt-1 text-sm text-slate-600">
-              {usage.planName ? (
+              {!overview.subscriptionsRequired ? (
+                <>Listing your business is free during our launch. <Link to="/dashboard/subscription" className="font-semibold text-brand-700 hover:underline">Learn more</Link></>
+              ) : usage.planName ? (
                 <>{usage.planName} plan</>
               ) : (
                 <>No plan yet: the Starter limits apply while you prepare. <Link to="/pricing" className="font-semibold text-brand-700 hover:underline">Compare plans</Link></>

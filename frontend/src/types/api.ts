@@ -82,6 +82,11 @@ export interface ApiListResponse<T> {
   meta: { page: number; pageSize: number; total: number };
 }
 
+export interface PlatformConfig {
+  /** false = free launch: businesses list for free. */
+  subscriptionsRequired: boolean;
+}
+
 export interface MessageResponse {
   message: string;
 }
@@ -172,6 +177,8 @@ export interface BusinessOverview {
   checklist: ChecklistItem[];
   canPublish: boolean;
   isVisible: boolean;
+  /** false = free launch: no plan needed to go live. */
+  subscriptionsRequired: boolean;
   usage: {
     planName: string | null;
     services: { used: number; limit: number | null };
