@@ -388,9 +388,9 @@ This is how starting the project will work once the code exists.
 
 | File | Committed to Git? | Content |
 |---|---|---|
-| `backend/.env.example` | ✅ Yes | Every variable with **safe placeholder values**, never real keys |
-| `backend/.env` | ❌ Never (git-ignored) | Your real local values |
-| `frontend/.env.example` | ✅ Yes | `VITE_API_URL=` |
+| `backend/.env.example` | Yes | Every variable with **safe placeholder values**, never real keys |
+| `backend/.env` | Never (git-ignored) | Your real local values |
+| `frontend/.env.example` | Yes | `VITE_API_URL=` |
 | Hosting platform settings | — | Real production values (database URL, `RESEND_API_KEY`, `JWT_SECRET`) |
 
 Preview of `backend/.env.example`:

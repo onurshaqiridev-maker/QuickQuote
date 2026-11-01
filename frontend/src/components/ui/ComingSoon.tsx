@@ -13,9 +13,7 @@ export function ComingSoon({ phase, title, features }: { phase: number; title: s
       <ul className="mt-4 grid gap-2 sm:grid-cols-2">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2 text-sm text-slate-700">
-            <span className="mt-0.5 text-brand-600" aria-hidden>
-              ◦
-            </span>
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden />
             {feature}
           </li>
         ))}

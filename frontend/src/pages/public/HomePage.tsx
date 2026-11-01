@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { publicApi } from '../../api/public.api';
 import { Container } from '../../components/layout/PublicLayout';
 import { Button, ButtonLink } from '../../components/ui/Button';
+import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { Spinner } from '../../components/ui/Spinner';
 import { useApi } from '../../hooks/useApi';
 
@@ -68,8 +69,10 @@ export function HomePage() {
                 to={`/explore?category=${category.slug}`}
                 className="group rounded-xl bg-white p-4 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-brand-500"
               >
-                <span className="text-2xl" aria-hidden>{category.icon}</span>
-                <p className="mt-2 font-semibold text-slate-900 group-hover:text-brand-700">{category.name}</p>
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600 group-hover:bg-brand-100">
+                  <CategoryIcon name={category.icon} />
+                </span>
+                <p className="mt-3 font-semibold text-slate-900 group-hover:text-brand-700">{category.name}</p>
                 <p className="mt-1 line-clamp-2 text-xs text-slate-500">{category.description}</p>
               </Link>
             ))}

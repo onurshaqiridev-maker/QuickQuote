@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { publicApi } from '../../api/public.api';
 import { Container } from '../../components/layout/PublicLayout';
 import { Alert } from '../../components/ui/Alert';
@@ -52,7 +53,7 @@ export function PricingPage() {
             <ul className="mt-6 flex-1 space-y-3 text-sm text-slate-700">
               {planFeatures(plan).map((feature) => (
                 <li key={feature} className="flex gap-2">
-                  <span className="font-bold text-brand-600" aria-hidden>✓</span>
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" aria-hidden strokeWidth={2.5} />
                   {feature}
                 </li>
               ))}

@@ -332,7 +332,7 @@ Business categories managed by the admin, for example "Beauty & Wellness".
 | `name` | `text` | NOT NULL, UK | Shown name |
 | `slug` | `text` | NOT NULL, UK | Used in filters: `?category=beauty-wellness` |
 | `description` | `text` | NULL | Short explanation |
-| `icon` | `text` | NULL | Icon name or emoji for the homepage tiles |
+| `icon` | `text` | NULL | Icon name for the homepage tiles, for example `scissors` (drawn by the website) |
 | `is_active` | `boolean` | NOT NULL, default `true` | Hidden from customers when `false` |
 | `sort_order` | `integer` | NOT NULL, default `0` | Display order |
 | `created_at`, `updated_at` | `timestamptz` | NOT NULL | |

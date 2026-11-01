@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { Link } from 'react-router';
 import { StatusBadge } from '../../components/ui/Badge';
 import { Card, CardTitle } from '../../components/ui/Card';
@@ -24,8 +25,8 @@ function GoLiveChecklist({ items }: { items: ChecklistItem[] }) {
       <ul className="divide-y divide-slate-100">
         {items.map((item) => (
           <li key={item.label} className="flex items-center gap-3 py-3 text-sm">
-            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${item.done ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'}`} aria-hidden>
-              {item.done ? '✓' : '•'}
+            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${item.done ? 'bg-green-100 text-green-700' : 'border-2 border-slate-200'}`} aria-hidden>
+              {item.done && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
             </span>
             <span className={item.done ? 'text-slate-500 line-through' : 'text-slate-800'}>{item.label}</span>
             <span className="ml-auto text-xs text-slate-500">

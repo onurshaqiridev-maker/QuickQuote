@@ -289,17 +289,17 @@ All admin pages share one layout with a side menu: Overview · Businesses · Cus
 
 ## 9. Permissions matrix
 
-✅ = allowed · — = not allowed · "own" = only their own data
+Yes = allowed · — = not allowed · "own" = only their own data
 
 | Action | Visitor | Customer | Business owner | Admin |
 |---|---|---|---|---|
-| Browse, search and view public profiles | ✅ | ✅ | ✅ | ✅ |
-| See plans and pricing, use the contact form | ✅ | ✅ | ✅ | ✅ |
-| Register / log in | ✅ | — | — | — |
-| Change own name, phone, password | — | ✅ | ✅ | ✅ |
-| Book an appointment | — | ✅ (email confirmed) | — | — |
+| Browse, search and view public profiles | Yes | Yes | Yes | Yes |
+| See plans and pricing, use the contact form | Yes | Yes | Yes | Yes |
+| Register / log in | Yes | — | — | — |
+| Change own name, phone, password | — | Yes | Yes | Yes |
+| Book an appointment | — | Yes (email confirmed) | — | — |
 | Cancel a reservation | — | own, before the deadline | own business's, any time | — |
-| Send a quote request | — | ✅ (email confirmed) | — | — |
+| Send a quote request | — | Yes (email confirmed) | — | — |
 | View reservations | — | own | own business's | all |
 | Confirm / reject / complete reservations | — | — | own business's | — |
 | View quote requests | — | own | own business's | all |
@@ -308,11 +308,11 @@ All admin pages share one layout with a side menu: Overview · Businesses · Cus
 | Edit profile, services, hours, settings | — | — | own business | — |
 | Publish / unpublish profile | — | — | own business | — |
 | Subscribe, renew, change plan, cancel | — | — | own business | — |
-| Approve / suspend / deactivate businesses | — | — | — | ✅ |
-| Suspend / reactivate users | — | — | — | ✅ |
-| Manage plans and categories | — | — | — | ✅ |
-| Mark payments paid or failed | — | — | — | ✅ |
-| View activity log and email queue, retry emails | — | — | — | ✅ |
+| Approve / suspend / deactivate businesses | — | — | — | Yes |
+| Suspend / reactivate users | — | — | — | Yes |
+| Manage plans and categories | — | — | — | Yes |
+| Mark payments paid or failed | — | — | — | Yes |
+| View activity log and email queue, retry emails | — | — | — | Yes |
 
 ---
 

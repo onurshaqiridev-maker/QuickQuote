@@ -92,7 +92,7 @@ The frontend uses `code` to decide what to do, and shows `message` to the user. 
 | **Public** | Anyone, logged in or not |
 | **Logged in** | Any logged-in user |
 | **Customer** | Logged in with role `customer` |
-| **Customer ✉** | Customer whose email is confirmed |
+| **Customer (verified)** | Customer whose email is confirmed |
 | **Business** | Logged in with role `business_owner`. The API automatically finds *their* business. |
 | **Admin** | Logged in with role `admin` |
 
@@ -161,11 +161,11 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 |---|---|---|---|
 | `GET` | `/api/customer/overview` | Customer | Upcoming reservations, recent quote requests, counts |
 | `GET` | `/api/customer/reservations` | Customer | My reservations. Query: `status`, `page`. |
-| `POST` | `/api/customer/reservations` | Customer ✉ | Book an appointment |
+| `POST` | `/api/customer/reservations` | Customer (verified) | Book an appointment |
 | `GET` | `/api/customer/reservations/:id` | Customer | One of my reservations |
 | `POST` | `/api/customer/reservations/:id/cancel` | Customer | Cancel (only if `pending` or `confirmed`, and before the cancellation deadline) |
 | `GET` | `/api/customer/quote-requests` | Customer | My quote requests. Query: `status`, `page`. |
-| `POST` | `/api/customer/quote-requests` | Customer ✉ | Send a quote request |
+| `POST` | `/api/customer/quote-requests` | Customer (verified) | Send a quote request |
 | `GET` | `/api/customer/quote-requests/:id` | Customer | One of my quote requests, including the business's answer |
 
 ### 6.6 Business — `/api/business`

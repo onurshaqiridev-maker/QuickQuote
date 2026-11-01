@@ -6,6 +6,7 @@ import { AuthCard } from '../../components/layout/AuthCard';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { SelectField, TextField } from '../../components/ui/FormField';
 import { Spinner } from '../../components/ui/Spinner';
 import { useApi } from '../../hooks/useApi';
@@ -119,7 +120,7 @@ export function BusinessRegisterPage() {
                 return (
                   <label key={category.id} className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 text-sm ring-1 ${checked ? 'bg-brand-50 ring-brand-500' : 'ring-slate-200'} ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}>
                     <input type="checkbox" checked={checked} disabled={disabled} onChange={() => toggleCategory(category.id)} className="h-4 w-4 accent-brand-600" />
-                    <span aria-hidden>{category.icon}</span> {category.name}
+                    <CategoryIcon name={category.icon} className="h-4 w-4 text-brand-600" /> {category.name}
                   </label>
                 );
               })}

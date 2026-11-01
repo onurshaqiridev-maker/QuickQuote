@@ -69,12 +69,12 @@ flowchart TD
 
    | # | Checklist item | Required to publish? |
    |---|---|---|
-   | 1 | Email confirmed | ✅ |
-   | 2 | Subscription active | ✅ |
-   | 3 | Profile complete: name, description, city | ✅ |
-   | 4 | At least 1 category | ✅ |
-   | 5 | At least 1 active service | ✅ |
-   | 6 | Working hours set (only if a service can be booked online) | ✅ |
+   | 1 | Email confirmed | Yes |
+   | 2 | Subscription active | Yes |
+   | 3 | Profile complete: name, description, city | Yes |
+   | 4 | At least 1 category | Yes |
+   | 5 | At least 1 active service | Yes |
+   | 6 | Working hours set (only if a service can be booked online) | Yes |
    | 7 | Logo and photos | Recommended |
    | 8 | Approved by an admin | Required to be **visible**, not to click Publish |
    | 9 | Published | The last step |

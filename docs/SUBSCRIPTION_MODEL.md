@@ -33,12 +33,12 @@ A simple first pricing structure with three monthly plans. Prices are in euros, 
 |---|---|---|---|
 | Price per month | **€19** | **€39** | **€59** |
 | `code` | `starter` | `professional` | `premium` |
-| Public business profile | ✅ | ✅ | ✅ |
-| Reservations and quote requests | ✅ | ✅ | ✅ |
-| Email notifications | ✅ | ✅ | ✅ |
+| Public business profile | Yes | Yes | Yes |
+| Reservations and quote requests | Yes | Yes | Yes |
+| Email notifications | Yes | Yes | Yes |
 | Services listed | up to 10 | up to 30 | unlimited |
 | Photos | up to 5 | up to 20 | up to 50 |
-| Featured on the homepage + listed first in search + "Featured" badge | — | — | ✅ |
+| Featured on the homepage + listed first in search + "Featured" badge | — | — | Yes |
 
 Stored in `subscription_plans` as:
 
@@ -54,12 +54,12 @@ Stored in `subscription_plans` as:
 
 | Feature | Without an active subscription | With an active subscription |
 |---|---|---|
-| Log in and use the dashboard | ✅ | ✅ |
-| Edit profile, services, working hours and settings | ✅ (to prepare, within the Starter plan limits) | ✅ (within their plan's limits) |
-| Publish the profile | ❌ | ✅ (if the profile is complete. It becomes visible once an admin approves it.) |
-| Appear in search and on a public profile page | ❌ | ✅ |
-| Receive new reservations and quote requests | ❌ | ✅ |
-| Manage existing reservations and quotes | ✅ (so customers are never left waiting) | ✅ |
+| Log in and use the dashboard | Yes | Yes |
+| Edit profile, services, working hours and settings | Yes (to prepare, within the Starter plan limits) | Yes (within their plan's limits) |
+| Publish the profile | No | Yes (if the profile is complete. It becomes visible once an admin approves it.) |
+| Appear in search and on a public profile page | No | Yes |
+| Receive new reservations and quote requests | No | Yes |
+| Manage existing reservations and quotes | Yes (so customers are never left waiting) | Yes |
 
 ---
 
@@ -104,7 +104,7 @@ stateDiagram-v2
    - payment → `paid`, `paid_at = now`, `period_start = now`, `period_end = now + 1 month`
    - subscription → `active`, `current_period_start = now`, `current_period_end = now + 1 month`
    - emails: `subscription_activated` and `payment_receipt`
-5. The go-live checklist now shows "Subscription active ✅".
+5. The go-live checklist now shows "Subscription active" as done.
 
 If the business starts checkout again while still `pending_payment` (for example, to pick another plan), the same subscription row is reused. Its plan is updated, the old pending payment is marked `failed`, and a new payment is created.
 
@@ -177,7 +177,7 @@ Every attempt to pay creates a row in `payments`. Together they form the **payme
 All payment logic goes through a small **provider** module, so the rest of the system does not care how the money arrives.
 
 ```
-PaymentService  ──uses──▶  PaymentProvider (one shared shape)
+PaymentService  ──uses──>  PaymentProvider (one shared shape)
                                ├── MockPaymentProvider     (development)
                                ├── ManualPaymentProvider   (bank transfer, early production)
                                └── StripePaymentProvider   (later)
@@ -233,10 +233,10 @@ Services ask `SubscriptionService.getPlanLimits(businessId)` for the limits. Whe
 
 A business appears publicly **only if all of these are true**:
 
-1. ✅ The **subscription** is `active` or `past_due`
-2. ✅ The **business** is `approved` by an admin
-3. ✅ The **profile** is published (`is_published = true`)
-4. ✅ The **owner's account** is `active`
+1. The **subscription** is `active` or `past_due`
+2. The **business** is `approved` by an admin
+3. The **profile** is published (`is_published = true`)
+4. The **owner's account** is `active`
 
 The SQL for this rule lives in one place (see [DATABASE_DESIGN.md → 8.1](DATABASE_DESIGN.md#81-which-businesses-are-publicly-visible)).
 

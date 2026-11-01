@@ -142,11 +142,11 @@ Each phase ends with something you can run and try. **Phases 1–3 build and dep
 
 | Phase | Goal | What you will be able to see |
 |---|---|---|
-| 0 | Planning documents | This `docs/` folder ✅ *(waiting for approval)* |
-| 1 ✅ | **Backend foundation** | The backend with its four layers (`api`, `services`, `data`, `models`) and the ESLint layer rules. PostgreSQL through Docker, settings from environment variables, migrations, the seed script, `GET /health` (200/503), `.env.example` and the README. |
-| 2 ✅ | **Email queue + accounts** | `email_jobs` table, the background worker, Resend sender, retries (1 try + 4 retries), and `pending` / `sent` / `failed` statuses. Registration, login, email confirmation, forgot password and the contact form all **enqueue** emails. |
-| 3 ⏳ | **Deploy + monitor** ([guide](DEPLOYMENT.md)) | API, worker and PostgreSQL running online. An Asniher monitor on `/health`, its screenshot in the README, example `curl` requests. ✅ **Backend requirements complete.** |
-| 4 ✅ | Frontend foundation | React app with layouts, navigation, and the login and registration pages connected to the API |
+| 0 (done) | Planning documents | This `docs/` folder |
+| 1 (done) | **Backend foundation** | The backend with its four layers (`api`, `services`, `data`, `models`) and the ESLint layer rules. PostgreSQL through Docker, settings from environment variables, migrations, the seed script, `GET /health` (200/503), `.env.example` and the README. |
+| 2 (done) | **Email queue + accounts** | `email_jobs` table, the background worker, Resend sender, retries (1 try + 4 retries), and `pending` / `sent` / `failed` statuses. Registration, login, email confirmation, forgot password and the contact form all **enqueue** emails. |
+| 3 (in progress) | **Deploy + monitor** ([guide](DEPLOYMENT.md)) | API, worker and PostgreSQL running online. An Asniher monitor on `/health`, its screenshot in the README, example `curl` requests. **Backend requirements complete.** |
+| 4 (done) | Frontend foundation | React app with layouts, navigation, and the login and registration pages connected to the API |
 | 5 | Business profile | Edit profile, logo, photos, categories, services and prices, working hours and booking settings |
 | 6 | Subscriptions | Pricing page, choosing a plan, mock checkout, manual payments, admin approval, go-live checklist and publishing |
 | 7 | Discovery | Homepage, Explore page with search and filters, and public business profiles |

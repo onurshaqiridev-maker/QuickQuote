@@ -153,9 +153,9 @@ What the monitor sees:
 
 | Situation | `/health` answer | Asniher shows |
 |---|---|---|
-| Everything works | `200` with `"database":"ok"` | Up ✅ |
-| The database is unreachable or slower than 2 s | `503` with `"database":"unreachable"` | Down 🔴, and you get an alert |
-| The app itself has crashed | No answer, or an error from Render | Down 🔴, and you get an alert |
+| Everything works | `200` with `"database":"ok"` | Up |
+| The database is unreachable or slower than 2 s | `503` with `"database":"unreachable"` | Down, and you get an alert |
+| The app itself has crashed | No answer, or an error from Render | Down, and you get an alert |
 
 **Optional test of the alert:** in Render, open **quickquote-db** and temporarily **suspend** it (if your plan offers that), or temporarily change `DATABASE_URL` on the web service to a wrong value. `/health` turns `503` and Asniher should alert. Undo the change afterwards.
 
