@@ -417,4 +417,4 @@ This table maps every item of the original brief to where it is covered.
 | PostgreSQL, migrations, seeds, settings from environment variables | S-07, S-08, [DATABASE_DESIGN.md → 10, 11](DATABASE_DESIGN.md#10-migrations-plan) |
 | **Database entities and relationships** | [DATABASE_DESIGN.md](DATABASE_DESIGN.md) |
 | **GET /health** with 200 / 503 | S-03, [ARCHITECTURE.md → 11](ARCHITECTURE.md#11-health-check-and-monitoring) |
-| **Diagrams:** system, database, reservation, email queue | [README](../README.md#diagrams) |
+| **Diagrams:** system, database, reservation, email queue | [ARCHITECTURE §2](ARCHITECTURE.md#2-system-architecture-diagram), [DATABASE_DESIGN §3](DATABASE_DESIGN.md#3-relationship-diagram), [USER_FLOWS §4](USER_FLOWS.md#4-make-a-reservation), [EMAIL_WORKFLOW §4](EMAIL_WORKFLOW.md#4-email-queue-workflow-diagram) |

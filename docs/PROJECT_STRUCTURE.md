@@ -32,6 +32,7 @@ backend/
 │   ├── server.ts                        # Entry point 1: starts the API server (HTTP)
 │   ├── worker.ts                        # Entry point 2: starts the email worker + hourly tasks
 │   ├── all.ts                           # Entry point 3 (optional): API + worker in one process, for cheap hosting
+│   ├── lifecycle.ts                     # Graceful shutdown on SIGTERM/SIGINT (stops components, closes the pool)
 │   │
 │   ├── config/                          # Supporting files (not a layer)
 │   │   ├── env.ts                       # Reads + validates environment variables with Zod
@@ -39,6 +40,11 @@ backend/
 │   │
 │   ├── api/                             # ── LAYER 1: API ──────────────────────────────
 │   │   ├── app.ts                       # Builds the Express app: security, JSON, cookies, routes, errors
+│   │   ├── http-server.ts               # Starts/stops the HTTP server (used by server.ts and all.ts)
+│   │   ├── validation.ts                # parseRequest(): checks input against a Zod schema from models/requests
+│   │   ├── responses.ts                 # sendData() / sendPage(): the { data, meta } response shape
+│   │   ├── session-cookie.ts            # Sets and clears the qq_session login cookie
+│   │   ├── types.d.ts                   # Adds req.user to Express requests
 │   │   ├── routes/                      # Which URL goes to which controller (+ middleware)
 │   │   │   ├── index.ts
 │   │   │   ├── health.routes.ts
@@ -63,15 +69,18 @@ backend/
 │   │       ├── require-role.ts          # requireRole('admin')
 │   │       ├── require-verified-email.ts
 │   │       ├── load-business.ts         # Business owner → req.businessId
-│   │       ├── validate.ts              # Checks body/query/params against a Zod schema
 │   │       ├── upload.ts                # Multer: images only, max 5 MB
 │   │       ├── rate-limit.ts            # express-rate-limit settings
+│   │       ├── request-logger.ts        # One log line per request
 │   │       ├── error-handler.ts         # Domain error code → HTTP status + JSON error
 │   │       └── not-found.ts             # Unknown URL → 404
 │   │
 │   ├── services/                        # ── LAYER 2: SERVICES (business logic) ────────
 │   │   ├── auth.service.ts              # Register, login, email confirmation, password reset
 │   │   ├── user.service.ts              # Profile updates, change password, admin user actions
+│   │   ├── password.service.ts          # bcrypt hashing and checking
+│   │   ├── mappers.ts                   # Entity -> response model (removes private fields)
+│   │   ├── seed.service.ts              # Inserts categories, plans and the first admin (used by seeds/seed.ts)
 │   │   ├── business.service.ts          # Business status, booking settings, go-live checklist, approval
 │   │   ├── profile.service.ts           # Profile content, logo, photos, categories, publish
 │   │   ├── category.service.ts          # Public list + admin management
@@ -90,14 +99,16 @@ backend/
 │   │   ├── email/
 │   │   │   ├── email-queue.service.ts   # enqueue(): the ONLY way business logic "sends" email
 │   │   │   ├── email-worker.service.ts  # Claim jobs, render, send, record result, retries
+│   │   │   ├── email-admin.service.ts   # Admin: list jobs, counts, retry failed jobs
 │   │   │   ├── senders/
+│   │   │   │   ├── index.ts             # getEmailSender(): picks console or Resend from EMAIL_DRIVER
 │   │   │   │   ├── email-sender.ts      # Shared shape: send({ to, subject, html, text })
 │   │   │   │   ├── console.sender.ts    # Development: prints the email
 │   │   │   │   └── resend.sender.ts     # Production: sends through Resend
 │   │   │   └── templates/
 │   │   │       ├── layout.ts            # Shared header/footer/styles
 │   │   │       ├── index.ts             # Template name → template function
-│   │   │       └── *.ts                 # One file per email (customer-welcome.ts, …)
+│   │   │       └── *.templates.ts       # The emails, grouped by topic (account, contact, …)
 │   │   ├── storage.service.ts           # Saves/deletes uploaded files (local disk now, S3 later)
 │   │   ├── contact.service.ts           # Contact form → email job
 │   │   ├── activity.service.ts          # Writes activity log entries
@@ -137,20 +148,23 @@ backend/
 │       ├── requests/                    # Zod schemas for request bodies, queries and params
 │       └── responses/                   # Shapes of the JSON returned to the frontend
 │
-├── migrations/                          # SQL migration files, run in order (see DATABASE_DESIGN.md §10)
+├── migrations/                          # SQL migration files 001_… to 011_…, run in order (see DATABASE_DESIGN.md §10)
+├── scripts/
+│   └── migrate.ts                       # npm run migrate:up / migrate:down
 ├── seeds/
 │   ├── seed.ts                          # Base data: categories, plans, first admin (safe in production)
-│   ├── seed-demo.ts                     # Demo businesses, customers, reservations (development only)
-│   └── data/                            # categories.ts, plans.ts, demo-businesses.ts
+│   └── data/                            # categories.ts, plans.ts
 ├── tests/
 │   ├── unit/                            # Service rules with fake repositories
 │   ├── integration/                     # Repositories + API against a test database
 │   └── helpers/                         # Test database setup, factories
 ├── uploads/                             # Local uploaded files in development (git-ignored)
 ├── .env.example                         # Every variable, with safe placeholder values
-├── eslint.config.js                     # Includes the layer import rules (§3)
+├── eslint.config.mjs                    # Includes the layer import rules (§3)
+├── vitest.config.mts                    # Test settings (uses the quickquote_test database)
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── tsconfig.build.json                  # What `npm run build` compiles into dist/
 ```
 
 **Style:** services and repositories are **plain TypeScript modules that export functions**, for example `reservationService.confirm(...)`. No classes or dependency-injection framework is needed.
@@ -159,16 +173,17 @@ backend/
 
 ## 3. Layer import rules
 
-These rules are written into `eslint.config.js` with `no-restricted-imports`. If a file breaks them, `npm run lint` fails.
+These rules are written into `eslint.config.mjs` with `no-restricted-imports`. If a file breaks them, `npm run lint` fails.
 
 | Files in… | May import from | May **not** import from |
 |---|---|---|
-| `src/api/**` | `services`, `models`, `config`, `express` | `data`, `pg` |
+| `src/api/**` | `services` (except email senders), `models`, `config`, `express` | `data`, `pg`, `resend`, `services/email/senders` |
 | `src/services/**` | `data`, `models`, `config` | `api`, `express` |
 | `src/data/**` | `models`, `config`, `pg` | `api`, `services`, `express` |
 | `src/models/**` | `zod` only | `api`, `services`, `data`, `config`, `express`, `pg` |
-| `src/worker.ts` | `services`, `config` | `api`, `data` |
-| `src/server.ts` | `api`, `config`, `data/db.ts` (only to close the pool on shutdown) | — |
+| `src/worker.ts` | `services`, `config`, `lifecycle.ts` | `api`, `data/repositories`, `express`, `pg` |
+| `seeds/**` | `services`, `config`, `data/db.ts` (only to close the pool) | `api`, `data/repositories`, `express`, `pg` |
+| `src/server.ts`, `src/all.ts` | `api`, `services`, `lifecycle.ts` | — |
 
 Quick self-check before every commit:
 
@@ -262,7 +277,7 @@ frontend/
 | I want to… | Put it in… |
 |---|---|
 | Add a new URL | `api/routes/*.routes.ts` + a controller function |
-| Check the shape of incoming data | A Zod schema in `models/requests/`, used through the `validate` middleware |
+| Check the shape of incoming data | A Zod schema in `models/requests/`, checked in the controller with `parseRequest(schema, req.body)` |
 | Add or change a business rule | The matching file in `services/` |
 | Read or write the database | A function in `data/repositories/` |
 | Change the database structure | A **new** file in `migrations/` |
@@ -290,7 +305,7 @@ Imagine we later add **"customers can leave a review after a completed reservati
 | 5 | `data/repositories/review.repository.ts` | `insert()`, `listByBusiness()` (SQL) |
 | 6 | `services/review.service.ts` | Rules: the reservation must be `completed`, belong to the customer, and not already have a review. Queue an email to the business. |
 | 7 | `api/controllers/customer/review.controller.ts` | Read the body, call the service, send `201` |
-| 8 | `api/routes/customer.routes.ts` | `POST /api/customer/reservations/:id/review` with `validate(...)` |
+| 8 | `api/routes/customer.routes.ts` | `POST /api/customer/reservations/:id/review` (the controller calls `parseRequest(...)`) |
 | 9 | `tests/` | Unit test for the rules, integration test for the endpoint |
 | 10 | `frontend/src/...` | A "Leave a review" form in My Reservations |
 
@@ -314,7 +329,7 @@ Each step only talks to the layer directly below it.
 | `npm run migrate:down` | Undoes the last migration |
 | `npm run migrate:create -- <name>` | Creates a new, empty migration file |
 | `npm run seed` | Inserts base data (categories, plans, first admin) |
-| `npm run seed:demo` | Inserts demo data (refuses to run in production) |
+| `npm run seed:demo` | *(later phase)* Inserts demo data (refuses to run in production) |
 | `npm test` | Runs all tests |
 | `npm run lint` | Checks code style **and the layer rules** |
 | `npm run typecheck` | Checks TypeScript types without building |
@@ -346,7 +361,6 @@ This is how starting the project will work once the code exists.
    npm install
    npm run migrate:up
    npm run seed
-   npm run seed:demo
    ```
 4. Start the API server (terminal 1):
    ```bash

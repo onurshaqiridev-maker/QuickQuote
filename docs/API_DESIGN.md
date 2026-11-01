@@ -69,11 +69,12 @@ The frontend uses `code` to decide what to do, and shows `message` to the user. 
 | `200 OK` | Read or update succeeded | — |
 | `201 Created` | Something new was created | — |
 | `204 No Content` | Success with nothing to return (for example logout, delete) | — |
-| `400 Bad Request` | Input is invalid | `VALIDATION_ERROR` |
+| `202 Accepted` | Accepted for background processing (for example the contact form: the email is queued, not sent yet) | — |
+| `400 Bad Request` | Input is invalid, or a one-time link is invalid or expired | `VALIDATION_ERROR`, `INVALID_TOKEN` |
 | `401 Unauthorized` | Not logged in, or the session expired | `UNAUTHENTICATED`, `INVALID_CREDENTIALS` |
 | `403 Forbidden` | Logged in, but not allowed | `FORBIDDEN`, `ACCOUNT_SUSPENDED`, `EMAIL_NOT_VERIFIED`, `SUBSCRIPTION_REQUIRED`, `PLAN_LIMIT_REACHED` |
 | `404 Not Found` | The item does not exist, or belongs to someone else | `NOT_FOUND` |
-| `409 Conflict` | The request clashes with the current state | `EMAIL_TAKEN`, `SLOT_UNAVAILABLE`, `INVALID_STATUS_TRANSITION`, `CANCELLATION_WINDOW_PASSED`, `GO_LIVE_REQUIREMENTS_NOT_MET`, `CATEGORY_IN_USE`, `SUBSCRIPTION_ALREADY_EXISTS` |
+| `409 Conflict` | The request clashes with the current state | `EMAIL_TAKEN`, `EMAIL_ALREADY_VERIFIED`, `SLOT_UNAVAILABLE`, `INVALID_STATUS_TRANSITION`, `CANCELLATION_WINDOW_PASSED`, `GO_LIVE_REQUIREMENTS_NOT_MET`, `CATEGORY_IN_USE`, `SUBSCRIPTION_ALREADY_EXISTS` |
 | `429 Too Many Requests` | A rate limit was hit | `RATE_LIMITED` |
 | `500 Internal Server Error` | An unexpected error happened | `INTERNAL_ERROR` |
 | `503 Service Unavailable` | The health check found the database unreachable | — |
@@ -152,7 +153,7 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 | `GET` | `/api/businesses` | Public | Search visible businesses. Query: `search`, `category` (slug), `city`, `featured=true`, `page`, `pageSize`. |
 | `GET` | `/api/businesses/:slug` | Public | Full public profile: details, photos, categories, active services, working hours |
 | `GET` | `/api/businesses/:slug/availability` | Public | Free time slots. Query: `serviceId`, `date` (`YYYY-MM-DD`). |
-| `POST` | `/api/contact` | Public | Send a contact form message to the platform admin (queued email) |
+| `POST` | `/api/contact` | Public | Send a contact form message to the platform admin. Answers `202`: the email is queued, the worker sends it. |
 
 ### 6.5 Customer — `/api/customer`
 
@@ -247,7 +248,8 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 |---|---|---|---|
 | `GET` | `/api/admin/overview` | Admin | Key numbers, recent activity, email queue status |
 | `GET` | `/api/admin/activity` | Admin | Full activity log. Query: `page`. |
-| `GET` | `/api/admin/email-jobs` | Admin | Email queue. Query: `status` (for example `failed`), `page`. |
+| `GET` | `/api/admin/email-jobs` | Admin | Email queue. Query: `status` (for example `failed`), `page`. The payload is never returned (it can contain private links). |
+| `GET` | `/api/admin/email-jobs/stats` | Admin | Number of `pending`, `sent` and `failed` jobs |
 | `POST` | `/api/admin/email-jobs/:id/retry` | Admin | Put a failed email back in the queue |
 
 **Businesses and users**
@@ -679,7 +681,7 @@ No login is needed, the response is never cached and the endpoint is not rate-li
 
 ## 8. Validation rules
 
-The **request models** in `src/models/requests/` define these rules as Zod schemas. The API layer's `validate` middleware checks every request against its schema before the controller runs.
+The **request models** in `src/models/requests/` define these rules as Zod schemas. Each controller checks the request against its schema with the `parseRequest()` helper (`src/api/validation.ts`) before calling a service, and gets back clean, typed data.
 
 | Field | Rule |
 |---|---|

@@ -271,7 +271,7 @@ The worker then picks the job up again.
 | Risk | Protection |
 |---|---|
 | Two workers send the same job | `FOR UPDATE SKIP LOCKED` when claiming |
-| Resend accepted the email, but the worker crashed before writing `sent`, so the job is retried | The job ID is passed to Resend as an **idempotency key** (`email-job/<id>`). Resend ignores a repeated send with the same key. |
+| The same attempt is sent to Resend twice (for example a network hiccup inside one attempt) | Each attempt passes an **idempotency key** (`email-job/<id>/attempt-<n>`). Resend ignores a repeated request with the same key. A new attempt uses a new key, so a retry after a real failure is never blocked by the earlier error. (Rare case: if the worker crashes in the tiny moment after Resend accepted the email but before `sent` is saved, the next attempt can send one duplicate.) |
 | The hourly subscription check queues the same reminder twice | `dedupe_key` (unique), for example `renewal-reminder:<subscription id>:<period end>:7d` |
 | A user double-clicks a button | The action itself is protected (for example, the reservation status can only change once), so only one email job is created |
 

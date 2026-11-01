@@ -750,7 +750,7 @@ The same values exist in the code, in `src/models/enums.ts`, so the code and the
 | Subscription plans | Starter, Professional, Premium (see [SUBSCRIPTION_MODEL.md](SUBSCRIPTION_MODEL.md#3-initial-pricing)) |
 | First administrator | Created from `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` |
 
-### 11.2 Demo seed (`npm run seed:demo`): development only
+### 11.2 Demo seed (`npm run seed:demo`): development only — added in a later phase, together with the features it fills
 
 The script refuses to run when `NODE_ENV=production`.
 
