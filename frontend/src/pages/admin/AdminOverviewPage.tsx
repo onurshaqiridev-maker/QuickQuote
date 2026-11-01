@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { adminApi } from '../../api/admin.api';
 import { errorMessage } from '../../api/client';
 import { Alert } from '../../components/ui/Alert';
@@ -33,6 +34,7 @@ export function AdminOverviewPage() {
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
   const [retrying, setRetrying] = useState<string | null>(null);
   const stats = useApi('email-queue-stats', () => adminApi.emailQueueStats());
+  const waiting = useApi('businesses-waiting', () => adminApi.businesses({ status: 'pending_review' }));
   const jobs = useApi(`email-jobs/${filter ?? 'all'}/${page}`, () => adminApi.emailJobs(filter, page));
 
   const retry = async (id: string) => {
@@ -54,6 +56,16 @@ export function AdminOverviewPage() {
   return (
     <>
       <PageHeader title="Admin overview" description="Platform health and the email queue." action={<Button variant="secondary" onClick={() => { stats.reload(); jobs.reload(); }}>Refresh</Button>} />
+      <Link
+        to="/admin/businesses?status=pending_review"
+        className="flex items-center justify-between rounded-2xl bg-white p-5 ring-1 ring-slate-200 hover:ring-brand-500"
+      >
+        <div>
+          <p className="text-sm text-slate-500">Businesses waiting for review</p>
+          <p className="mt-1 text-3xl font-bold text-amber-600">{waiting.data?.meta.total ?? '–'}</p>
+        </div>
+        <span className="text-sm font-semibold text-brand-700">Review now</span>
+      </Link>
       <section aria-label="Email queue numbers" className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Emails waiting (pending)" value={stats.data?.pending} tone="text-amber-600" />
         <StatTile label="Emails sent" value={stats.data?.sent} tone="text-green-600" />

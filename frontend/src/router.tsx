@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router';
 import { GuestOnlyRoute, ProtectedRoute } from './components/guards/ProtectedRoute';
 import { DashboardLayout, type DashboardNavItem } from './components/layout/DashboardLayout';
 import { PublicLayout } from './components/layout/PublicLayout';
+import { AdminBusinessDetailPage } from './pages/admin/AdminBusinessDetailPage';
 import { AdminOverviewPage } from './pages/admin/AdminOverviewPage';
 import { AdminQuoteRequestsPage } from './pages/admin/AdminQuoteRequestsPage';
 import { AdminReservationsPage } from './pages/admin/AdminReservationsPage';
@@ -114,6 +115,7 @@ export function AppRoutes() {
       <Route path="admin" element={<ProtectedRoute roles={['admin']}><DashboardLayout title="Administration" items={ADMIN_NAV} /></ProtectedRoute>}>
         <Route index element={<AdminOverviewPage />} />
         <Route path="businesses" element={<ManageBusinessesPage />} />
+        <Route path="businesses/:id" element={<AdminBusinessDetailPage />} />
         <Route path="customers" element={<ManageCustomersPage />} />
         <Route path="reservations" element={<AdminReservationsPage />} />
         <Route path="quotes" element={<AdminQuoteRequestsPage />} />
