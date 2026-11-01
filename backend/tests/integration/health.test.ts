@@ -15,3 +15,11 @@ describe('GET /health (database reachable)', () => {
     expect(typeof response.body.uptimeSeconds).toBe('number');
   });
 });
+
+describe('GET /', () => {
+  it('explains what this server is and where the health check is', async () => {
+    const response = await request(createApp()).get('/');
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ name: 'Quick Quote API', health: '/health' });
+  });
+});
