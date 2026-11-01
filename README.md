@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -169,6 +169,12 @@ Full details: [docs/EMAIL_WORKFLOW.md](docs/EMAIL_WORKFLOW.md).
    ```bash
    npm run migrate:up
    npm run seed
+   ```
+
+   Optional, for development: add 8 demo businesses with logos, photos, services and hours, 1 business waiting for review, and 3 demo customers (password `QuickQuote2026`, e.g. `bella.demo@example.com` or `sara.demo@example.com`):
+
+   ```bash
+   npm run seed:demo
    ```
 
 4. Start the API server (terminal 1):
@@ -399,6 +405,12 @@ curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>
 | `POST` | `/api/contact` | public | Contact form (queues `contact_message_admin`) |
 | `GET` | `/api/config` | public | Platform settings, e.g. `subscriptionsRequired` (free launch) |
 | `GET` | `/api/plans` | public | Active subscription plans (pricing page) |
+| `GET` | `/api/businesses` | public | Search visible businesses (`search`, `category`, `city`, `featured`, `page`, `pageSize`) |
+| `GET` | `/api/businesses/:slug` | public | Public profile: photos, services, prices, hours, contact |
+| `GET` | `/api/cities` | public | Cities with visible businesses |
+| `GET` | `/api/admin/businesses` | admin | List businesses (`status`, `search`, `page`) |
+| `GET` | `/api/admin/businesses/:id` | admin | Business details for review |
+| `POST` | `/api/admin/businesses/:id/approve` / `suspend` / `deactivate` / `reactivate` | admin | Change the status (suspend and deactivate need `{ "reason" }`); the owner is emailed |
 | `GET` | `/api/business/overview` | business | Go-live checklist, plan usage, visibility |
 | `GET` / `PUT` | `/api/business/profile` | business | Read / update the profile details |
 | `POST` / `DELETE` | `/api/business/profile/logo` | business | Upload (multipart, field `file`) / remove the logo |
@@ -435,6 +447,7 @@ The full planned API is in [docs/API_DESIGN.md](docs/API_DESIGN.md).
 | `npm run migrate:down` | Undo the last migration |
 | `npm run migrate:create -- <name>` | Create a new SQL migration file |
 | `npm run seed` | Insert categories, plans and the first admin (safe to run again) |
+| `npm run seed:demo` | Development only: demo businesses and customers (refuses to run in production) |
 | `npm run migrate:deploy` / `npm run seed:deploy` | The same, using the compiled code (used on Render after `npm run build`) |
 | `npm test` | Run all tests |
 | `npm run lint` | Code style **and the layer rules** |

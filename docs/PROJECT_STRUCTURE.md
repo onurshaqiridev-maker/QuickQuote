@@ -125,7 +125,8 @@ backend/
 │   │       ├── auth-token.repository.ts
 │   │       ├── business.repository.ts
 │   │       ├── profile.repository.ts
-│   │       ├── public-business.repository.ts   # The public visibility rule lives here
+│   │       ├── public-business.repository.ts   # The public visibility rule lives here (search, profile, cities)
+│       ├── admin-business.repository.ts    # Admin business list and details
 │   │       ├── category.repository.ts
 │   │       ├── photo.repository.ts
 │   │       ├── offering.repository.ts          # SQL for the "services" table
@@ -153,7 +154,9 @@ backend/
 │   └── migrate.ts                       # npm run migrate:up / migrate:down
 ├── seeds/
 │   ├── seed.ts                          # Base data: categories, plans, first admin (safe in production)
-│   └── data/                            # categories.ts, plans.ts
+│   ├── seed-demo.ts                     # Demo businesses and customers (development only)
+│   ├── demo-images.ts                   # Makes gradient PNG images for the demo businesses
+│   └── data/                            # categories.ts, plans.ts, demo.ts
 ├── tests/
 │   ├── unit/                            # Service rules with fake repositories
 │   ├── integration/                     # Repositories + API against a test database
@@ -225,7 +228,7 @@ frontend/
     │   ├── layout/                # PublicLayout, DashboardLayout, Navbar, Footer, AuthCard,
     │   │                          # EmailVerificationBanner, ScrollToTop
     │   ├── guards/                # ProtectedRoute (login + role), GuestOnlyRoute
-    │   ├── business/              # GoLiveChecklist, CategoryPicker, UsageMeter, ImageUploadButton
+    │   ├── business/              # BusinessCard, BusinessLogo, GoLiveChecklist, CategoryPicker, UsageMeter, ImageUploadButton
     │   └── account/               # AccountSettings (name, phone, password), shared by customers and owners
     ├── pages/
     │   ├── public/                # HomePage, ExplorePage, BusinessDetailsPage, AboutPage, ContactPage, PricingPage

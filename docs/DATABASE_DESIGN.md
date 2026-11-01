@@ -750,18 +750,16 @@ The same values exist in the code, in `src/models/enums.ts`, so the code and the
 | Subscription plans | Starter, Professional, Premium (see [SUBSCRIPTION_MODEL.md](SUBSCRIPTION_MODEL.md#3-initial-pricing)) |
 | First administrator | Created from `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` |
 
-### 11.2 Demo seed (`npm run seed:demo`): development only — added in a later phase, together with the features it fills
+### 11.2 Demo seed (`npm run seed:demo`): development only
 
 The script refuses to run when `NODE_ENV=production`.
 
 | Data | Content |
 |---|---|
-| Demo businesses | 6 businesses in different categories and cities, each with a profile, logo placeholder, services, working hours and an active subscription. Includes one Premium business, so the homepage has a featured business. |
-| Waiting businesses | 1 business in `pending_review` (to test admin approval) and 1 with an expired subscription (to test visibility) |
+| Demo businesses | 8 approved and published businesses in Berlin, Munich, Hamburg and Cologne, across 8 categories, each with a generated logo, photos, services with prices and working hours |
+| Waiting business | 1 business in `pending_review` (to try admin approval) |
 | Demo customers | 3 customers with confirmed emails |
-| Reservations | Examples of every status: pending, confirmed, rejected, cancelled and completed |
-| Quote requests | Examples of every status: pending, processing, completed and rejected |
-| Payments | Paid history for the demo subscriptions |
+| Later phases | Reservations and quote requests will be added to the demo seed in phases 8 and 9 |
 
 All demo accounts share one simple password, printed in the terminal when the seed finishes.
 

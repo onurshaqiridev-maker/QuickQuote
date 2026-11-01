@@ -149,10 +149,10 @@ Each phase ends with something you can run and try. **Phases 1–3 build and dep
 | 4 (done) | Frontend foundation | React app with layouts, navigation, and the login and registration pages connected to the API |
 | 5 (done) | Business profile | Edit profile, logo, photos, categories, services and prices, working hours and booking settings |
 | 6 (postponed: free launch) | Subscriptions | Pricing page, choosing a plan, mock checkout, manual payments, admin approval, go-live checklist and publishing |
-| 7 | Discovery | Homepage, Explore page with search and filters, and public business profiles |
+| 7 (done) | Discovery | Homepage, Explore page with search and filters, and public business profiles |
 | 8 | Reservations | Available time slots, booking, double-booking protection, and reservation pages for businesses and customers |
 | 9 | Quotations | Quote request form, business responses, and customer quote history |
-| 10 | Admin dashboard | Overview, management pages, activity log and email queue monitor |
+| 10 (in progress: business review done) | Admin dashboard | Overview, management pages, activity log and email queue monitor |
 | 11 | Launch preparation | About and Contact pages, frontend deployment, a security review and more tests |
 
 ---
