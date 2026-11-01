@@ -199,56 +199,54 @@ Quick self-check before every commit:
 ```
 frontend/
 ├── index.html
-├── vite.config.ts                 # Dev server; forwards /api and /uploads to http://localhost:4000
-├── tailwind.config.js
-├── .env.example                   # VITE_API_URL
-├── package.json
+├── vite.config.ts                 # Dev server (port 5173); forwards /api and /health to http://localhost:4000
+├── eslint.config.js               # Code checks, including the React hooks rules
+├── tsconfig.json                  # + tsconfig.app.json (the website) and tsconfig.node.json (vite.config.ts)
+├── .env.example                   # VITE_API_URL (empty in development)
+├── public/favicon.svg
 └── src/
     ├── main.tsx                   # Starts React
-    ├── App.tsx                    # Providers (auth) + router
-    ├── router.tsx                 # All routes, grouped by layout and role
+    ├── App.tsx                    # Router + AuthProvider
+    ├── router.tsx                 # ALL routes (29 pages), grouped by layout and protected by role
     ├── api/                       # Talking to the backend
-    │   ├── client.ts              # fetch wrapper: base URL, credentials, JSON, error handling
-    │   ├── auth.api.ts
-    │   ├── public.api.ts
-    │   ├── customer.api.ts
-    │   ├── business.api.ts
-    │   └── admin.api.ts
+    │   ├── client.ts              # fetch wrapper: JSON, login cookie, ApiError with field errors
+    │   ├── auth.api.ts            # register, login, logout, me, verify email, passwords, account settings
+    │   ├── public.api.ts          # categories, plans, contact form
+    │   └── admin.api.ts           # email queue stats, list, retry
     ├── context/
-    │   └── AuthContext.tsx        # Current user from GET /api/auth/me
+    │   ├── auth-context.ts        # The shape of the auth context
+    │   └── AuthProvider.tsx       # Who is logged in (asks GET /api/auth/me on page load)
     ├── hooks/
-    │   ├── useAuth.ts
-    │   └── useApi.ts              # Small helper for loading / error / data states
+    │   ├── useAuth.ts             # const { user, login, logout } = useAuth()
+    │   └── useApi.ts              # const { data, loading, error, reload } = useApi('plans', () => publicApi.plans())
     ├── components/
-    │   ├── ui/                    # Button, Input, Select, Textarea, Card, Badge, StatusBadge,
-    │   │                          # Modal, Table, Tabs, Pagination, EmptyState, Spinner, Alert
-    │   ├── layout/                # PublicLayout, DashboardLayout, Navbar, Footer, Sidebar
-    │   ├── guards/                # ProtectedRoute (checks login + role)
-    │   ├── business/              # BusinessCard, ServiceList, WorkingHoursTable, PhotoGallery
-    │   ├── booking/               # BookingPanel, DatePicker, TimeSlotGrid
-    │   └── quotes/                # QuoteRequestForm
+    │   ├── ui/                    # Button, TextField/SelectField/TextAreaField, Card, Alert, Badge/StatusBadge,
+    │   │                          # Spinner, PageHeader, ComingSoon, Logo
+    │   ├── layout/                # PublicLayout, DashboardLayout, Navbar, Footer, AuthCard,
+    │   │                          # EmailVerificationBanner, ScrollToTop
+    │   ├── guards/                # ProtectedRoute (login + role), GuestOnlyRoute
+    │   └── account/               # AccountSettings (name, phone, password), shared by customers and owners
     ├── pages/
-    │   ├── public/                # HomePage, ExplorePage, BusinessDetailsPage,
-    │   │                          # AboutPage, ContactPage, PricingPage
+    │   ├── public/                # HomePage, ExplorePage, BusinessDetailsPage, AboutPage, ContactPage, PricingPage
     │   ├── auth/                  # CustomerRegisterPage, BusinessRegisterPage, LoginPage,
     │   │                          # ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage
-    │   ├── customer/              # CustomerOverviewPage, MyReservationsPage,
-    │   │                          # MyQuoteRequestsPage, CustomerSettingsPage
-    │   ├── business/              # BusinessOverviewPage, EditProfilePage, ManageServicesPage,
-    │   │                          # WorkingHoursPage, BusinessReservationsPage,
-    │   │                          # BusinessQuoteRequestsPage, SubscriptionPage,
-    │   │                          # MockCheckoutPage, BusinessSettingsPage
+    │   ├── customer/              # CustomerOverviewPage, MyReservationsPage, MyQuoteRequestsPage, CustomerSettingsPage
+    │   ├── business/              # BusinessOverviewPage, EditProfilePage, ManageServicesPage, WorkingHoursPage,
+    │   │                          # BusinessReservationsPage, BusinessQuoteRequestsPage, SubscriptionPage,
+    │   │                          # BusinessSettingsPage
     │   ├── admin/                 # AdminOverviewPage, ManageBusinessesPage, ManageCustomersPage,
-    │   │                          # AdminReservationsPage, AdminQuoteRequestsPage,
-    │   │                          # ManageSubscriptionsPage, ManageCategoriesPage
+    │   │                          # AdminReservationsPage, AdminQuoteRequestsPage, ManageSubscriptionsPage,
+    │   │                          # ManageCategoriesPage
     │   └── NotFoundPage.tsx
-    ├── types/                     # TypeScript types matching the API responses
-    ├── utils/                     # formatPrice(), formatDateTime(timezone), constants
-    └── styles/
-        └── index.css              # Tailwind base styles
+    ├── types/api.ts               # TypeScript types matching the API responses
+    ├── utils/                     # formatPrice(), formatDateTime(), homePathForRole()
+    ├── styles/index.css           # Tailwind + brand colours
+    └── test/setup.ts              # Test helpers (jest-dom matchers)
 ```
 
-**How the 29 pages map to files:** each numbered page in [FEATURES.md → Pages](FEATURES.md#7-pages) is one file in `src/pages/`. Pieces shared by several pages (such as `StatusBadge` or `BusinessCard`) live in `src/components/`.
+**How the 29 pages map to files:** each numbered page in [FEATURES.md → Pages](FEATURES.md#7-pages) is one file in `src/pages/`. Pieces shared by several pages (such as `StatusBadge` or `AccountSettings`) live in `src/components/`. Pages whose features belong to a later phase already exist and show a "Phase N" panel listing what will come.
+
+**Security note:** `ProtectedRoute` only makes the website friendly (it hides pages you cannot use). The real protection is the backend, which checks the login cookie and the role on every request.
 
 ---
 
@@ -289,7 +287,7 @@ frontend/
 | Add a scheduled task | `services/maintenance.service.ts`, then start it from `worker.ts` |
 | Add a new setting | `config/env.ts` + `.env.example` + the variables table in the README |
 | Add starting data | `seeds/data/` |
-| Add a new page | `frontend/src/pages/...` + a route in `router.tsx` + API functions in `frontend/src/api/` |
+| Add a new page | `frontend/src/pages/...` + a route in `frontend/src/router.tsx` + API functions in `frontend/src/api/` |
 
 ---
 

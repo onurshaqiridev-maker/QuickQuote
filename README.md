@@ -6,12 +6,17 @@ Quick Quote is a platform for finding businesses, requesting quotes and booking 
 - **Customers** use the platform for free. They can find businesses, compare services, request quotes and book appointments.
 - **Administrators** run the platform. They approve businesses, manage categories and plans, and keep an eye on activity.
 
-This repository contains the **backend**: a small monolithic Node.js + TypeScript application with a PostgreSQL database and an email queue that sends through [Resend](https://resend.com). The frontend will be added later (see the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap)).
+This repository contains:
+- the **backend**: a small monolithic Node.js + TypeScript application with a PostgreSQL database and an email queue that sends through [Resend](https://resend.com),
+- the **frontend**: a React website (Vite + TypeScript + Tailwind CSS) that talks to the backend.
+
+See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what comes next.
 
 | | |
 |---|---|
-| **Status** | Phases 1–2 done: four-layer backend, migrations, seed script, `GET /health`, email queue and worker, and accounts. Phase 3 (deployment on Render + Asniher monitoring) is ready to deploy: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
-| **Tech** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
+| **Status** | **Phases 1, 2 and 4 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts) and the frontend foundation (all 29 pages routed, layouts, login and registration, settings, contact form, admin email queue). **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
+| **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
 ---
 
@@ -183,6 +188,16 @@ Full details: [docs/EMAIL_WORKFLOW.md](docs/EMAIL_WORKFLOW.md).
    ```bash
    curl -i http://localhost:4000/health
    ```
+
+7. Start the website (terminal 3):
+
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+   Open **http://localhost:5173**. In development, Vite forwards `/api` requests to the backend on port 4000, so the login cookie works without any extra setup. Log in as the seeded admin (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`) to see the email queue in the admin dashboard.
 
 With the default `EMAIL_DRIVER=console`, emails are **printed in the worker's terminal** instead of being sent. To send real emails, set `EMAIL_DRIVER=resend` and `RESEND_API_KEY` (see below).
 
@@ -390,7 +405,9 @@ The full planned API is in [docs/API_DESIGN.md](docs/API_DESIGN.md).
 
 ## Scripts
 
-Run these in `backend/`:
+**Frontend** (run in `frontend/`): `npm run dev` (website at http://localhost:5173), `npm run build` (production files in `dist/`), `npm test`, `npm run lint`, `npm run typecheck`.
+
+**Backend:** run these in `backend/`:
 
 | Command | What it does |
 |---|---|
@@ -413,8 +430,17 @@ Run these in `backend/`:
 
 ## Tests
 
+Backend:
+
 ```bash
 cd backend
+npm test
+```
+
+Frontend (price formatting, API error handling, role-protected pages):
+
+```bash
+cd frontend
 npm test
 ```
 
@@ -470,6 +496,13 @@ QuickQuote/
     │   ├── data/             # LAYER 3: connection pool, repositories (all SQL)
     │   └── models/           # LAYER 4: entities, DTOs, request/response models
     └── tests/                # Unit + integration tests
+└── frontend/
+    └── src/
+        ├── api/              # fetch wrapper + one file per API area
+        ├── context/, hooks/  # who is logged in (useAuth), loading data (useApi)
+        ├── components/       # UI building blocks, layouts, route guards
+        ├── pages/            # the 29 pages: public, auth, customer, business, admin
+        └── router.tsx        # every URL and which role may open it
 ```
 
 Full explanation: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
