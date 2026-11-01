@@ -5,9 +5,11 @@
 import type { Business, BusinessProfile } from '../models/entities/business.entity';
 import type { Category } from '../models/entities/category.entity';
 import type { EmailJob } from '../models/entities/email-job.entity';
+import type { SubscriptionPlan } from '../models/entities/subscription-plan.entity';
 import type { User } from '../models/entities/user.entity';
 import type { CategoryResponse } from '../models/responses/category.response';
 import type { EmailJobResponse } from '../models/responses/email-job.response';
+import type { PlanResponse } from '../models/responses/plan.response';
 import type { BusinessSummaryResponse, UserResponse } from '../models/responses/user.response';
 
 export function toUserResponse(user: User): UserResponse {
@@ -55,5 +57,20 @@ export function toEmailJobResponse(job: EmailJob): EmailJobResponse {
     lastError: job.lastError,
     sentAt: job.sentAt ? job.sentAt.toISOString() : null,
     createdAt: job.createdAt.toISOString(),
+  };
+}
+
+export function toPlanResponse(plan: SubscriptionPlan): PlanResponse {
+  return {
+    id: plan.id,
+    code: plan.code,
+    name: plan.name,
+    description: plan.description,
+    priceCents: plan.priceCents,
+    currency: plan.currency,
+    billingInterval: plan.billingInterval,
+    maxServices: plan.maxServices,
+    maxPhotos: plan.maxPhotos,
+    isFeatured: plan.isFeatured,
   };
 }
