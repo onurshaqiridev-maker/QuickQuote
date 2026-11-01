@@ -17,7 +17,9 @@ export type ErrorCode =
   | 'NOT_FOUND'
   | 'EMAIL_TAKEN'
   | 'EMAIL_ALREADY_VERIFIED'
-  | 'INVALID_STATUS_TRANSITION';
+  | 'INVALID_STATUS_TRANSITION'
+  | 'PLAN_LIMIT_REACHED'
+  | 'GO_LIVE_REQUIREMENTS_NOT_MET';
 
 export interface ErrorDetail {
   field: string;

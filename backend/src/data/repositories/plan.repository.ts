@@ -69,3 +69,11 @@ export async function insertIfMissing(plan: PlanSeed, db: Queryable = pool): Pro
   );
   return (result.rowCount ?? 0) > 0;
 }
+
+/** The cheapest active plan (its limits apply while a business has no subscription yet). */
+export async function findCheapestActive(db: Queryable = pool): Promise<SubscriptionPlan | null> {
+  const result = await db.query<PlanRow>(
+    'SELECT * FROM subscription_plans WHERE is_active = true ORDER BY price_cents, sort_order LIMIT 1',
+  );
+  return result.rows[0] ? toPlan(result.rows[0]) : null;
+}

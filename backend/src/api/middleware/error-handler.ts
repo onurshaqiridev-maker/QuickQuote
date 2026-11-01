@@ -6,6 +6,7 @@
  * (the details only go to the server log).
  */
 import type { NextFunction, Request, Response } from 'express';
+import multer from 'multer';
 import { logger } from '../../config/logger';
 import { DomainError, type ErrorCode } from '../../models/errors';
 
@@ -21,6 +22,8 @@ const HTTP_STATUS_BY_CODE: Record<ErrorCode, number> = {
   EMAIL_TAKEN: 409,
   EMAIL_ALREADY_VERIFIED: 409,
   INVALID_STATUS_TRANSITION: 409,
+  PLAN_LIMIT_REACHED: 403,
+  GO_LIVE_REQUIREMENTS_NOT_MET: 409,
 };
 
 /** Errors created by Express's JSON body parser (e.g. invalid JSON). */
@@ -35,6 +38,14 @@ export function errorHandler(error: unknown, req: Request, res: Response, _next:
     res.status(HTTP_STATUS_BY_CODE[error.code]).json({
       error: { code: error.code, message: error.message, ...(error.details ? { details: error.details } : {}) },
     });
+    return;
+  }
+
+  // File upload problems (too big, too many files, wrong field name).
+  if (error instanceof multer.MulterError) {
+    const message =
+      error.code === 'LIMIT_FILE_SIZE' ? 'The image must be 5 MB or smaller.' : 'Please upload one image in the "file" field.';
+    res.status(400).json({ error: { code: 'VALIDATION_ERROR', message, details: [{ field: 'file', message }] } });
     return;
   }
 

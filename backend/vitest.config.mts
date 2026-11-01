@@ -16,6 +16,7 @@ export default defineConfig({
       EMAIL_DRIVER: 'console',
       FRONTEND_URL: 'http://localhost:5173',
       ADMIN_NOTIFICATION_EMAIL: 'admin@quickquote.test',
+      UPLOAD_DIR: '/tmp/quickquote-test-uploads',
     },
   },
 });
