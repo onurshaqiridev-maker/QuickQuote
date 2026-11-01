@@ -6,9 +6,21 @@
  *
  * The database address comes from DATABASE_URL (and DATABASE_SSL), like the app itself.
  */
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { runner } from 'node-pg-migrate';
 import { env } from '../src/config/env';
+
+/**
+ * The SQL files live in backend/migrations. This script runs from scripts/ (with tsx)
+ * or from dist/scripts/ (compiled, in production), so look in both places.
+ */
+function findMigrationsDir(): string {
+  const candidates = [path.resolve(__dirname, '../migrations'), path.resolve(__dirname, '../../migrations')];
+  const found = candidates.find((dir) => existsSync(dir));
+  if (!found) throw new Error(`Migrations folder not found. Looked in: ${candidates.join(', ')}`);
+  return found;
+}
 
 export async function runMigrations(direction: 'up' | 'down', databaseUrl = env.DATABASE_URL): Promise<void> {
   await runner({
@@ -16,7 +28,7 @@ export async function runMigrations(direction: 'up' | 'down', databaseUrl = env.
       connectionString: databaseUrl,
       ssl: env.DATABASE_SSL ? { rejectUnauthorized: false } : undefined,
     },
-    dir: path.resolve(__dirname, '../migrations'),
+    dir: findMigrationsDir(),
     direction,
     count: direction === 'down' ? 1 : Infinity,
     migrationsTable: 'pgmigrations',

@@ -13,6 +13,8 @@
     "start": "node dist/src/server.js",
     "start:worker": "node dist/src/worker.js",
     "start:all": "node dist/src/all.js",
+    "migrate:deploy": "node dist/scripts/migrate.js up",
+    "seed:deploy": "node dist/seeds/seed.js",
     "migrate:up": "tsx scripts/migrate.ts up",
     "migrate:down": "tsx scripts/migrate.ts down",
     "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql",
