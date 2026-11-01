@@ -22,5 +22,6 @@ export interface BusinessStatusChange {
   to: BusinessStatus;
   from: BusinessStatus[];
   reason: string | null;
-  adminUserId: string;
+  /** null = the system (e.g. the demo seed) */
+  adminUserId: string | null;
 }

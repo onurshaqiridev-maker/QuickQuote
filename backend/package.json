@@ -19,6 +19,7 @@
     "migrate:down": "tsx scripts/migrate.ts down",
     "migrate:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language sql",
     "seed": "tsx seeds/seed.ts",
+    "seed:demo": "tsx seeds/seed-demo.ts",
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"

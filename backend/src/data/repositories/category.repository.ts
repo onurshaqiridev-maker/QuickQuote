@@ -54,3 +54,9 @@ export async function insertIfMissing(category: CategorySeed, db: Queryable = po
   );
   return (result.rowCount ?? 0) > 0;
 }
+
+/** slug -> id, for the given slugs. */
+export async function findIdsBySlugs(slugs: string[], db: Queryable = pool): Promise<Map<string, string>> {
+  const result = await db.query<{ id: string; slug: string }>('SELECT id, slug FROM categories WHERE slug = ANY($1::text[])', [slugs]);
+  return new Map(result.rows.map((row) => [row.slug, row.id]));
+}
