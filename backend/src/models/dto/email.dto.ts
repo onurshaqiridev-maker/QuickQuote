@@ -12,6 +12,8 @@ export interface EmailPayloads {
   verify_email: { fullName: string; verifyUrl: string };
   password_reset: { fullName: string; resetUrl: string };
   contact_message_admin: { name: string; email: string; subject: string; message: string };
+  business_approved: { fullName: string; businessName: string; isPublished: boolean; profileUrl: string; dashboardUrl: string };
+  business_suspended: { fullName: string; businessName: string; status: 'suspended' | 'deactivated'; reason: string; contactUrl: string };
 }
 
 export type EmailTemplateName = keyof EmailPayloads;

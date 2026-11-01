@@ -4,6 +4,7 @@
  */
 import type { EmailPayloads, EmailTemplateName, RenderedEmail } from '../../../models/dto/email.dto';
 import { adminNewBusiness, businessWelcome, customerWelcome, passwordReset, verifyEmail } from './account.templates';
+import { businessApproved, businessSuspended } from './business.templates';
 import { contactMessageAdmin } from './contact.templates';
 
 type TemplateRegistry = { [Name in EmailTemplateName]: (payload: EmailPayloads[Name]) => RenderedEmail };
@@ -15,6 +16,8 @@ const templates: TemplateRegistry = {
   verify_email: verifyEmail,
   password_reset: passwordReset,
   contact_message_admin: contactMessageAdmin,
+  business_approved: businessApproved,
+  business_suspended: businessSuspended,
 };
 
 export function isKnownTemplate(name: string): name is EmailTemplateName {

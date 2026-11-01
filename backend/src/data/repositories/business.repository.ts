@@ -5,6 +5,7 @@ import type {
   NewBusinessProfile,
   ProfileChanges,
 } from '../../models/dto/business.dto';
+import type { BusinessStatusChange } from '../../models/dto/admin.dto';
 import type { Category } from '../../models/entities/category.entity';
 import type { Business, BusinessProfile } from '../../models/entities/business.entity';
 import { pool, type Queryable } from '../db';
@@ -279,4 +280,23 @@ export async function getGoLiveFacts(businessId: string, db: Queryable = pool): 
     bookableServiceCount: Number(row.bookable_service_count),
     workingHoursCount: Number(row.working_hours_count),
   };
+}
+
+/**
+ * Changes the admin status - but ONLY if the current status is one of `change.from`.
+ * Doing the check inside the UPDATE means two admins clicking at once cannot cause a wrong change.
+ * Returns null if the business does not exist or is in another status.
+ */
+export async function changeStatus(businessId: string, change: BusinessStatusChange, db: Queryable = pool): Promise<Business | null> {
+  const result = await db.query<BusinessRow>(
+    `UPDATE businesses
+        SET status = $2,
+            status_reason = $3,
+            approved_at = CASE WHEN $2 = 'approved' THEN now() ELSE approved_at END,
+            approved_by = CASE WHEN $2 = 'approved' THEN $4::uuid ELSE approved_by END
+      WHERE id = $1 AND status = ANY($5::text[])
+      RETURNING *`,
+    [businessId, change.to, change.reason, change.adminUserId, change.from],
+  );
+  return result.rows[0] ? toBusiness(result.rows[0]) : null;
 }
