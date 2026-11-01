@@ -29,6 +29,7 @@ export function centsToInput(cents: number | null): string {
 /** "€45", "from €25" or "Price on request". */
 export function priceLabel(priceType: 'fixed' | 'starting_from' | 'on_request', priceCents: number | null): string {
   if (priceType === 'on_request' || priceCents === null) return 'Price on request';
+  if (priceCents === 0) return 'Free';
   return priceType === 'starting_from' ? `from ${formatPrice(priceCents)}` : formatPrice(priceCents);
 }
 

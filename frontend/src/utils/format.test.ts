@@ -29,6 +29,7 @@ describe('price input helpers', () => {
     expect(priceLabel('fixed', 4500)).toBe('€45');
     expect(priceLabel('starting_from', 8950)).toBe('from €89.50');
     expect(priceLabel('on_request', null)).toBe('Price on request');
+    expect(priceLabel('fixed', 0)).toBe('Free');
   });
 
   it('formats durations', () => {

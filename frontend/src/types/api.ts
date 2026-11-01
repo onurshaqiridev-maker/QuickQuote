@@ -186,3 +186,92 @@ export interface BusinessOverview {
   };
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
 }
+
+// ---------------------------------------------------------------------------
+// Public discovery
+// ---------------------------------------------------------------------------
+
+export interface PublicCategory {
+  slug: string;
+  name: string;
+  icon: string | null;
+}
+
+export interface BusinessCard {
+  id: string;
+  slug: string;
+  displayName: string;
+  shortDescription: string | null;
+  logoUrl: string | null;
+  city: string | null;
+  isFeatured: boolean;
+  startingPriceCents: number | null;
+  categories: PublicCategory[];
+}
+
+export interface PublicService {
+  id: string;
+  name: string;
+  description: string | null;
+  priceType: PriceType;
+  priceCents: number | null;
+  durationMinutes: number | null;
+  isBookable: boolean;
+}
+
+export interface PublicBusiness {
+  id: string;
+  slug: string;
+  displayName: string;
+  description: string | null;
+  logoUrl: string | null;
+  isFeatured: boolean;
+  timezone: string;
+  contact: { email: string | null; phone: string | null; websiteUrl: string | null };
+  address: { line: string | null; city: string | null; postalCode: string | null; country: string | null };
+  categories: PublicCategory[];
+  photos: Photo[];
+  services: PublicService[];
+  workingHours: WorkingHoursRange[];
+}
+
+export interface City {
+  name: string;
+  businessCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// Admin
+// ---------------------------------------------------------------------------
+
+export interface AdminBusinessOwner {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  emailVerified: boolean;
+}
+
+export interface AdminBusinessListItem {
+  id: string;
+  displayName: string;
+  slug: string;
+  city: string | null;
+  status: BusinessStatus;
+  isPublished: boolean;
+  activeServices: number;
+  owner: AdminBusinessOwner;
+  createdAt: string;
+}
+
+export interface AdminBusinessDetail {
+  id: string;
+  status: BusinessStatus;
+  statusReason: string | null;
+  approvedAt: string | null;
+  createdAt: string;
+  owner: AdminBusinessOwner;
+  profile: BusinessProfile;
+  activeServices: number;
+  checklist: ChecklistItem[];
+}

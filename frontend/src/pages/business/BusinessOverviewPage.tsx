@@ -4,6 +4,7 @@ import { GoLiveChecklist } from '../../components/business/GoLiveChecklist';
 import { UsageMeter } from '../../components/business/UsageMeter';
 import { Alert } from '../../components/ui/Alert';
 import { Badge, StatusBadge } from '../../components/ui/Badge';
+import { ButtonLink } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { FullPageSpinner } from '../../components/ui/Spinner';
@@ -19,6 +20,7 @@ export function BusinessOverviewPage() {
   return (
     <>
       <PageHeader
+        action={overview.isVisible ? <ButtonLink to={`/businesses/${business.slug}`} variant="secondary">View public page</ButtonLink> : undefined}
         title={business.displayName}
         description={
           <span className="flex flex-wrap items-center gap-2">

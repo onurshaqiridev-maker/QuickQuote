@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { publicApi } from '../../api/public.api';
+import { BusinessCard } from '../../components/business/BusinessCard';
 import { Container } from '../../components/layout/PublicLayout';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { CategoryIcon } from '../../components/ui/CategoryIcon';
@@ -19,6 +20,8 @@ export function HomePage() {
   const [city, setCity] = useState('');
   const categories = useApi('categories', () => publicApi.categories());
   const config = useApi('config', () => publicApi.config());
+  // Featured businesses come first in the results, then the newest ones.
+  const highlights = useApi('home-businesses', () => publicApi.searchBusinesses({ pageSize: 6 }));
   const freeLaunch = config.data?.subscriptionsRequired === false;
 
   const submitSearch = (event: FormEvent) => {
@@ -81,6 +84,21 @@ export function HomePage() {
           </div>
         </div>
       </Container>
+
+      {/* A few businesses to discover */}
+      {highlights.data && highlights.data.data.length > 0 && (
+        <Container className="pt-0">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl font-bold text-slate-900">Discover businesses</h2>
+            <Link to="/explore" className="text-sm font-semibold text-brand-700 hover:underline">
+              See all {highlights.data.meta.total}
+            </Link>
+          </div>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {highlights.data.data.map((business) => <BusinessCard key={business.id} business={business} />)}
+          </div>
+        </Container>
+      )}
 
       {/* How it works */}
       <section className="bg-white">
