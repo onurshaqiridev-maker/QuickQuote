@@ -8,7 +8,9 @@ import { Badge, StatusBadge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { TextField } from '../../components/ui/FormField';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Pagination } from '../../components/ui/Pagination';
 import { Spinner } from '../../components/ui/Spinner';
+import { Tabs, type TabItem } from '../../components/ui/Tabs';
 import { useApi } from '../../hooks/useApi';
 import type { BusinessReservation } from '../../types/api';
 import { formatInZone, timeInZone } from '../../utils/dates';
@@ -16,7 +18,7 @@ import { formatDuration, priceLabel } from '../../utils/format';
 
 type Tab = 'pending' | 'upcoming' | 'past' | 'all';
 type Action = 'confirm' | 'reject' | 'cancel' | 'complete';
-const TABS: { value: Tab; label: string }[] = [
+const TABS: TabItem<Tab>[] = [
   { value: 'pending', label: 'Needs your answer' },
   { value: 'upcoming', label: 'Upcoming' },
   { value: 'past', label: 'Past' },
@@ -99,21 +101,14 @@ function ReservationRow({ reservation, onChanged }: { reservation: BusinessReser
 
 export function BusinessReservationsPage() {
   const [params, setParams] = useSearchParams();
-  const tab = (TABS.find((t) => t.value === params.get('tab'))?.value ?? 'upcoming') as Tab;
+  const tab = TABS.find((t) => t.value === params.get('tab'))?.value ?? 'upcoming';
   const page = Math.max(1, Number(params.get('page')) || 1);
   const list = useApi(`business-reservations/${tab}/${page}`, () => businessApi.reservations(tab, page));
-  const totalPages = list.data ? Math.max(1, Math.ceil(list.data.meta.total / list.data.meta.pageSize)) : 1;
 
   return (
     <>
       <PageHeader title="Reservations" description="Confirm new requests and manage your appointments. Customers are emailed automatically." />
-      <div className="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1">
-        {TABS.map((t) => (
-          <button key={t.value} type="button" onClick={() => setParams({ tab: t.value })} className={`rounded-md px-3 py-1.5 text-sm font-medium ${tab === t.value ? 'bg-white shadow-sm' : 'text-slate-600'}`}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs tabs={TABS} active={tab} onChange={(value) => setParams({ tab: value })} />
       {list.loading && !list.data && <Spinner />}
       {list.error && <Alert tone="error">{list.error}</Alert>}
       {list.data && list.data.data.length === 0 && (
@@ -126,13 +121,7 @@ export function BusinessReservationsPage() {
           {list.data.data.map((reservation) => <ReservationRow key={reservation.id} reservation={reservation} onChanged={list.reload} />)}
         </ul>
       )}
-      {list.data && totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
-          <Button variant="secondary" disabled={page <= 1} onClick={() => setParams({ tab, page: String(page - 1) })}>Previous</Button>
-          <span className="text-slate-500">Page {page} of {totalPages}</span>
-          <Button variant="secondary" disabled={page >= totalPages} onClick={() => setParams({ tab, page: String(page + 1) })}>Next</Button>
-        </div>
-      )}
+      {list.data && <Pagination page={page} total={list.data.meta.total} pageSize={list.data.meta.pageSize} onChange={(p) => setParams({ tab, page: String(p) })} />}
     </>
   );
 }

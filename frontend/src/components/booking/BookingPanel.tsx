@@ -3,9 +3,8 @@
  *   1. choose a day   2. choose a free time   3. add notes   4. confirm
  * Times are shown in the business's time zone.
  */
-import { CalendarCheck, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { CalendarCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { ApiError, errorMessage } from '../../api/client';
 import { customerApi } from '../../api/customer.api';
 import { publicApi } from '../../api/public.api';
@@ -14,9 +13,10 @@ import { useAuth } from '../../hooks/useAuth';
 import type { PublicBusiness, PublicService } from '../../types/api';
 import { formatDuration, priceLabel } from '../../utils/format';
 import { addDays, dateParts, longDate, todayIn, weekdayOf } from '../../utils/dates';
-import { EmailVerificationBanner } from '../layout/EmailVerificationBanner';
+import { CustomerOnly } from '../customer/CustomerOnly';
 import { Alert } from '../ui/Alert';
 import { Button, ButtonLink } from '../ui/Button';
+import { Dialog } from '../ui/Dialog';
 import { TextAreaField, TextField } from '../ui/FormField';
 import { Spinner } from '../ui/Spinner';
 
@@ -99,10 +99,7 @@ function TimePicker({ business, service, date, selected, onSelect, reloadKey }: 
 }
 
 export function BookingPanel({ business, service, onClose }: { business: PublicBusiness; service: PublicService; onClose: () => void }) {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const closeButton = useRef<HTMLButtonElement>(null);
+  const { user } = useAuth();
   const [date, setDate] = useState<string | null>(null);
   const [startsAt, setStartsAt] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
@@ -112,18 +109,6 @@ export function BookingPanel({ business, service, onClose }: { business: PublicB
   const [sending, setSending] = useState(false);
   const [booked, setBooked] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-
-  // Close with Escape, keep the page behind from scrolling, start keyboard focus inside the dialog.
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    closeButton.current?.focus();
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
 
   const selectedTime = useMemo(
     () => (startsAt ? new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: business.timezone }).format(new Date(startsAt)) : null),
@@ -152,12 +137,8 @@ export function BookingPanel({ business, service, onClose }: { business: PublicB
     }
   };
 
-  const goToLogin = () => navigate('/login', { state: { from: `${location.pathname}?book=${service.id}` } });
-
   let body: React.ReactNode;
-  if (authLoading) {
-    body = <Spinner />;
-  } else if (booked) {
+  if (booked) {
     body = (
       <div className="py-6 text-center">
         <CalendarCheck className="mx-auto h-12 w-12 text-green-600" aria-hidden />
@@ -171,65 +152,40 @@ export function BookingPanel({ business, service, onClose }: { business: PublicB
         </div>
       </div>
     );
-  } else if (!user) {
-    body = (
-      <div className="space-y-4 py-4 text-center">
-        <p className="text-sm text-slate-600">Log in or create a free account to book. You will come straight back here.</p>
-        <div className="flex justify-center gap-3">
-          <Button onClick={goToLogin}>Log in to book</Button>
-          <ButtonLink to="/register" variant="secondary">Create a free account</ButtonLink>
-        </div>
-      </div>
-    );
-  } else if (user.role !== 'customer') {
-    body = <Alert tone="info">Bookings are made with a customer account. Please log out and use (or create) a customer account to book.</Alert>;
-  } else if (!user.emailVerified) {
-    body = <EmailVerificationBanner />;
   } else {
     body = (
-      <div className="space-y-6">
-        <DayPicker business={business} selected={date} onSelect={(day) => { setDate(day); setStartsAt(null); setError(null); }} />
-        {date && <TimePicker business={business} service={service} date={date} selected={startsAt} onSelect={setStartsAt} reloadKey={reloadKey} />}
-        {startsAt && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-900">3. Anything the business should know?</h3>
-            <TextAreaField label="Notes (optional)" rows={2} maxLength={1000} value={notes} onChange={(e) => setNotes(e.target.value)} error={fieldErrors.notes} />
-            <TextField label="Phone (optional)" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={fieldErrors.phone} autoComplete="tel" />
+      <CustomerOnly action="book" returnQuery={`?book=${service.id}`}>
+        <div className="space-y-6">
+          <DayPicker business={business} selected={date} onSelect={(day) => { setDate(day); setStartsAt(null); setError(null); }} />
+          {date && <TimePicker business={business} service={service} date={date} selected={startsAt} onSelect={setStartsAt} reloadKey={reloadKey} />}
+          {startsAt && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-900">3. Anything the business should know?</h3>
+              <TextAreaField label="Notes (optional)" rows={2} maxLength={1000} value={notes} onChange={(e) => setNotes(e.target.value)} error={fieldErrors.notes} />
+              <TextField label="Phone (optional)" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={fieldErrors.phone} autoComplete="tel" />
+            </div>
+          )}
+          {error && <Alert tone="error">{error}</Alert>}
+          <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <p className="text-sm text-slate-600">
+              {startsAt && date ? <><span className="font-semibold text-slate-900">{longDate(date)}, {selectedTime}</span></> : 'Choose a day and a time.'}
+            </p>
+            <Button onClick={confirm} disabled={!startsAt} loading={sending}>Confirm booking</Button>
           </div>
-        )}
-        {error && <Alert tone="error">{error}</Alert>}
-        <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
-          <p className="text-sm text-slate-600">
-            {startsAt && date ? <><span className="font-semibold text-slate-900">{longDate(date)}, {selectedTime}</span></> : 'Choose a day and a time.'}
-          </p>
-          <Button onClick={confirm} disabled={!startsAt} loading={sending}>Confirm booking</Button>
+          <p className="text-xs text-slate-500">Free cancellation online until {business.booking.cancellationNoticeHours} hours before the appointment.</p>
         </div>
-        <p className="text-xs text-slate-500">Free cancellation online until {business.booking.cancellationNoticeHours} hours before the appointment.</p>
-      </div>
+      </CustomerOnly>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="booking-title"
-        className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl sm:rounded-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-slate-500">Book at {business.displayName}</p>
-            <h2 id="booking-title" className="text-xl font-bold text-slate-900">{service.name}</h2>
-            <p className="mt-1 text-sm text-slate-600">{formatDuration(service.durationMinutes)} · {priceLabel(service.priceType, service.priceCents)}</p>
-          </div>
-          <button ref={closeButton} type="button" onClick={onClose} aria-label="Close" className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {body}
-      </div>
-    </div>
+    <Dialog
+      eyebrow={`Book at ${business.displayName}`}
+      title={service.name}
+      subtitle={`${formatDuration(service.durationMinutes)} · ${priceLabel(service.priceType, service.priceCents)}`}
+      onClose={onClose}
+    >
+      {body}
+    </Dialog>
   );
 }

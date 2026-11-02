@@ -21,9 +21,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-export function Button({ variant = 'primary', loading = false, fullWidth = false, className = '', children, disabled, ...props }: ButtonProps) {
+/** A button. It does NOT submit forms unless you pass type="submit". */
+export function Button({ variant = 'primary', loading = false, fullWidth = false, className = '', children, disabled, type = 'button', ...props }: ButtonProps) {
   return (
     <button
+      type={type}
       className={`${BASE} ${VARIANTS[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
       disabled={disabled || loading}
       {...props}
