@@ -6,6 +6,14 @@ import type { EmailPayloads, EmailTemplateName, RenderedEmail } from '../../../m
 import { adminNewBusiness, businessWelcome, customerWelcome, passwordReset, verifyEmail } from './account.templates';
 import { businessApproved, businessSuspended } from './business.templates';
 import { contactMessageAdmin } from './contact.templates';
+import {
+  reservationCancelledBusiness,
+  reservationCancelledCustomer,
+  reservationConfirmedCustomer,
+  reservationNewBusiness,
+  reservationReceivedCustomer,
+  reservationRejectedCustomer,
+} from './reservation.templates';
 
 type TemplateRegistry = { [Name in EmailTemplateName]: (payload: EmailPayloads[Name]) => RenderedEmail };
 
@@ -18,6 +26,12 @@ const templates: TemplateRegistry = {
   contact_message_admin: contactMessageAdmin,
   business_approved: businessApproved,
   business_suspended: businessSuspended,
+  reservation_new_business: reservationNewBusiness,
+  reservation_received_customer: reservationReceivedCustomer,
+  reservation_confirmed_customer: reservationConfirmedCustomer,
+  reservation_rejected_customer: reservationRejectedCustomer,
+  reservation_cancelled_customer: reservationCancelledCustomer,
+  reservation_cancelled_business: reservationCancelledBusiness,
 };
 
 export function isKnownTemplate(name: string): name is EmailTemplateName {

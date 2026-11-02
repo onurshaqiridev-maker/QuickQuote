@@ -41,6 +41,8 @@ export interface PublicBusinessResponse {
   logoUrl: string | null;
   isFeatured: boolean;
   timezone: string;
+  /** Rules the booking calendar needs. */
+  booking: { maxAdvanceDays: number; minNoticeHours: number; cancellationNoticeHours: number };
   contact: { email: string | null; phone: string | null; websiteUrl: string | null };
   address: { line: string | null; city: string | null; postalCode: string | null; country: string | null };
   categories: PublicCategory[];

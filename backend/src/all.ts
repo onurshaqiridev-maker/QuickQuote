@@ -6,5 +6,6 @@
 import { startHttpServer } from './api/http-server';
 import { runUntilShutdown } from './lifecycle';
 import { startEmailWorker } from './services/email/email-worker.service';
+import { startMaintenance } from './services/maintenance.service';
 
-runUntilShutdown([startHttpServer(), startEmailWorker()]);
+runUntilShutdown([startHttpServer(), startEmailWorker(), startMaintenance()]);

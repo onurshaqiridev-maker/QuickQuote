@@ -26,6 +26,10 @@ export interface PublicBusinessRow {
   postalCode: string | null;
   country: string | null;
   timezone: string;
+  slotIntervalMinutes: number;
+  minNoticeHours: number;
+  maxAdvanceDays: number;
+  cancellationNoticeHours: number;
   isFeatured: boolean;
 }
 

@@ -1,5 +1,6 @@
 import type { BusinessStatus, PriceType, SubscriptionStatus } from '../enums';
 import type { CategoryResponse } from './category.response';
+import type { BusinessReservationResponse } from './reservation.response';
 import type { BusinessSummaryResponse } from './user.response';
 
 export interface PhotoResponse {
@@ -97,4 +98,5 @@ export interface BusinessOverviewResponse {
   subscriptionsRequired: boolean;
   usage: PlanUsageResponse;
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
+  reservations: { pendingCount: number; today: BusinessReservationResponse[] };
 }

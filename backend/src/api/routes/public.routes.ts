@@ -15,4 +15,5 @@ publicRoutes.get('/plans', planController.listPlans);
 publicRoutes.get('/cities', discoveryController.listCities);
 publicRoutes.get('/businesses', discoveryController.searchBusinesses);
 publicRoutes.get('/businesses/:slug', discoveryController.getBusiness);
+publicRoutes.get('/businesses/:slug/availability', discoveryController.getAvailability);
 publicRoutes.post('/contact', contactLimiter, contactController.sendContactMessage);

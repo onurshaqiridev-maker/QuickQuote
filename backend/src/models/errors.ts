@@ -19,7 +19,9 @@ export type ErrorCode =
   | 'EMAIL_ALREADY_VERIFIED'
   | 'INVALID_STATUS_TRANSITION'
   | 'PLAN_LIMIT_REACHED'
-  | 'GO_LIVE_REQUIREMENTS_NOT_MET';
+  | 'GO_LIVE_REQUIREMENTS_NOT_MET'
+  | 'SLOT_UNAVAILABLE'
+  | 'CANCELLATION_WINDOW_PASSED';
 
 export interface ErrorDetail {
   field: string;

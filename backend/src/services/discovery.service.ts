@@ -65,6 +65,11 @@ export async function getPublicBusiness(slug: string): Promise<PublicBusinessRes
     logoUrl: business.logoUrl,
     isFeatured: business.isFeatured,
     timezone: business.timezone,
+    booking: {
+      maxAdvanceDays: business.maxAdvanceDays,
+      minNoticeHours: business.minNoticeHours,
+      cancellationNoticeHours: business.cancellationNoticeHours,
+    },
     contact: { email: business.contactEmail, phone: business.contactPhone, websiteUrl: business.websiteUrl },
     address: { line: business.addressLine, city: business.city, postalCode: business.postalCode, country: business.country },
     categories: categories.filter((c) => c.isActive).map((c) => ({ slug: c.slug, name: c.name, icon: c.icon })),

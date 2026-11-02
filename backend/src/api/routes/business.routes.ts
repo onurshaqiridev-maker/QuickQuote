@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as offeringController from '../controllers/business/offering.controller';
 import * as overviewController from '../controllers/business/overview.controller';
 import * as profileController from '../controllers/business/profile.controller';
+import * as reservationController from '../controllers/business/reservation.controller';
 import * as scheduleController from '../controllers/business/schedule.controller';
 import { authenticate } from '../middleware/authenticate';
 import { loadBusiness } from '../middleware/load-business';
@@ -42,3 +43,11 @@ businessRoutes.put('/working-hours', scheduleController.replaceWorkingHours);
 businessRoutes.get('/blocked-times', scheduleController.listBlockedTimes);
 businessRoutes.post('/blocked-times', scheduleController.addBlockedTime);
 businessRoutes.delete('/blocked-times/:id', scheduleController.deleteBlockedTime);
+
+// Reservations
+businessRoutes.get('/reservations', reservationController.listReservations);
+businessRoutes.get('/reservations/:id', reservationController.getReservation);
+businessRoutes.post('/reservations/:id/confirm', reservationController.confirm);
+businessRoutes.post('/reservations/:id/reject', reservationController.reject);
+businessRoutes.post('/reservations/:id/cancel', reservationController.cancel);
+businessRoutes.post('/reservations/:id/complete', reservationController.complete);

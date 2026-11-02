@@ -88,3 +88,12 @@ export async function deleteBlockedTime(businessId: string, id: string, db: Quer
   const result = await db.query('DELETE FROM blocked_times WHERE id = $1 AND business_id = $2', [id, businessId]);
   return (result.rowCount ?? 0) > 0;
 }
+
+/** Blocked periods of a business that overlap [from, to). */
+export async function listBlockedBetween(businessId: string, from: Date, to: Date, db: Queryable = pool): Promise<{ start: Date; end: Date }[]> {
+  const result = await db.query<{ starts_at: Date; ends_at: Date }>(
+    'SELECT starts_at, ends_at FROM blocked_times WHERE business_id = $1 AND starts_at < $3 AND ends_at > $2',
+    [businessId, from, to],
+  );
+  return result.rows.map((row) => ({ start: row.starts_at, end: row.ends_at }));
+}

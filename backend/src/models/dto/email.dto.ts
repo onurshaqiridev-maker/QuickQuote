@@ -14,6 +14,21 @@ export interface EmailPayloads {
   contact_message_admin: { name: string; email: string; subject: string; message: string };
   business_approved: { fullName: string; businessName: string; isPublished: boolean; profileUrl: string; dashboardUrl: string };
   business_suspended: { fullName: string; businessName: string; status: 'suspended' | 'deactivated'; reason: string; contactUrl: string };
+  reservation_new_business: ReservationEmailData & { customerName: string; customerEmail: string; customerPhone: string | null; customerNotes: string | null; dashboardUrl: string };
+  reservation_received_customer: ReservationEmailData & { customerName: string; accountUrl: string };
+  reservation_confirmed_customer: ReservationEmailData & { customerName: string; address: string | null; accountUrl: string };
+  reservation_rejected_customer: ReservationEmailData & { customerName: string; message: string | null; profileUrl: string };
+  reservation_cancelled_customer: ReservationEmailData & { customerName: string; message: string | null; cancelledBy: 'business' | 'system'; profileUrl: string };
+  reservation_cancelled_business: ReservationEmailData & { customerName: string; message: string | null; dashboardUrl: string };
+}
+
+/** Details every reservation email shows. Dates are already formatted in the business's time zone. */
+export interface ReservationEmailData {
+  businessName: string;
+  serviceName: string;
+  /** e.g. "Tuesday, 10 November 2026 at 09:30" */
+  when: string;
+  price: string;
 }
 
 export type EmailTemplateName = keyof EmailPayloads;

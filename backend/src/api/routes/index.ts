@@ -3,6 +3,7 @@ import { accountRoutes } from './account.routes';
 import { adminRoutes } from './admin.routes';
 import { authRoutes } from './auth.routes';
 import { businessRoutes } from './business.routes';
+import { customerRoutes } from './customer.routes';
 import { publicRoutes } from './public.routes';
 
 /** Every /api route. */
@@ -12,4 +13,5 @@ apiRoutes.use('/auth', authRoutes);
 apiRoutes.use('/account', accountRoutes);
 apiRoutes.use('/admin', adminRoutes);
 apiRoutes.use('/business', businessRoutes);
+apiRoutes.use('/customer', customerRoutes);
 apiRoutes.use('/', publicRoutes);

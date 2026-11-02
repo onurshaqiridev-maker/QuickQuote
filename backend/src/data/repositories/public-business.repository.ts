@@ -118,19 +118,32 @@ interface ProfileRow {
   postal_code: string | null;
   country: string | null;
   timezone: string;
+  slot_interval_minutes: number;
+  min_notice_hours: number;
+  max_advance_days: number;
+  cancellation_notice_hours: number;
   is_featured: boolean;
 }
 
+const PROFILE_SELECT = `
+  SELECT b.id, b.timezone, b.slot_interval_minutes, b.min_notice_hours, b.max_advance_days, b.cancellation_notice_hours,
+         p.slug, p.display_name, p.description, p.logo_url, p.contact_email, p.contact_phone,
+         p.website_url, p.address_line, p.city, p.postal_code, p.country, ${IS_FEATURED} AS is_featured
+    ${FROM}`;
+
 /** The business behind a public URL - only if it is visible. */
 export async function findVisibleBySlug(slug: string, requireSubscription: boolean, db: Queryable = pool): Promise<PublicBusinessRow | null> {
-  const result = await db.query<ProfileRow>(
-    `SELECT b.id, b.timezone, p.slug, p.display_name, p.description, p.logo_url, p.contact_email, p.contact_phone,
-            p.website_url, p.address_line, p.city, p.postal_code, p.country, ${IS_FEATURED} AS is_featured
-       ${FROM}
-      WHERE ${VISIBLE} AND p.slug = $2`,
-    [requireSubscription, slug],
-  );
-  const row = result.rows[0];
+  const result = await db.query<ProfileRow>(`${PROFILE_SELECT} WHERE ${VISIBLE} AND p.slug = $2`, [requireSubscription, slug]);
+  return toPublicRow(result.rows[0]);
+}
+
+/** Same, by id (used when booking). */
+export async function findVisibleById(id: string, requireSubscription: boolean, db: Queryable = pool): Promise<PublicBusinessRow | null> {
+  const result = await db.query<ProfileRow>(`${PROFILE_SELECT} WHERE ${VISIBLE} AND b.id = $2`, [requireSubscription, id]);
+  return toPublicRow(result.rows[0]);
+}
+
+function toPublicRow(row: ProfileRow | undefined): PublicBusinessRow | null {
   if (!row) return null;
   return {
     id: row.id,
@@ -146,6 +159,10 @@ export async function findVisibleBySlug(slug: string, requireSubscription: boole
     postalCode: row.postal_code,
     country: row.country,
     timezone: row.timezone,
+    slotIntervalMinutes: row.slot_interval_minutes,
+    minNoticeHours: row.min_notice_hours,
+    maxAdvanceDays: row.max_advance_days,
+    cancellationNoticeHours: row.cancellation_notice_hours,
     isFeatured: row.is_featured,
   };
 }
