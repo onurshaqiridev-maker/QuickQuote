@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Quote requests work** (phase 9): customers describe what they need, businesses answer with a message and an optional price (or decline), and customers accept or decline the quote, with an email at every step. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Quote requests work** (phase 9): customers describe what they need, businesses answer with a message and an optional price (or decline), and customers accept or decline the quote, with an email at every step. **The admin panel is complete** (phase 10): platform numbers and an activity feed, user management (suspend and reactivate), read-only lists of all reservations and quote requests, and category management. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -494,6 +494,14 @@ Each step queues an email (`quote_new_business` and `quote_received_customer`, t
 | `POST` | `/api/business/quote-requests/:id/reject` | business | Decline (optional `{ "message" }`) |
 | `GET` | `/api/business/reservations[/:id]` | business | List (`tab=pending\|upcoming\|past\|all`) / one reservation |
 | `POST` | `/api/business/reservations/:id/confirm` / `reject` / `cancel` / `complete` | business | Answer a request (optional `{ "message" }`); the customer is emailed |
+| `GET` | `/api/admin/stats` | admin | Platform numbers (users, businesses by status, reservations and quotes this week) |
+| `GET` | `/api/admin/activity` | admin | Activity feed: who did what, newest first |
+| `GET` | `/api/admin/users[/:id]` | admin | Users (`role`, `status`, `search`) / one user with counts |
+| `POST` | `/api/admin/users/:id/suspend` / `reactivate` | admin | Block (with `{ "reason" }`) or allow login again |
+| `GET` | `/api/admin/reservations` | admin | All reservations (`status`, `search`, `from`, `to`) |
+| `GET` | `/api/admin/quote-requests` | admin | All quote requests (`status`, `search`) |
+| `GET` / `POST` | `/api/admin/categories` | admin | Categories with business counts / add one |
+| `PUT` / `DELETE` | `/api/admin/categories/:id` | admin | Edit (name, address name, icon, position, on/off) / delete if unused |
 | `GET` | `/api/admin/email-jobs` | admin | List email jobs (`?status=pending\|sent\|failed&page=1&pageSize=20`) |
 | `GET` | `/api/admin/email-jobs/stats` | admin | Count of jobs per status |
 | `POST` | `/api/admin/email-jobs/:id/retry` | admin | Retry a failed job |

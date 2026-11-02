@@ -250,8 +250,8 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/admin/overview` | Admin | Key numbers, recent activity, email queue status |
-| `GET` | `/api/admin/activity` | Admin | Full activity log. Query: `page`. |
+| `GET` | `/api/admin/stats` | Admin | Key numbers: customers, business owners, suspended accounts, businesses by status (and how many are visible), reservations and quote requests in the last 7 days, open ones |
+| `GET` | `/api/admin/activity` | Admin | Full activity log, newest first, with the actor's name and a readable `entityLabel`. Query: `page`, `pageSize`. |
 | `GET` | `/api/admin/email-jobs` | Admin | Email queue. Query: `status` (for example `failed`), `page`. The payload is never returned (it can contain private links). |
 | `GET` | `/api/admin/email-jobs/stats` | Admin | Number of `pending`, `sent` and `failed` jobs |
 | `POST` | `/api/admin/email-jobs/:id/retry` | Admin | Put a failed email back in the queue |
@@ -268,15 +268,15 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 | `POST` | `/api/admin/businesses/:id/reactivate` | Admin | `deactivated` → `approved` |
 | `GET` | `/api/admin/users` | Admin | All users. Query: `role` (for example `customer`), `status`, `search`, `page`. |
 | `GET` | `/api/admin/users/:id` | Admin | User details with reservation and quote counts |
-| `POST` | `/api/admin/users/:id/suspend` | Admin | Block login. Body: `{ "reason": string }` |
+| `POST` | `/api/admin/users/:id/suspend` | Admin | Block login (effective on the next request). Body: `{ "reason": string }`. Administrators cannot be suspended (`403`). A suspended owner's business is hidden. |
 | `POST` | `/api/admin/users/:id/reactivate` | Admin | Allow login again |
 
 **Reservations and quotes (read-only)**
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/admin/reservations` | Admin | All reservations. Query: `status`, `businessId`, `from`, `to`, `page`. |
-| `GET` | `/api/admin/quote-requests` | Admin | All quote requests. Query: `status`, `businessId`, `page`. |
+| `GET` | `/api/admin/reservations` | Admin | All reservations. Query: `status`, `search` (business, customer or service), `from`, `to` (`YYYY-MM-DD`, appointment day), `page`. |
+| `GET` | `/api/admin/quote-requests` | Admin | All quote requests. Query: `status`, `search` (business, customer or subject), `page`. |
 
 **Subscriptions, payments and plans**
 

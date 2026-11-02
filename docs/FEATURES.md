@@ -107,8 +107,8 @@ Customers use everything for **free**.
 | A-05 | Manage customers | Search and filter users, see details and counts, suspend/reactivate |
 | A-06 | View reservations | All reservations, filtered by status, business or date range |
 | A-07 | View quote requests | All quote requests, filtered by status or business |
-| A-08 | Manage subscription plans | Create, edit prices and limits, activate/deactivate (never delete) |
-| A-09 | Subscriptions and payments | View all subscriptions and payments. Mark bank transfers as paid or failed. |
+| A-08 | Manage subscription plans | Create, edit prices and limits, activate/deactivate (never delete). Postponed with phase 6 (free launch). |
+| A-09 | Subscriptions and payments | View all subscriptions and payments. Mark bank transfers as paid or failed. Postponed with phase 6 (free launch). |
 | A-10 | Manage categories | Create, edit, reorder, activate/deactivate, delete if unused |
 | A-11 | Activity log | Timeline of important events, with who did them |
 | A-12 | Email queue monitor | Pending and failed counts, the list of failed jobs with their errors, **Retry** button |
