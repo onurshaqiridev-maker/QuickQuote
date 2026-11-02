@@ -40,3 +40,23 @@ export function layout(title: string, bodyHtml: string): string {
 </body>
 </html>`;
 }
+
+/** A small two-column table of details, e.g. [["Service", "Haircut"], ["Price", "45.00 EUR"]]. Empty values are skipped. */
+export function detailsTable(rows: [label: string, value: string | null][]): string {
+  const cells = rows
+    .filter(([, value]) => value)
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:4px 12px 4px 0;color:#6b7280;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:4px 0;font-weight:bold;">${escapeHtml(value as string)}</td></tr>`,
+    )
+    .join('');
+  return `<table style="margin:0 0 16px;border-collapse:collapse;">${cells}</table>`;
+}
+
+/** The plain-text version of `detailsTable`. */
+export function detailsText(rows: [label: string, value: string | null][]): string {
+  return rows
+    .filter(([, value]) => value)
+    .map(([label, value]) => `${label}: ${value}`)
+    .join('\n');
+}

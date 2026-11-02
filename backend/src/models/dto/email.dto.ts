@@ -3,7 +3,7 @@
  *
  * `EmailPayloads` lists every email template and the data it needs.
  * TypeScript then checks that every `enqueueEmail(...)` call passes the right data.
- * New emails (reservations, quotes, subscriptions...) are added here in later phases.
+ * New emails (for example subscriptions) are added here in later phases.
  */
 export interface EmailPayloads {
   customer_welcome: { fullName: string; verifyUrl: string };
@@ -20,6 +20,39 @@ export interface EmailPayloads {
   reservation_rejected_customer: ReservationEmailData & { customerName: string; message: string | null; profileUrl: string };
   reservation_cancelled_customer: ReservationEmailData & { customerName: string; message: string | null; cancelledBy: 'business' | 'system'; profileUrl: string };
   reservation_cancelled_business: ReservationEmailData & { customerName: string; message: string | null; dashboardUrl: string };
+  quote_new_business: QuoteEmailData & {
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string | null;
+    description: string;
+    preferredDate: string | null;
+    budget: string | null;
+    dashboardUrl: string;
+  };
+  quote_received_customer: QuoteEmailData & { customerName: string; accountUrl: string };
+  quote_status_customer: QuoteEmailData & {
+    customerName: string;
+    status: 'processing' | 'completed' | 'rejected';
+    price: string | null;
+    message: string | null;
+    accountUrl: string;
+  };
+  quote_decision_business: QuoteEmailData & {
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string | null;
+    decision: 'accepted' | 'declined';
+    price: string | null;
+    dashboardUrl: string;
+  };
+}
+
+/** Details every quote email shows. */
+export interface QuoteEmailData {
+  businessName: string;
+  subject: string;
+  /** null = a general request */
+  serviceName: string | null;
 }
 
 /** Details every reservation email shows. Dates are already formatted in the business's time zone. */

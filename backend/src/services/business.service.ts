@@ -12,6 +12,7 @@ import type {
   ChecklistItemResponse,
 } from '../models/responses/business.response';
 import { toBookingSettingsResponse, toBusinessSummaryResponse } from './mappers';
+import { getBusinessQuoteCounts } from './quote.service';
 import { getBusinessToday } from './reservation.service';
 import { getCurrentSubscription, getPlanLimits } from './subscription.service';
 
@@ -103,7 +104,7 @@ export async function getOverview(businessId: string): Promise<BusinessOverviewR
   if (!business || !profile || !facts) throw new NotFoundError('Business not found.');
 
   const checklist = buildChecklist(facts, business.status === 'approved', profile.isPublished);
-  const reservations = await getBusinessToday(businessId, business.timezone);
+  const [reservations, quotes] = await Promise.all([getBusinessToday(businessId, business.timezone), getBusinessQuoteCounts(businessId)]);
   return {
     business: toBusinessSummaryResponse(business, profile),
     checklist,
@@ -116,6 +117,7 @@ export async function getOverview(businessId: string): Promise<BusinessOverviewR
       photos: { used: photoCount, limit: limits.maxPhotos },
     },
     reservations,
+    quotes,
     subscription: subscription
       ? {
           status: subscription.status,

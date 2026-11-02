@@ -1,5 +1,5 @@
-/** Demo businesses and customers for development (npm run seed:demo). Fictional data. */
-import type { DemoBusinessSpec, DemoCustomerSpec } from '../../src/models/dto/demo.dto';
+/** Demo businesses, customers and quote requests for development (npm run seed:demo). Fictional data. */
+import type { DemoBusinessSpec, DemoCustomerSpec, DemoQuoteSpec } from '../../src/models/dto/demo.dto';
 import { gradientPng } from '../demo-images';
 
 const WEEKDAYS = [1, 2, 3, 4, 5];
@@ -136,5 +136,43 @@ export const demoBusinesses: DemoBusinessSpec[] = [
     hours: [{ days: WEEKDAYS, startTime: '08:00', endTime: '16:00' }],
     logo: logo([34, 197, 94], [21, 128, 61]),
     photos: [],
+  },
+];
+
+/** Quote requests in every status, so both the customer and the business pages have something to show. */
+export const demoQuotes: DemoQuoteSpec[] = [
+  {
+    customerEmail: 'sara.demo@example.com', businessOwnerEmail: 'bella.demo@example.com', serviceName: 'Bridal hair',
+    subject: 'Bridal hair for my wedding',
+    description: 'My wedding is in June. Long hair, I would like an updo with small flowers, and a trial session before the big day.',
+    preferredInDays: 60, budgetCents: 25000, status: 'pending',
+  },
+  {
+    customerEmail: 'jonas.demo@example.com', businessOwnerEmail: 'plumbing.demo@example.com', serviceName: 'New bathroom installation',
+    subject: 'Renovate small bathroom',
+    description: 'About 5 square metres. New tiles, a walk-in shower instead of the bathtub, and a new toilet.',
+    preferredInDays: 45, budgetCents: 500000, status: 'completed',
+    answer: { quotedPriceCents: 460000, message: 'The price includes materials and labour. The work takes about 6 days. We could start in about 6 weeks.' },
+  },
+  {
+    customerEmail: 'sara.demo@example.com', businessOwnerEmail: 'pixel.demo@example.com', serviceName: null,
+    subject: 'Website for my yoga studio',
+    description: 'A simple website with 4 pages: home, classes, prices and contact. Online booking would be nice later.',
+    preferredInDays: null, budgetCents: 150000, status: 'completed',
+    answer: { quotedPriceCents: 120000, message: 'Four pages, mobile friendly, ready in 3 weeks. Booking can be added later for 300 EUR.' },
+    decision: 'accepted',
+  },
+  {
+    customerEmail: 'elena.demo@example.com', businessOwnerEmail: 'lens.demo@example.com', serviceName: 'Wedding photography',
+    subject: 'Wedding photos in September',
+    description: 'Ceremony and party, about 80 guests, from 14:00 to midnight in Cologne.',
+    preferredInDays: 120, budgetCents: null, status: 'processing',
+  },
+  {
+    customerEmail: 'elena.demo@example.com', businessOwnerEmail: 'autocare.demo@example.com', serviceName: null,
+    subject: 'Restore a 1970s classic car',
+    description: 'Rust repair and new paint for an old Volkswagen Beetle.',
+    preferredInDays: null, budgetCents: 300000, status: 'rejected',
+    answer: { message: 'Sorry, we only service modern cars. A classic car specialist would be the right choice.' },
   },
 ];

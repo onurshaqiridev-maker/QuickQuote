@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as offeringController from '../controllers/business/offering.controller';
 import * as overviewController from '../controllers/business/overview.controller';
 import * as profileController from '../controllers/business/profile.controller';
+import * as quoteController from '../controllers/business/quote.controller';
 import * as reservationController from '../controllers/business/reservation.controller';
 import * as scheduleController from '../controllers/business/schedule.controller';
 import { authenticate } from '../middleware/authenticate';
@@ -51,3 +52,10 @@ businessRoutes.post('/reservations/:id/confirm', reservationController.confirm);
 businessRoutes.post('/reservations/:id/reject', reservationController.reject);
 businessRoutes.post('/reservations/:id/cancel', reservationController.cancel);
 businessRoutes.post('/reservations/:id/complete', reservationController.complete);
+
+// Quote requests
+businessRoutes.get('/quote-requests', quoteController.listQuotes);
+businessRoutes.get('/quote-requests/:id', quoteController.getQuote);
+businessRoutes.post('/quote-requests/:id/start', quoteController.start);
+businessRoutes.post('/quote-requests/:id/respond', quoteController.respond);
+businessRoutes.post('/quote-requests/:id/reject', quoteController.reject);

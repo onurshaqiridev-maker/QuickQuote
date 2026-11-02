@@ -24,6 +24,10 @@ export type ReservationStatus = (typeof RESERVATION_STATUSES)[number];
 export const QUOTE_STATUSES = ['pending', 'processing', 'completed', 'rejected'] as const;
 export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
 
+/** What the customer did with a quote the business sent. */
+export const QUOTE_DECISIONS = ['accepted', 'declined'] as const;
+export type QuoteDecision = (typeof QUOTE_DECISIONS)[number];
+
 export const SUBSCRIPTION_STATUSES = ['pending_payment', 'active', 'past_due', 'cancelled', 'expired'] as const;
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 

@@ -8,15 +8,23 @@ import * as businessRepository from '../data/repositories/business.repository';
 import * as categoryRepository from '../data/repositories/category.repository';
 import * as offeringRepository from '../data/repositories/offering.repository';
 import * as photoRepository from '../data/repositories/photo.repository';
+import * as quoteRepository from '../data/repositories/quote.repository';
 import * as scheduleRepository from '../data/repositories/schedule.repository';
 import * as userRepository from '../data/repositories/user.repository';
-import type { DemoBusinessSpec, DemoCustomerSpec, DemoSeedSummary } from '../models/dto/demo.dto';
+import type { DemoBusinessSpec, DemoCustomerSpec, DemoQuoteSpec, DemoSeedSummary } from '../models/dto/demo.dto';
 import { slugify } from './auth.service';
 import { hashPassword } from './password.service';
 import { saveImage } from './storage.service';
 
-export async function seedDemoData(data: { businesses: DemoBusinessSpec[]; customers: DemoCustomerSpec[]; password: string }): Promise<DemoSeedSummary> {
-  const summary: DemoSeedSummary = { businessesCreated: 0, customersCreated: 0, skipped: 0 };
+export async function seedDemoData(data: {
+  businesses: DemoBusinessSpec[];
+  customers: DemoCustomerSpec[];
+  quotes?: DemoQuoteSpec[];
+  password: string;
+}): Promise<DemoSeedSummary> {
+  const summary: DemoSeedSummary = { businessesCreated: 0, customersCreated: 0, quotesCreated: 0, skipped: 0 };
+  /** Businesses created in THIS run (owner email -> business id). Quotes are only added to these, so a second run adds nothing. */
+  const createdBusinesses = new Map<string, string>();
   const passwordHash = await hashPassword(data.password);
   const categoryIds = await categoryRepository.findIdsBySlugs(data.businesses.flatMap((b) => b.categorySlugs));
 
@@ -81,6 +89,45 @@ export async function seedDemoData(data: { businesses: DemoBusinessSpec[]; custo
       await photoRepository.insert({ businessId, imageUrl: url, caption: photo.caption });
     }
     summary.businessesCreated += 1;
+    createdBusinesses.set(spec.ownerEmail, businessId);
+  }
+
+  for (const quote of data.quotes ?? []) {
+    const businessId = createdBusinesses.get(quote.businessOwnerEmail);
+    const customer = await userRepository.findByEmail(quote.customerEmail);
+    if (!businessId || !customer) continue;
+    await seedQuote(quote, businessId, customer.id);
+    summary.quotesCreated += 1;
   }
   return summary;
+}
+
+/** Saves one demo quote request and plays the business's answer and the customer's decision (no emails). */
+async function seedQuote(spec: DemoQuoteSpec, businessId: string, customerId: string): Promise<void> {
+  const services = await offeringRepository.listByBusiness(businessId);
+  const preferredDate =
+    spec.preferredInDays === null ? null : new Date(Date.now() + spec.preferredInDays * 86_400_000).toISOString().slice(0, 10);
+  await withTransaction(async (tx) => {
+    const quote = await quoteRepository.insert(
+      {
+        businessId,
+        customerId,
+        serviceId: services.find((service) => service.name === spec.serviceName)?.id ?? null,
+        subject: spec.subject,
+        description: spec.description,
+        preferredDate,
+        budgetCents: spec.budgetCents,
+        customerPhone: null,
+      },
+      tx,
+    );
+    if (spec.status !== 'pending') {
+      await quoteRepository.changeStatus(
+        quote.id,
+        { to: spec.status, from: ['pending'], message: spec.answer?.message ?? null, quotedPriceCents: spec.answer?.quotedPriceCents ?? null },
+        tx,
+      );
+    }
+    if (spec.decision) await quoteRepository.setCustomerDecision(quote.id, spec.decision, tx);
+  });
 }

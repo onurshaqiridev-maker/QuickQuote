@@ -1,5 +1,6 @@
 import type { BusinessStatus, PriceType, SubscriptionStatus } from '../enums';
 import type { CategoryResponse } from './category.response';
+import type { BusinessQuoteCounts } from './quote.response';
 import type { BusinessReservationResponse } from './reservation.response';
 import type { BusinessSummaryResponse } from './user.response';
 
@@ -99,4 +100,6 @@ export interface BusinessOverviewResponse {
   usage: PlanUsageResponse;
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
   reservations: { pendingCount: number; today: BusinessReservationResponse[] };
+  /** Quote requests per tab, e.g. `new` = waiting for a first answer. */
+  quotes: BusinessQuoteCounts;
 }

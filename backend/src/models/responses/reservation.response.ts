@@ -1,4 +1,5 @@
 import type { PriceType, ReservationStatus } from '../enums';
+import type { CustomerQuoteSummary } from './quote.response';
 
 export interface SlotResponse {
   /** Exact moment, ISO in UTC */
@@ -56,7 +57,13 @@ export interface BusinessReservationResponse {
   createdAt: string;
 }
 
-export interface CustomerOverviewResponse {
+/** The reservation part of the customer overview. */
+export interface CustomerReservationSummary {
   upcoming: CustomerReservationResponse[];
   counts: { upcoming: number; past: number; cancelled: number };
+}
+
+/** Customer overview page: reservations (as before, at the top level) plus quote requests. */
+export interface CustomerOverviewResponse extends CustomerReservationSummary {
+  quotes: CustomerQuoteSummary;
 }

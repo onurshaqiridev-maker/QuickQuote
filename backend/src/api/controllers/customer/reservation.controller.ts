@@ -10,10 +10,6 @@ import { currentUser } from '../../middleware/authenticate';
 import { sendData, sendPage } from '../../responses';
 import { parseRequest } from '../../validation';
 
-export async function getOverview(req: Request, res: Response): Promise<void> {
-  sendData(res, await reservationService.getCustomerOverview(currentUser(req).id));
-}
-
 export async function listReservations(req: Request, res: Response): Promise<void> {
   const query = parseRequest(customerReservationsQuerySchema, req.query);
   sendPage(res, await reservationService.listCustomerReservations(currentUser(req).id, query));

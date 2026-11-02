@@ -22,12 +22,13 @@ import type {
 } from '../models/requests/reservation.requests';
 import type {
   BusinessReservationResponse,
-  CustomerOverviewResponse,
+  CustomerReservationSummary,
   CustomerReservationResponse,
 } from '../models/responses/reservation.response';
 import { logActivity } from './activity.service';
 import { findBookableService, slotsFor } from './availability.service';
 import { enqueueEmail } from './email/email-queue.service';
+import { formatEuros } from './formatting';
 
 const link = (path: string) => new URL(path, env.FRONTEND_URL).toString();
 
@@ -86,7 +87,7 @@ export function formatWhen(date: Date, timezone: string): string {
 function priceText(r: { priceType: string; priceCents: number | null }): string {
   if (r.priceType === 'on_request' || r.priceCents === null) return 'Price on request';
   if (r.priceCents === 0) return 'Free';
-  const euros = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(r.priceCents / 100);
+  const euros = formatEuros(r.priceCents);
   return r.priceType === 'starting_from' ? `from ${euros}` : euros;
 }
 
@@ -275,7 +276,8 @@ export async function getCustomerReservation(customerId: string, id: string): Pr
   return toCustomerResponse(details);
 }
 
-export async function getCustomerOverview(customerId: string): Promise<CustomerOverviewResponse> {
+/** For the customer overview: the next 3 appointments and the counts per tab. */
+export async function getCustomerReservationSummary(customerId: string): Promise<CustomerReservationSummary> {
   const [upcoming, counts] = await Promise.all([
     reservationRepository.listForCustomer(customerId, 'upcoming', { page: 1, pageSize: 3 }),
     reservationRepository.countForCustomer(customerId),
