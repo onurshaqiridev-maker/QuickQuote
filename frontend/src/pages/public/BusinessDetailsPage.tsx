@@ -16,6 +16,7 @@ import { useApi } from '../../hooks/useApi';
 import type { PublicBusiness } from '../../types/api';
 import { formatDuration, priceLabel } from '../../utils/format';
 import { DAY_NAMES } from '../../utils/timezones';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 /** Today's weekday (1 = Monday ... 7 = Sunday) in the business's own time zone. */
 function todayIn(timezone: string): number {
@@ -82,6 +83,7 @@ function ContactCard({ business }: { business: PublicBusiness }) {
 export function BusinessDetailsPage() {
   const { slug = '' } = useParams();
   const { data: business, error, loading } = useApi(`business/${slug}`, () => publicApi.business(slug));
+  usePageTitle(business ? `${business.displayName}${business.address.city ? `, ${business.address.city}` : ''}` : error ? 'Business not available' : null);
   // ?book=<serviceId> opens the booking dialog, ?quote=<serviceId or "general"> the quote form
   // (e.g. when coming back from the login page).
   const [params, setParams] = useSearchParams();

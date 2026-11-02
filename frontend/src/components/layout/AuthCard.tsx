@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 /** Centred card used by the login, registration and password pages. */
 export function AuthCard({ title, subtitle, children, footer, wide = false }: { title: string; subtitle?: ReactNode; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
+  usePageTitle(title);
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-start justify-center bg-gradient-to-b from-brand-50 to-slate-50 px-4 py-12">
       <div className={`w-full ${wide ? 'max-w-2xl' : 'max-w-md'}`}>

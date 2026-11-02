@@ -269,7 +269,7 @@ function PublishCard({ profile, onSaved }: { profile: BusinessProfile; onSaved: 
       )}
       <p className="text-sm text-slate-600">
         {profile.isPublished
-          ? 'Customers can find your profile once our team has approved your business and your subscription is active.'
+          ? 'Your profile is published. Customers can find it as soon as our team has approved your business (see the checklist on your overview).'
           : 'When everything on your checklist is ready, publish your profile so customers can find you.'}
       </p>
       <Button className="mt-4" variant={profile.isPublished ? 'secondary' : 'primary'} loading={busy} onClick={toggle}>

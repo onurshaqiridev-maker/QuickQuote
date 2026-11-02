@@ -7,6 +7,7 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { Spinner } from '../../components/ui/Spinner';
 import { useApi } from '../../hooks/useApi';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const STEPS = [
   { title: 'Find', text: 'Search businesses by name, category and city. Compare services and prices.' },
@@ -15,6 +16,7 @@ const STEPS = [
 ];
 
 export function HomePage() {
+  usePageTitle();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
