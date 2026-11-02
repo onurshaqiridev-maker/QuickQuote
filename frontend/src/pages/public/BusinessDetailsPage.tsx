@@ -5,6 +5,7 @@ import { assetUrl } from '../../api/client';
 import { publicApi } from '../../api/public.api';
 import { BookingPanel } from '../../components/booking/BookingPanel';
 import { BusinessLogo } from '../../components/business/BusinessCard';
+import { QuoteRequestPanel } from '../../components/quotes/QuoteRequestPanel';
 import { Container } from '../../components/layout/PublicLayout';
 import { Badge } from '../../components/ui/Badge';
 import { Button, ButtonLink } from '../../components/ui/Button';
@@ -81,12 +82,15 @@ function ContactCard({ business }: { business: PublicBusiness }) {
 export function BusinessDetailsPage() {
   const { slug = '' } = useParams();
   const { data: business, error, loading } = useApi(`business/${slug}`, () => publicApi.business(slug));
-  // ?book=<serviceId> opens the booking dialog (e.g. when coming back from the login page).
+  // ?book=<serviceId> opens the booking dialog, ?quote=<serviceId or "general"> the quote form
+  // (e.g. when coming back from the login page).
   const [params, setParams] = useSearchParams();
   const [bookingId, setBookingId] = useState<string | null>(params.get('book'));
-  const closeBooking = () => {
+  const [quoteFor, setQuoteFor] = useState<string | null>(params.get('quote'));
+  const closeDialogs = () => {
     setBookingId(null);
-    if (params.has('book')) setParams({}, { replace: true });
+    setQuoteFor(null);
+    if (params.has('book') || params.has('quote')) setParams({}, { replace: true });
   };
 
   if (loading && !business) return <FullPageSpinner />;
@@ -108,7 +112,7 @@ export function BusinessDetailsPage() {
 
       <header className="flex flex-col gap-5 sm:flex-row sm:items-center">
         <BusinessLogo name={business.displayName} logoUrl={business.logoUrl} size="h-20 w-20" />
-        <div>
+        <div className="flex-1">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">{business.displayName}</h1>
             {business.isFeatured && <Badge color="blue">Featured</Badge>}
@@ -122,6 +126,7 @@ export function BusinessDetailsPage() {
             ))}
           </div>
         </div>
+        <Button variant="secondary" onClick={() => setQuoteFor('general')}>Request a quote</Button>
       </header>
 
       {mainPhoto && (
@@ -154,7 +159,7 @@ export function BusinessDetailsPage() {
 
           <section>
             <h2 className="text-xl font-bold">Services and prices</h2>
-            <p className="mt-1 text-sm text-slate-600">Book a free time online, or contact {business.displayName} for services marked "quote on request".</p>
+            <p className="mt-1 text-sm text-slate-600">Book a free time online, or ask {business.displayName} for a personal quote.</p>
             <ul className="mt-4 divide-y divide-slate-200 rounded-2xl bg-white ring-1 ring-slate-200">
               {business.services.map((service) => (
                 <li key={service.id} className="flex flex-col gap-2 p-5 sm:flex-row sm:items-start sm:justify-between">
@@ -163,12 +168,15 @@ export function BusinessDetailsPage() {
                     {service.description && <p className="mt-1 text-sm text-slate-600">{service.description}</p>}
                     <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                       {service.durationMinutes && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" aria-hidden /> {formatDuration(service.durationMinutes)}</span>}
-                      {!service.isBookable && <Badge>Quote on request</Badge>}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-4 sm:flex-col sm:items-end sm:gap-2">
                     <span className="text-lg font-semibold text-slate-900">{priceLabel(service.priceType, service.priceCents)}</span>
-                    {service.isBookable && service.durationMinutes && <Button onClick={() => setBookingId(service.id)}>Book</Button>}
+                    {service.isBookable && service.durationMinutes ? (
+                      <Button onClick={() => setBookingId(service.id)}>Book</Button>
+                    ) : (
+                      <Button variant="secondary" onClick={() => setQuoteFor(service.id)}>Request a quote</Button>
+                    )}
                   </div>
                 </li>
               ))}
@@ -181,7 +189,14 @@ export function BusinessDetailsPage() {
           <OpeningHours business={business} />
         </aside>
       </div>
-      {bookingService && <BookingPanel business={business} service={bookingService} onClose={closeBooking} />}
+      {bookingService && <BookingPanel business={business} service={bookingService} onClose={closeDialogs} />}
+      {quoteFor && !bookingService && (
+        <QuoteRequestPanel
+          business={business}
+          serviceId={business.services.some((service) => service.id === quoteFor) ? quoteFor : null}
+          onClose={closeDialogs}
+        />
+      )}
     </Container>
   );
 }

@@ -4,6 +4,8 @@ import type {
   BookingSettings,
   BusinessOverview,
   BusinessProfile,
+  BusinessQuote,
+  BusinessQuoteTab,
   BusinessReservation,
   ApiListResponse,
   Offering,
@@ -75,6 +77,13 @@ export const businessApi = {
     api.get<ApiListResponse<BusinessReservation>>(`/api/business/reservations?tab=${tab}&page=${page}&pageSize=20`),
   reservationAction: (id: string, action: 'confirm' | 'reject' | 'cancel' | 'complete', message?: string) =>
     data(api.post<ApiResponse<BusinessReservation>>(`/api/business/reservations/${id}/${action}`, message ? { message } : {})),
+
+  quotes: (tab: BusinessQuoteTab, page = 1) => api.get<ApiListResponse<BusinessQuote>>(`/api/business/quote-requests?tab=${tab}&page=${page}&pageSize=20`),
+  startQuote: (id: string) => data(api.post<ApiResponse<BusinessQuote>>(`/api/business/quote-requests/${id}/start`, {})),
+  respondToQuote: (id: string, input: { message: string; quotedPriceCents: number | null }) =>
+    data(api.post<ApiResponse<BusinessQuote>>(`/api/business/quote-requests/${id}/respond`, input)),
+  rejectQuote: (id: string, message: string) =>
+    data(api.post<ApiResponse<BusinessQuote>>(`/api/business/quote-requests/${id}/reject`, message ? { message } : {})),
 
   settings: () => data(api.get<ApiResponse<BookingSettings>>('/api/business/settings')),
   saveSettings: (input: BookingSettings) => data(api.put<ApiResponse<BookingSettings>>('/api/business/settings', input)),

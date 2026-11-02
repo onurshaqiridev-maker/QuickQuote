@@ -1,7 +1,9 @@
 import { Link } from 'react-router';
 import { customerApi } from '../../api/customer.api';
+import { DecisionBadge, QuoteStatusBadge } from '../../components/quotes/QuoteStatusBadge';
 import { CustomerReservationCard } from '../../components/reservations/CustomerReservationCard';
 import { Alert } from '../../components/ui/Alert';
+import { Badge } from '../../components/ui/Badge';
 import { ButtonLink } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -17,7 +19,7 @@ export function CustomerOverviewPage() {
 
   return (
     <>
-      <PageHeader title={`Hi ${firstName}!`} description="Your upcoming appointments at a glance." action={<ButtonLink to="/explore">Find a business</ButtonLink>} />
+      <PageHeader title={`Hi ${firstName}!`} description="Your appointments and quote requests at a glance." action={<ButtonLink to="/explore">Find a business</ButtonLink>} />
       {counts && (
         <div className="grid gap-4 sm:grid-cols-3">
           {[['Upcoming', counts.upcoming, 'upcoming'], ['Past', counts.past, 'past'], ['Cancelled or declined', counts.cancelled, 'cancelled']].map(([label, value, tab]) => (
@@ -42,10 +44,36 @@ export function CustomerOverviewPage() {
           {overview.data?.upcoming.map((reservation) => <CustomerReservationCard key={reservation.id} reservation={reservation} onChanged={overview.reload} />)}
         </ul>
       </section>
-      <Card>
-        <h2 className="font-semibold">Quote requests</h2>
-        <p className="mt-2 text-sm text-slate-600">Asking businesses for a price arrives in phase 9.</p>
-      </Card>
+      {overview.data && (
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Latest quote requests</h2>
+            <Link to="/account/quotes" className="text-sm font-semibold text-brand-700 hover:underline">All quote requests</Link>
+          </div>
+          {overview.data.quotes.recent.length === 0 ? (
+            <Card>
+              <p className="text-sm text-slate-600">Need a price first? Open a business page and click "Request a quote".</p>
+            </Card>
+          ) : (
+            <ul className="divide-y divide-slate-100 rounded-2xl bg-white ring-1 ring-slate-200">
+              {overview.data.quotes.recent.map((quote) => (
+                <li key={quote.id}>
+                  <Link to="/account/quotes" className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-slate-50">
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium text-slate-900">{quote.subject}</span>
+                      <span className="block truncate text-sm text-slate-500">{quote.business.displayName}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      {quote.canDecide && <Badge color="blue">Your answer needed</Badge>}
+                      {quote.customerDecision ? <DecisionBadge decision={quote.customerDecision} viewer="customer" /> : <QuoteStatusBadge status={quote.status} viewer="customer" />}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
     </>
   );
 }

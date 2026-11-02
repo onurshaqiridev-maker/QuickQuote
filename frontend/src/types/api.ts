@@ -186,6 +186,7 @@ export interface BusinessOverview {
   };
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
   reservations: { pendingCount: number; today: BusinessReservation[] };
+  quotes: BusinessQuoteCounts;
 }
 
 // ---------------------------------------------------------------------------
@@ -338,4 +339,43 @@ export interface BusinessReservation {
 export interface CustomerOverview {
   upcoming: CustomerReservation[];
   counts: { upcoming: number; past: number; cancelled: number };
+  quotes: { recent: CustomerQuote[]; counts: { open: number; answered: number; declined: number } };
 }
+
+// ---------------------------------------------------------------------------
+// Quote requests
+// ---------------------------------------------------------------------------
+
+export type QuoteStatus = 'pending' | 'processing' | 'completed' | 'rejected';
+export type QuoteDecision = 'accepted' | 'declined';
+export type CustomerQuoteTab = 'all' | 'open' | 'answered' | 'declined';
+export type BusinessQuoteTab = 'new' | 'in_progress' | 'answered' | 'declined';
+
+interface QuoteBase {
+  id: string;
+  status: QuoteStatus;
+  subject: string;
+  description: string;
+  /** "YYYY-MM-DD" */
+  preferredDate: string | null;
+  budgetCents: number | null;
+  /** null = a general request */
+  service: { id: string; name: string } | null;
+  quotedPriceCents: number | null;
+  businessMessage: string | null;
+  respondedAt: string | null;
+  customerDecision: QuoteDecision | null;
+  customerDecidedAt: string | null;
+  createdAt: string;
+}
+
+export interface CustomerQuote extends QuoteBase {
+  business: { slug: string; displayName: string; logoUrl: string | null; city: string | null; phone: string | null; email: string | null };
+  canDecide: boolean;
+}
+
+export interface BusinessQuote extends QuoteBase {
+  customer: { name: string; email: string; phone: string | null };
+}
+
+export type BusinessQuoteCounts = Record<BusinessQuoteTab, number>;

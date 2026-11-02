@@ -78,8 +78,23 @@ export function BusinessOverviewPage() {
             )}
           </Card>
           <Card>
-            <h2 className="font-semibold">New quote requests</h2>
-            <p className="mt-2 text-sm text-slate-600">None yet. Quote requests arrive in phase 9.</p>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Quote requests</h2>
+              <Link to="/dashboard/quotes" className="text-sm font-semibold text-brand-700 hover:underline">All requests</Link>
+            </div>
+            {overview.quotes.new > 0 && (
+              <Link to="/dashboard/quotes?tab=new" className="mt-3 block rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100">
+                {overview.quotes.new} new quote request{overview.quotes.new > 1 ? 's' : ''} waiting for your answer
+              </Link>
+            )}
+            {overview.quotes.in_progress > 0 && (
+              <Link to="/dashboard/quotes?tab=in_progress" className="mt-2 block rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100">
+                {overview.quotes.in_progress} in progress
+              </Link>
+            )}
+            {overview.quotes.new === 0 && overview.quotes.in_progress === 0 && (
+              <p className="mt-3 text-sm text-slate-600">No open quote requests. Customers can ask you for a price from your public page.</p>
+            )}
           </Card>
         </div>
       </div>
