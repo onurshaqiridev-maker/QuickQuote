@@ -1,6 +1,6 @@
-# Quick Quote — Deployment and Monitoring Guide (Phase 3)
+# Quick Quote — Deployment and Monitoring Guide (Phases 3 and 11)
 
-This guide puts the Quick Quote backend online and connects it to **Asniher**, so you get an alert when it goes down. Follow the steps in order. It takes about 20–30 minutes.
+This guide puts Quick Quote online (the website, the API, the email worker and the database) and connects it to **Asniher**, so you get an alert when it goes down. Follow the steps in order. It takes about 20–30 minutes.
 
 > **In simple terms:** Render runs our code and our PostgreSQL database on the internet. Resend delivers the emails. Asniher calls `GET /health` every minute and warns you if the answer is not "200 OK".
 
@@ -13,7 +13,7 @@ flowchart LR
     YOU["You / anyone<br/>browser or curl"] -->|"HTTPS"| WEB
     ASN["Asniher monitor"] -->|"GET /health every minute"| WEB
     subgraph RENDER["Render"]
-        WEB["quickquote-api<br/>web service<br/>API + email worker"]
+        WEB["quickquote-api<br/>web service<br/>website + API + email worker"]
         DB[("quickquote-db<br/>PostgreSQL")]
         WEB --> DB
     end
@@ -21,7 +21,7 @@ flowchart LR
     RES --> INBOX["Your inbox"]
 ```
 
-- **A live API**, for example `https://quickquote-api.onrender.com` (Render picks the exact name).
+- **A live website and API on one address**, for example `https://quickquote-api.onrender.com` (Render picks the exact name). The API server also serves the built website, so the login cookie works without extra setup.
 - **A PostgreSQL database** on Render.
 - **Real emails** sent through Resend.
 - **An Asniher monitor** on `/health`, plus a screenshot of it for the README.
@@ -74,7 +74,7 @@ Have one **email address of your own** ready. You will use it for the admin acco
    ```
    ### MIGRATION 001_extensions-and-helpers (UP) ###
    ...
-   ### MIGRATION 011_create-activity-logs (UP) ###
+   ### MIGRATION 013_add-password-changed-at (UP) ###
    Seed finished:
      categories created: 12 (of 12)
      plans created:      3 (of 3)
@@ -85,7 +85,7 @@ Have one **email address of your own** ready. You will use it for the admin acco
    (Render tells the app which port to use. The "localhost" in this line is normal.)
 8. At the top of the service page, copy your public URL, for example `https://quickquote-api.onrender.com`.
 
-**What happens on each deploy?** The start command in `render.yaml` first applies any new migrations, then makes sure the seed data exists, then starts the API and the email worker together (`dist/src/all.js`). Every push to the branch triggers a new deploy automatically.
+**What happens on each deploy?** The build command builds the website (`frontend/dist`) and the API. The start command first applies any new migrations, then makes sure the seed data exists, then starts the API and the email worker together (`dist/src/all.js`). Every push to the branch triggers a new deploy automatically.
 
 ---
 
@@ -93,12 +93,12 @@ Have one **email address of your own** ready. You will use it for the admin acco
 
 Replace `https://YOUR-URL` with your Render URL. You can paste the `curl` commands into a terminal, or open the GET URLs in a browser.
 
-1. The API answers:
+1. The website opens: visit `https://YOUR-URL` in your browser. You see the Quick Quote homepage. Click **Log in** and use your admin email and password: you land on the admin overview. The API answers too:
    ```bash
-   curl https://YOUR-URL/
+   curl https://YOUR-URL/api/categories
    ```
    ```json
-   { "name": "Quick Quote API", "status": "running", "health": "/health", ... }
+   { "data": [ { "name": "Beauty & Wellness", "slug": "beauty-wellness", ... }, ... ] }
    ```
 
 2. The health check returns 200:
@@ -177,6 +177,7 @@ What the monitor sees:
 |---|---|
 | **No free background workers** | That is why `render.yaml` runs the API **and** the worker in one service (`node dist/src/all.js`). They still only communicate through the `email_jobs` table. |
 | **The web service sleeps after ~15 minutes without traffic** | Asniher's checks every minute count as traffic, so the service stays awake. If it does fall asleep, the first request takes up to about a minute. That is why the monitor timeout is 30–60 seconds. |
+| **Uploaded images are temporary** | The free web service has no permanent disk: logos and photos that businesses upload are **lost on every restart or deploy** (the database rows stay, the pictures show as missing). Fine for a demo. For real use, add a Render disk (paid) and set `UPLOAD_DIR` to it, or move to cloud storage (only `backend/src/services/storage.service.ts` changes). |
 | **The free PostgreSQL database expires after 30 days** (with a 14-day grace period) | Fine for the assignment. To keep it running longer, upgrade the database to a paid plan in Render before it expires, or create a new one. |
 
 ### Optional: separate API and worker (paid plan)
@@ -210,7 +211,10 @@ services:
 
 | Problem | What to check |
 |---|---|
-| The build fails with `tsc: not found` | The build command must be `npm ci --include=dev && npm run build` (TypeScript is a dev dependency) |
+| The build fails with `tsc: not found` | Use the build command from `render.yaml`: it installs with `npm ci --include=dev` for both `frontend` and `backend` (TypeScript and Vite are dev dependencies) |
+| The logs say `FRONTEND_DIST_DIR: ... does not exist` | The website was not built. The build command must run `npm run build --prefix frontend` before the backend build (as in `render.yaml`). |
+| The logs say `FRONTEND_URL must be the public website address in production` | Remove `FRONTEND_URL` from the environment (Render's address is used automatically), or set it to your real `https://` address. |
+| A page shows "Not found" after a refresh, or you get logged out when moving around | Make sure you open the site on the Render address of **quickquote-api** itself, and that `VITE_API_URL` is **not** set in Render. |
 | The logs say `Invalid environment configuration` | The message lists the missing or wrong variable. Add it under **quickquote-api → Environment**, then **Manual Deploy → Deploy latest commit**. |
 | The logs show an SSL or connection error from PostgreSQL | Check that `DATABASE_URL` comes from **quickquote-db** (the *internal* connection string). If you use the *external* connection string, set `DATABASE_SSL=true`. |
 | `/health` returns `503` | The app runs but cannot reach the database. Check that the database is "Available" in Render and that `DATABASE_URL` is correct. |
