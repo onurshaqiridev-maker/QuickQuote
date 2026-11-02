@@ -189,6 +189,8 @@ describe('managing categories', () => {
     const refused = await request(app).delete(`/api/admin/categories/${used.id}`).set('Cookie', admin);
     expect(refused.status).toBe(409);
     expect(refused.body.error.code).toBe('CATEGORY_IN_USE');
-    expect((await get('/activity')).body.data.some((a: { action: string; metadata: { name?: string } }) => a.action === 'category.deleted' && a.metadata.name === 'Pets')).toBe(true);
+    const feed = (await get('/activity')).body.data as { action: string; entityLabel: string | null; metadata: { name?: string } }[];
+    expect(feed.find((a) => a.action === 'category.deleted')?.metadata.name).toBe('Pets');
+    expect(feed.find((a) => a.action === 'category.created')).toMatchObject({ entityLabel: null, metadata: { name: 'Pets' } });
   });
 });

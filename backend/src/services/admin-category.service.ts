@@ -2,6 +2,7 @@
  * Admin tools for categories: list (with usage), create, edit, delete.
  * A category that businesses use cannot be deleted; it can be switched off instead
  * (then it disappears from filters and forms, but businesses keep it).
+ * Every change keeps the category's name in the log, so the feed still reads well after a delete.
  */
 import * as categoryRepository from '../data/repositories/category.repository';
 import type { CategoryFields } from '../models/dto/category.dto';
@@ -47,14 +48,14 @@ export async function listCategories(): Promise<AdminCategoryResponse[]> {
 
 export async function createCategory(adminUserId: string, input: CategoryInput): Promise<AdminCategoryResponse> {
   const category = await categoryRepository.insert(toFields(input));
-  await logActivity({ actorUserId: adminUserId, action: 'category.created', entityType: 'category', entityId: category.id });
+  await logActivity({ actorUserId: adminUserId, action: 'category.created', entityType: 'category', entityId: category.id, metadata: { name: category.name } });
   return toResponse(category, 0);
 }
 
 export async function updateCategory(adminUserId: string, id: string, input: CategoryInput): Promise<AdminCategoryResponse> {
   const category = await categoryRepository.update(id, toFields(input));
   if (!category) throw new NotFoundError('Category not found.');
-  await logActivity({ actorUserId: adminUserId, action: 'category.updated', entityType: 'category', entityId: id });
+  await logActivity({ actorUserId: adminUserId, action: 'category.updated', entityType: 'category', entityId: id, metadata: { name: category.name } });
   return toResponse(category, await categoryRepository.countBusinesses(id));
 }
 
@@ -68,6 +69,5 @@ export async function deleteCategory(adminUserId: string, id: string): Promise<v
       `"${category.name}" is used by ${count} business${count === 1 ? '' : 'es'}. Switch it off instead, so it is no longer offered.`,
     );
   }
-  // The row is gone, so the name is kept in the log.
   await logActivity({ actorUserId: adminUserId, action: 'category.deleted', entityType: 'category', entityId: id, metadata: { name: category.name } });
 }
