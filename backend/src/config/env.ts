@@ -44,9 +44,14 @@ const envSchema = z
       .regex(/^\d+d$/, 'JWT_EXPIRES_IN must be a number of days, e.g. "7d"')
       .default('7d'),
 
-    // Public addresses (used for CORS and for links inside emails)
+    // Public addresses (used for CORS and for links inside emails).
+    // On Render they default to the service's own address (RENDER_EXTERNAL_URL), see loadEnv() below.
     FRONTEND_URL: z.url().default('http://localhost:5173'),
     API_PUBLIC_URL: z.url().default('http://localhost:4000'),
+
+    // Production: the built website (frontend/dist). When set, the API server also serves the website,
+    // so both share one address (needed for the login cookie). Leave empty in development (Vite serves it).
+    FRONTEND_DIST_DIR: z.string().min(1).optional(),
 
     // Email
     EMAIL_DRIVER: z.enum(['console', 'resend']).default('console'),
@@ -80,6 +85,14 @@ const envSchema = z
     SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
   })
   .superRefine((env, ctx) => {
+    // Links in emails must never point to "localhost" on the real website.
+    if (env.NODE_ENV === 'production' && /\/\/(localhost|127\.0\.0\.1)[:/]?/.test(env.FRONTEND_URL)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['FRONTEND_URL'],
+        message: 'FRONTEND_URL must be the public website address in production (e.g. https://quickquote.onrender.com)',
+      });
+    }
     if (env.EMAIL_DRIVER === 'resend' && !env.RESEND_API_KEY) {
       ctx.addIssue({
         code: 'custom',
@@ -93,9 +106,14 @@ export type Env = z.infer<typeof envSchema>;
 
 function loadEnv(): Env {
   // Treat empty strings ("KEY=") as "not set", so defaults apply.
-  const raw = Object.fromEntries(
-    Object.entries(process.env).filter(([, value]) => value !== undefined && value !== ''),
+  const raw: Record<string, string> = Object.fromEntries(
+    Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined && entry[1] !== ''),
   );
+  // Render tells every service its public address. With the website and API on one service, both use it.
+  if (raw.RENDER_EXTERNAL_URL) {
+    raw.FRONTEND_URL ??= raw.RENDER_EXTERNAL_URL;
+    raw.API_PUBLIC_URL ??= raw.RENDER_EXTERNAL_URL;
+  }
   const result = envSchema.safeParse(raw);
   if (!result.success) {
     const problems = result.error.issues

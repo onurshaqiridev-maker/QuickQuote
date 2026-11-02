@@ -13,9 +13,17 @@ import { notFound } from './middleware/not-found';
 import { generalLimiter } from './middleware/rate-limit';
 import { requestLogger } from './middleware/request-logger';
 import { apiRoutes } from './routes';
+import * as healthController from './controllers/health.controller';
 import { healthRoutes } from './routes/health.routes';
+import { serveWebsite } from './website';
 
-export function createApp(): Express {
+export interface AppOptions {
+  /** Folder of the built website to serve as well (production). Defaults to FRONTEND_DIST_DIR. */
+  websiteDir?: string;
+}
+
+export function createApp(options: AppOptions = {}): Express {
+  const websiteDir = options.websiteDir ?? env.FRONTEND_DIST_DIR;
   const app = express();
 
   // Hosting platforms put a proxy in front of the app; trust it so client IPs are correct (rate limits).
@@ -41,6 +49,10 @@ export function createApp(): Express {
   );
 
   app.use('/api', generalLimiter, apiRoutes);
+
+  // The home address "/": the website when it is served from here, otherwise short API information.
+  if (websiteDir) serveWebsite(app, websiteDir);
+  else app.get('/', healthController.getApiInfo);
 
   app.use(notFound);
   app.use(errorHandler);

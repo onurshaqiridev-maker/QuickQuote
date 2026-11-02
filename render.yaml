@@ -1,7 +1,9 @@
 # Render Blueprint: describes the whole deployment in one file.
 # In Render: New + -> Blueprint -> pick this repository. Render reads this file and creates:
 #   1. a free PostgreSQL database
-#   2. one free web service that runs the API server AND the email worker (npm run start:all)
+#   2. one free web service that runs the API server AND the email worker (npm run start:all),
+#      and also serves the website (frontend/dist). Website and API share one address,
+#      which the login cookie needs, so no extra CORS setup is required.
 #
 # Free plans have no background workers, so both run in one process (they still only talk
 # through the email_jobs table). On a paid plan you can split them: see docs/DEPLOYMENT.md.
@@ -18,18 +20,24 @@ services:
     name: quickquote-api
     runtime: node
     plan: free
-    rootDir: backend
-    # --include=dev: TypeScript is a dev dependency but is needed to build.
-    buildCommand: npm ci --include=dev && npm run build
+    # Build the website, then the API. --include=dev: TypeScript and Vite are dev dependencies
+    # but are needed to build (Render sets NODE_ENV=production, which would skip them).
+    buildCommand: >-
+      npm ci --include=dev --prefix frontend && npm run build --prefix frontend &&
+      npm ci --include=dev --prefix backend && npm run build --prefix backend
     # On every start: apply new migrations, make sure the seed data exists, then start
     # the API + email worker. "exec" lets the app receive Render's shutdown signal directly.
-    startCommand: npm run migrate:deploy && npm run seed:deploy && exec node dist/src/all.js
+    startCommand: cd backend && npm run migrate:deploy && npm run seed:deploy && exec node dist/src/all.js
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
         value: "22"
       - key: NODE_ENV
         value: production
+      # The built website, relative to the backend folder. FRONTEND_URL and API_PUBLIC_URL are not
+      # needed: the app uses Render's public address (RENDER_EXTERNAL_URL) for links in emails.
+      - key: FRONTEND_DIST_DIR
+        value: ../frontend/dist
       - key: DATABASE_URL
         fromDatabase:
           name: quickquote-db
