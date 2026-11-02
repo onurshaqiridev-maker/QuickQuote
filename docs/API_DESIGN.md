@@ -161,7 +161,7 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 | Method | Path | Who | Purpose |
 |---|---|---|---|
 | `GET` | `/api/customer/overview` | Customer | Upcoming reservations, recent quote requests, counts |
-| `GET` | `/api/customer/reservations` | Customer | My reservations. Query: `status`, `page`. |
+| `GET` | `/api/customer/reservations` | Customer | My reservations. Query: `tab` (`upcoming`, `past`, `cancelled`), `page`. |
 | `POST` | `/api/customer/reservations` | Customer (verified) | Book an appointment |
 | `GET` | `/api/customer/reservations/:id` | Customer | One of my reservations |
 | `POST` | `/api/customer/reservations/:id/cancel` | Customer | Cancel (only if `pending` or `confirmed`, and before the cancellation deadline) |
@@ -212,7 +212,7 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/business/reservations` | Business | My reservations. Query: `status`, `from`, `to`, `page`. |
+| `GET` | `/api/business/reservations` | Business | My reservations. Query: `tab` (`pending`, `upcoming`, `past`, `all`), `page`. |
 | `GET` | `/api/business/reservations/:id` | Business | One reservation, with customer information |
 | `POST` | `/api/business/reservations/:id/confirm` | Business | `pending` → `confirmed` |
 | `POST` | `/api/business/reservations/:id/reject` | Business | `pending` → `rejected`. Body: `{ "message"?: string }` |

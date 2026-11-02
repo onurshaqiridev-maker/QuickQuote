@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -384,6 +384,44 @@ Put a failed job back in the queue:
 curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>/retry
 ```
 
+### Book an appointment (needs `npm run seed:demo`)
+
+Find free times for a service on a day. The business id and service ids are in the profile response (`GET /api/businesses/bella-hair-studio`):
+
+```bash
+curl -s "http://localhost:4000/api/businesses/bella-hair-studio/availability?serviceId=<service id>&date=2026-11-10"
+```
+
+```json
+{ "data": { "date": "2026-11-10", "timezone": "Europe/Berlin",
+            "service": { "id": "673afc45-...", "name": "Women's haircut", "durationMinutes": 60 },
+            "slots": [ { "startsAt": "2026-11-10T08:00:00.000Z", "localTime": "09:00" },
+                       { "startsAt": "2026-11-10T08:30:00.000Z", "localTime": "09:30" }, ... ] } }
+```
+
+Log in as a demo customer and book one of those times. The business and the customer each get an email (queued):
+
+```bash
+curl -s -c sara.txt -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"sara.demo@example.com","password":"QuickQuote2026"}'
+
+curl -s -b sara.txt -X POST http://localhost:4000/api/customer/reservations \
+  -H "Content-Type: application/json" \
+  -d '{"businessId":"<business id>","serviceId":"<service id>","startsAt":"2026-11-10T08:00:00.000Z","notes":"First visit"}'
+```
+
+Booking the same time again returns `409` with the code `SLOT_UNAVAILABLE`. The business answers the request:
+
+```bash
+curl -s -c bella.txt -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"bella.demo@example.com","password":"QuickQuote2026"}'
+
+curl -s -b bella.txt -X POST http://localhost:4000/api/business/reservations/<reservation id>/confirm \
+  -H "Content-Type: application/json" -d '{"message":"See you then!"}'
+```
+
 ### All endpoints available now
 
 | Method | Path | Who | Purpose |
@@ -408,6 +446,11 @@ curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>
 | `GET` | `/api/businesses` | public | Search visible businesses (`search`, `category`, `city`, `featured`, `page`, `pageSize`) |
 | `GET` | `/api/businesses/:slug` | public | Public profile: photos, services, prices, hours, contact |
 | `GET` | `/api/cities` | public | Cities with visible businesses |
+| `GET` | `/api/businesses/:slug/availability` | public | Free time slots for a service on a day (`serviceId`, `date=YYYY-MM-DD`) |
+| `GET` | `/api/customer/overview` | customer | Reservation counts and the next appointments |
+| `GET` / `POST` | `/api/customer/reservations` | customer | List (`tab=upcoming\|past\|cancelled`) / book (needs a confirmed email) |
+| `GET` | `/api/customer/reservations/:id` | customer | One reservation |
+| `POST` | `/api/customer/reservations/:id/cancel` | customer | Cancel (before the business's cancellation deadline) |
 | `GET` | `/api/admin/businesses` | admin | List businesses (`status`, `search`, `page`) |
 | `GET` | `/api/admin/businesses/:id` | admin | Business details for review |
 | `POST` | `/api/admin/businesses/:id/approve` / `suspend` / `deactivate` / `reactivate` | admin | Change the status (suspend and deactivate need `{ "reason" }`); the owner is emailed |
@@ -421,6 +464,8 @@ curl -s -b admin.txt -X POST http://localhost:4000/api/admin/email-jobs/<job id>
 | `GET` / `PUT` | `/api/business/working-hours` | business | Weekly hours (whole week at once, no overlaps) |
 | `GET` / `POST` / `DELETE` | `/api/business/blocked-times[/:id]` | business | Holidays and other blocked periods |
 | `GET` / `PUT` | `/api/business/settings` | business | Booking settings |
+| `GET` | `/api/business/reservations[/:id]` | business | List (`tab=pending\|upcoming\|past\|all`) / one reservation |
+| `POST` | `/api/business/reservations/:id/confirm` / `reject` / `cancel` / `complete` | business | Answer a request (optional `{ "message" }`); the customer is emailed |
 | `GET` | `/api/admin/email-jobs` | admin | List email jobs (`?status=pending\|sent\|failed&page=1&pageSize=20`) |
 | `GET` | `/api/admin/email-jobs/stats` | admin | Count of jobs per status |
 | `POST` | `/api/admin/email-jobs/:id/retry` | admin | Retry a failed job |
