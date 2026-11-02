@@ -40,3 +40,8 @@ export function formatDuration(minutes: number | null): string {
   const rest = minutes % 60;
   return [hours ? `${hours} h` : '', rest ? `${rest} min` : ''].filter(Boolean).join(' ');
 }
+
+/** plural(1, 'reservation') -> "1 reservation", plural(3, 'reservation') -> "3 reservations" */
+export function plural(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? '' : 's'}`;
+}

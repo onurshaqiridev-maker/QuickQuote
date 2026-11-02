@@ -379,3 +379,71 @@ export interface BusinessQuote extends QuoteBase {
 }
 
 export type BusinessQuoteCounts = Record<BusinessQuoteTab, number>;
+
+// ---------------------------------------------------------------------------
+// Admin panel
+// ---------------------------------------------------------------------------
+
+export interface AdminStats {
+  users: { customers: number; businessOwners: number; suspended: number };
+  businesses: Record<BusinessStatus, number> & { visible: number };
+  reservations: { createdThisWeek: number; pending: number };
+  quotes: { createdThisWeek: number; open: number };
+}
+
+export interface AdminActivityItem {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  entityLabel: string | null;
+  actor: { id: string; fullName: string; role: UserRole } | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface AdminUserListItem {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  role: UserRole;
+  status: UserStatus;
+  emailVerified: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface AdminUserDetail extends AdminUserListItem {
+  statusReason: string | null;
+  counts: { reservations: number; quoteRequests: number };
+  business: { id: string; displayName: string; status: BusinessStatus } | null;
+}
+
+export interface AdminReservation extends BusinessReservation {
+  business: { id: string; slug: string; displayName: string };
+}
+
+export interface AdminQuote extends BusinessQuote {
+  business: { id: string; slug: string; displayName: string };
+}
+
+export interface AdminCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  businessCount: number;
+}
+
+export interface CategoryInput {
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  sortOrder: number;
+  isActive: boolean;
+}

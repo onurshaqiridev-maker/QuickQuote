@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { centsToInput, formatDuration, formatPrice, parsePriceToCents, priceLabel } from './format';
+import { centsToInput, formatDuration, formatPrice, parsePriceToCents, plural, priceLabel } from './format';
 
 describe('formatPrice', () => {
   it('shows whole euros without cents', () => {
@@ -36,5 +36,13 @@ describe('price input helpers', () => {
     expect(formatDuration(90)).toBe('1 h 30 min');
     expect(formatDuration(45)).toBe('45 min');
     expect(formatDuration(120)).toBe('2 h');
+  });
+});
+
+describe('plural', () => {
+  it('adds an "s" unless there is exactly one', () => {
+    expect(plural(1, 'reservation')).toBe('1 reservation');
+    expect(plural(0, 'quote request')).toBe('0 quote requests');
+    expect(plural(2, 'reservation')).toBe('2 reservations');
   });
 });
