@@ -26,6 +26,7 @@ const HTTP_STATUS_BY_CODE: Record<ErrorCode, number> = {
   GO_LIVE_REQUIREMENTS_NOT_MET: 409,
   SLOT_UNAVAILABLE: 409,
   CANCELLATION_WINDOW_PASSED: 409,
+  CATEGORY_IN_USE: 409,
 };
 
 /** Errors created by Express's JSON body parser (e.g. invalid JSON). */

@@ -6,6 +6,7 @@ import { DomainError } from '../../models/errors';
 import type { Reservation, ReservationDetails } from '../../models/entities/reservation.entity';
 import { pool, type Queryable } from '../db';
 import { isPgError, PG_ERROR } from '../pg-errors';
+import { containsPattern } from '../search-pattern';
 
 interface ReservationRow {
   id: string;
@@ -273,4 +274,35 @@ export async function completeFinished(hours: number, db: Queryable = pool): Pro
 export async function findUnansweredPast(db: Queryable = pool): Promise<string[]> {
   const result = await db.query<{ id: string }>("SELECT id FROM reservations WHERE status = 'pending' AND starts_at <= now()");
   return result.rows.map((row) => row.id);
+}
+
+/**
+ * Admin: all reservations, newest appointment first.
+ * `search` matches the business, the customer's name or email, or the service.
+ * `from` / `to` ("YYYY-MM-DD", both included) filter on the appointment day.
+ */
+export async function listForAdmin(
+  filter: { status?: ReservationStatus; search?: string; from?: string; to?: string } & PageQuery,
+  db: Queryable = pool,
+): Promise<Page<ReservationDetails>> {
+  const where = `
+    WHERE ($1::text IS NULL OR r.status = $1)
+      AND ($2::text IS NULL OR p.display_name ILIKE $2 OR c.full_name ILIKE $2 OR c.email ILIKE $2 OR r.service_name ILIKE $2)
+      AND ($3::date IS NULL OR r.starts_at >= $3::date)
+      AND ($4::date IS NULL OR r.starts_at < $4::date + 1)`;
+  const params = [filter.status ?? null, filter.search ? containsPattern(filter.search) : null, filter.from ?? null, filter.to ?? null];
+  const [rows, count] = await Promise.all([
+    db.query<DetailsRow>(`${DETAILS} ${where} ORDER BY r.starts_at DESC, r.id LIMIT $5 OFFSET $6`, [
+      ...params,
+      filter.pageSize,
+      (filter.page - 1) * filter.pageSize,
+    ]),
+    db.query<{ count: string }>(
+      `SELECT count(*) FROM reservations r
+         JOIN business_profiles p ON p.business_id = r.business_id
+         JOIN users c ON c.id = r.customer_id ${where}`,
+      params,
+    ),
+  ]);
+  return { items: rows.rows.map(toDetails), total: Number(count.rows[0].count), page: filter.page, pageSize: filter.pageSize };
 }

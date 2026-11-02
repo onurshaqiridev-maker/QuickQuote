@@ -3,6 +3,7 @@ import type { AdminBusinessRow } from '../../models/dto/admin.dto';
 import type { Page, PageQuery } from '../../models/dto/page.dto';
 import type { BusinessStatus } from '../../models/enums';
 import { pool, type Queryable } from '../db';
+import { containsPattern } from '../search-pattern';
 
 interface Row {
   id: string;
@@ -36,11 +37,6 @@ function toRow(row: Row): AdminBusinessRow {
     ownerEmailVerified: row.owner_email_verified,
     createdAt: row.created_at,
   };
-}
-
-/** Turns user text into a safe LIKE pattern: "50%_off" must not act as wildcards. */
-export function containsPattern(text: string): string {
-  return `%${text.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
 }
 
 const SELECT = `

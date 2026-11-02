@@ -21,7 +21,8 @@ export type ErrorCode =
   | 'PLAN_LIMIT_REACHED'
   | 'GO_LIVE_REQUIREMENTS_NOT_MET'
   | 'SLOT_UNAVAILABLE'
-  | 'CANCELLATION_WINDOW_PASSED';
+  | 'CANCELLATION_WINDOW_PASSED'
+  | 'CATEGORY_IN_USE';
 
 export interface ErrorDetail {
   field: string;

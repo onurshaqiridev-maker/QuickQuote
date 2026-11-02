@@ -10,7 +10,7 @@
 import type { BusinessCardRow, BusinessSearchFilter, PublicBusinessRow } from '../../models/dto/discovery.dto';
 import type { Page } from '../../models/dto/page.dto';
 import { pool, type Queryable } from '../db';
-import { containsPattern } from './admin-business.repository';
+import { containsPattern } from '../search-pattern';
 
 const FROM = `
   FROM businesses b
@@ -178,4 +178,16 @@ export async function listCities(requireSubscription: boolean, db: Queryable = p
     [requireSubscription],
   );
   return result.rows.map((row) => ({ name: row.name, count: Number(row.count) }));
+}
+
+/** How many businesses customers can see right now (admin overview). */
+export async function countVisible(requireSubscription: boolean, db: Queryable = pool): Promise<number> {
+  const result = await db.query<{ count: string }>(
+    `SELECT count(*) FROM businesses b
+       JOIN business_profiles p ON p.business_id = b.id
+       JOIN users owner ON owner.id = b.owner_user_id
+      WHERE ${VISIBLE}`,
+    [requireSubscription],
+  );
+  return Number(result.rows[0].count);
 }

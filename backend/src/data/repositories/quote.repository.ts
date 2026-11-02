@@ -4,6 +4,7 @@ import type { BusinessQuoteTab, CustomerQuoteTab, NewQuoteRequest } from '../../
 import type { QuoteDecision, QuoteStatus } from '../../models/enums';
 import type { QuoteRequest, QuoteRequestDetails } from '../../models/entities/quote-request.entity';
 import { pool, type Queryable } from '../db';
+import { containsPattern } from '../search-pattern';
 
 interface QuoteRow {
   id: string;
@@ -218,4 +219,29 @@ export async function setCustomerDecision(id: string, decision: QuoteDecision, d
     [id, decision],
   );
   return result.rows[0] ? toQuote(result.rows[0]) : null;
+}
+
+/** Admin: all quote requests, newest first. `search` matches the business, the customer's name or email, or the subject. */
+export async function listForAdmin(
+  filter: { status?: QuoteStatus; search?: string } & PageQuery,
+  db: Queryable = pool,
+): Promise<Page<QuoteRequestDetails>> {
+  const where = `
+    WHERE ($1::text IS NULL OR q.status = $1)
+      AND ($2::text IS NULL OR p.display_name ILIKE $2 OR c.full_name ILIKE $2 OR c.email ILIKE $2 OR q.subject ILIKE $2)`;
+  const params = [filter.status ?? null, filter.search ? containsPattern(filter.search) : null];
+  const [rows, count] = await Promise.all([
+    db.query<DetailsRow>(`${DETAILS} ${where} ORDER BY q.created_at DESC, q.id LIMIT $3 OFFSET $4`, [
+      ...params,
+      filter.pageSize,
+      (filter.page - 1) * filter.pageSize,
+    ]),
+    db.query<{ count: string }>(
+      `SELECT count(*) FROM quote_requests q
+         JOIN business_profiles p ON p.business_id = q.business_id
+         JOIN users c ON c.id = q.customer_id ${where}`,
+      params,
+    ),
+  ]);
+  return { items: rows.rows.map(toDetails), total: Number(count.rows[0].count), page: filter.page, pageSize: filter.pageSize };
 }

@@ -40,3 +40,13 @@ export type PaymentProvider = (typeof PAYMENT_PROVIDERS)[number];
 /** Email queue job statuses: waiting/being retried, delivered to Resend, or given up. */
 export const EMAIL_JOB_STATUSES = ['pending', 'sent', 'failed'] as const;
 export type EmailJobStatus = (typeof EMAIL_JOB_STATUSES)[number];
+
+/**
+ * Icon names a category can use. The website draws each one (frontend/src/components/ui/CategoryIcon.tsx),
+ * so both lists must stay the same.
+ */
+export const CATEGORY_ICONS = [
+  'scissors', 'stethoscope', 'wrench', 'sparkles', 'hammer', 'car', 'party-popper', 'camera',
+  'book-open', 'laptop', 'dumbbell', 'scale', 'utensils', 'paw-print', 'music', 'shirt', 'house', 'leaf', 'heart', 'store',
+] as const;
+export type CategoryIcon = (typeof CATEGORY_ICONS)[number];
