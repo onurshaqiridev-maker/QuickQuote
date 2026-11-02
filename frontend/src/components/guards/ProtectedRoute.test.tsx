@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { AuthContext, type AuthContextValue } from '../../context/auth-context';
 import type { User, UserRole } from '../../types/api';
-import { ProtectedRoute } from './ProtectedRoute';
+import { GuestOnlyRoute, ProtectedRoute } from './ProtectedRoute';
 
 function authWith(role: UserRole | null): AuthContextValue {
   const user: User | null = role
@@ -49,6 +49,37 @@ describe('ProtectedRoute', () => {
 
   it('sends users with another role to their own home page', () => {
     renderAt('/admin', 'customer');
+    expect(screen.getByText('Customer account')).toBeInTheDocument();
+  });
+});
+
+describe('GuestOnlyRoute', () => {
+  function renderLogin(role: UserRole | null, from?: string) {
+    render(
+      <AuthContext.Provider value={authWith(role)}>
+        <MemoryRouter initialEntries={[{ pathname: '/login', state: from ? { from } : null }]}>
+          <Routes>
+            <Route path="/login" element={<GuestOnlyRoute><p>Login form</p></GuestOnlyRoute>} />
+            <Route path="/account" element={<p>Customer account</p>} />
+            <Route path="/businesses/:slug" element={<p>Business page</p>} />
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+  }
+
+  it('shows the login form to visitors', () => {
+    renderLogin(null);
+    expect(screen.getByText('Login form')).toBeInTheDocument();
+  });
+
+  it('sends a user who just logged in back to the page they came from', () => {
+    renderLogin('customer', '/businesses/bella?book=123');
+    expect(screen.getByText('Business page')).toBeInTheDocument();
+  });
+
+  it('never redirects to another website', () => {
+    renderLogin('customer', '//evil.example');
     expect(screen.getByText('Customer account')).toBeInTheDocument();
   });
 });

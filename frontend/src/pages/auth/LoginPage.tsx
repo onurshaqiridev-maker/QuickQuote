@@ -28,7 +28,8 @@ export function LoginPage() {
     setError(null);
     try {
       const { user } = await login(email, password);
-      navigate(from ?? homePathForRole(user.role), { replace: true });
+      const safeFrom = from && from.startsWith('/') && !from.startsWith('//') ? from : null;
+      navigate(safeFrom ?? homePathForRole(user.role), { replace: true });
     } catch (err) {
       setError(errorMessage(err));
       setLoading(false);

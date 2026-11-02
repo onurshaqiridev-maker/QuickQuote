@@ -22,10 +22,19 @@ export function ProtectedRoute({ roles, children }: { roles: UserRole[]; childre
   return <>{children}</>;
 }
 
-/** For login/register pages: logged-in users are sent to their own home page. */
+/**
+ * For login/register pages: logged-in users are sent away - back to the page that sent them
+ * to log in (e.g. a booking), or else to their own home page.
+ */
 export function GuestOnlyRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) return <FullPageSpinner />;
-  if (user) return <Navigate to={homePathForRole(user.role)} replace />;
+  if (user) {
+    const from = (location.state as { from?: string } | null)?.from;
+    // Only go back to pages inside this website ("/..."), never to another site.
+    const target = from && from.startsWith('/') && !from.startsWith('//') ? from : homePathForRole(user.role);
+    return <Navigate to={target} replace />;
+  }
   return <>{children}</>;
 }
