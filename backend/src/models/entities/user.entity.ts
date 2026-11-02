@@ -12,6 +12,8 @@ export interface User {
   statusReason: string | null;
   emailVerifiedAt: Date | null;
   lastLoginAt: Date | null;
+  /** When the password last changed; older login sessions are refused. */
+  passwordChangedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

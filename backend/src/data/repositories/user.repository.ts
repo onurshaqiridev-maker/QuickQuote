@@ -15,6 +15,7 @@ interface UserRow {
   status_reason: string | null;
   email_verified_at: Date | null;
   last_login_at: Date | null;
+  password_changed_at: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -31,6 +32,7 @@ function toUser(row: UserRow): User {
     statusReason: row.status_reason,
     emailVerifiedAt: row.email_verified_at,
     lastLoginAt: row.last_login_at,
+    passwordChangedAt: row.password_changed_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -76,8 +78,9 @@ export async function updateProfile(
   return result.rows[0] ? toUser(result.rows[0]) : null;
 }
 
-export async function updatePasswordHash(id: string, passwordHash: string, db: Queryable = pool): Promise<void> {
-  await db.query('UPDATE users SET password_hash = $2 WHERE id = $1', [id, passwordHash]);
+/** Saves a new password. `changedAt` ends every login session that started before it. */
+export async function updatePasswordHash(id: string, passwordHash: string, changedAt: Date, db: Queryable = pool): Promise<void> {
+  await db.query('UPDATE users SET password_hash = $2, password_changed_at = $3 WHERE id = $1', [id, passwordHash, changedAt]);
 }
 
 export async function markEmailVerified(id: string, db: Queryable = pool): Promise<User | null> {

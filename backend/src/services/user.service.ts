@@ -5,6 +5,7 @@ import type { ChangePasswordRequest, UpdateProfileRequest } from '../models/requ
 import type { UserResponse } from '../models/responses/user.response';
 import { hashPassword, verifyPassword } from './password.service';
 import { toUserResponse } from './mappers';
+import { signSessionToken } from './session.service';
 
 export async function updateProfile(userId: string, input: UpdateProfileRequest): Promise<UserResponse> {
   const user = await userRepository.updateProfile(userId, { fullName: input.fullName, phone: input.phone ?? null });
@@ -12,11 +13,16 @@ export async function updateProfile(userId: string, input: UpdateProfileRequest)
   return toUserResponse(user);
 }
 
-export async function changePassword(userId: string, input: ChangePasswordRequest): Promise<void> {
+/**
+ * Changes the password. Every other login session of this user ends; the caller gets a NEW session
+ * token, so the person who changed the password stays logged in on this device.
+ */
+export async function changePassword(userId: string, input: ChangePasswordRequest): Promise<{ sessionToken: string }> {
   const user = await userRepository.findById(userId);
   if (!user) throw new UnauthenticatedError();
   if (!(await verifyPassword(input.currentPassword, user.passwordHash))) {
     throw new ValidationError([{ field: 'currentPassword', message: 'Current password is incorrect.' }]);
   }
-  await userRepository.updatePasswordHash(user.id, await hashPassword(input.newPassword));
+  await userRepository.updatePasswordHash(user.id, await hashPassword(input.newPassword), new Date());
+  return { sessionToken: signSessionToken(user) };
 }

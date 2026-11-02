@@ -5,15 +5,13 @@
  * transaction as the change that caused them.
  */
 import { createHash, randomBytes } from 'node:crypto';
-import jwt from 'jsonwebtoken';
-import { env, sessionDays } from '../config/env';
+import { env } from '../config/env';
 import { withTransaction, type Transaction } from '../data/db';
 import * as authTokenRepository from '../data/repositories/auth-token.repository';
 import * as businessRepository from '../data/repositories/business.repository';
 import * as categoryRepository from '../data/repositories/category.repository';
 import * as userRepository from '../data/repositories/user.repository';
 import type { AuthenticatedUser, AuthResult } from '../models/dto/user.dto';
-import type { User } from '../models/entities/user.entity';
 import type { AuthTokenPurpose } from '../models/enums';
 import { DomainError, UnauthenticatedError, ValidationError } from '../models/errors';
 import type {
@@ -26,6 +24,7 @@ import { logActivity } from './activity.service';
 import { enqueueEmail } from './email/email-queue.service';
 import { toBusinessSummaryResponse, toUserResponse } from './mappers';
 import { hashPassword, verifyPassword } from './password.service';
+import { readSessionToken, signSessionToken, startedBeforePasswordChange } from './session.service';
 
 const EMAIL_VERIFICATION_HOURS = 48;
 const PASSWORD_RESET_HOURS = 1;
@@ -55,14 +54,6 @@ async function createOneTimeToken(
 
 function frontendLink(pathAndQuery: string): string {
   return new URL(pathAndQuery, env.FRONTEND_URL).toString();
-}
-
-function signSessionToken(user: User): string {
-  return jwt.sign({ role: user.role }, env.JWT_SECRET, {
-    subject: user.id,
-    expiresIn: sessionDays * 24 * 60 * 60,
-    algorithm: 'HS256',
-  });
 }
 
 /** Turns "Bella Hair Studio!" into "bella-hair-studio". */
@@ -224,17 +215,14 @@ export async function login(input: LoginRequest): Promise<AuthResult> {
  * The user is loaded from the database on every request, so a suspended user is blocked immediately.
  */
 export async function authenticateSession(token: string): Promise<AuthenticatedUser> {
-  let userId: string | undefined;
-  try {
-    const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
-    userId = typeof payload === 'object' ? payload.sub : undefined;
-  } catch {
-    userId = undefined;
-  }
-  if (!userId) throw new UnauthenticatedError('Your session has expired. Please log in again.');
+  const session = readSessionToken(token);
+  if (!session) throw new UnauthenticatedError('Your session has expired. Please log in again.');
 
-  const user = await userRepository.findById(userId);
+  const user = await userRepository.findById(session.userId);
   if (!user) throw new UnauthenticatedError('Your session has expired. Please log in again.');
+  if (startedBeforePasswordChange(session.issuedAt, user.passwordChangedAt)) {
+    throw new UnauthenticatedError('Your password was changed. Please log in again.');
+  }
   if (user.status !== 'active') {
     throw new DomainError('ACCOUNT_SUSPENDED', 'This account has been suspended. Please contact support.');
   }
@@ -324,7 +312,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
     if (!usedToken) {
       throw new DomainError('INVALID_TOKEN', 'This reset link is invalid or has expired. Please request a new one.');
     }
-    await userRepository.updatePasswordHash(usedToken.userId, passwordHash, tx);
+    await userRepository.updatePasswordHash(usedToken.userId, passwordHash, new Date(), tx);
     await authTokenRepository.invalidateUnused(usedToken.userId, 'password_reset', tx);
     await logActivity(
       { actorUserId: usedToken.userId, action: 'user.password_reset', entityType: 'user', entityId: usedToken.userId },

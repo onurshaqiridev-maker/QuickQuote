@@ -3,6 +3,7 @@ import { changePasswordSchema, updateProfileSchema } from '../../models/requests
 import * as userService from '../../services/user.service';
 import { currentUser } from '../middleware/authenticate';
 import { sendData } from '../responses';
+import { setSessionCookie } from '../session-cookie';
 import { parseRequest } from '../validation';
 
 export async function updateProfile(req: Request, res: Response): Promise<void> {
@@ -12,6 +13,7 @@ export async function updateProfile(req: Request, res: Response): Promise<void> 
 
 export async function changePassword(req: Request, res: Response): Promise<void> {
   const input = parseRequest(changePasswordSchema, req.body);
-  await userService.changePassword(currentUser(req).id, input);
-  sendData(res, { message: 'Password changed.' });
+  const { sessionToken } = await userService.changePassword(currentUser(req).id, input);
+  setSessionCookie(res, sessionToken); // other devices are logged out; this one gets a fresh session
+  sendData(res, { message: 'Password changed. You were logged out on your other devices.' });
 }
