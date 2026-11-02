@@ -1,11 +1,13 @@
 import { Clock, Globe, Mail, MapPin, Phone } from 'lucide-react';
-import { Link, useParams } from 'react-router';
+import { useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { assetUrl } from '../../api/client';
 import { publicApi } from '../../api/public.api';
+import { BookingPanel } from '../../components/booking/BookingPanel';
 import { BusinessLogo } from '../../components/business/BusinessCard';
 import { Container } from '../../components/layout/PublicLayout';
 import { Badge } from '../../components/ui/Badge';
-import { ButtonLink } from '../../components/ui/Button';
+import { Button, ButtonLink } from '../../components/ui/Button';
 import { Card, CardTitle } from '../../components/ui/Card';
 import { CategoryIcon } from '../../components/ui/CategoryIcon';
 import { FullPageSpinner } from '../../components/ui/Spinner';
@@ -79,6 +81,13 @@ function ContactCard({ business }: { business: PublicBusiness }) {
 export function BusinessDetailsPage() {
   const { slug = '' } = useParams();
   const { data: business, error, loading } = useApi(`business/${slug}`, () => publicApi.business(slug));
+  // ?book=<serviceId> opens the booking dialog (e.g. when coming back from the login page).
+  const [params, setParams] = useSearchParams();
+  const [bookingId, setBookingId] = useState<string | null>(params.get('book'));
+  const closeBooking = () => {
+    setBookingId(null);
+    if (params.has('book')) setParams({}, { replace: true });
+  };
 
   if (loading && !business) return <FullPageSpinner />;
   if (error || !business) {
@@ -92,6 +101,7 @@ export function BusinessDetailsPage() {
   }
 
   const [mainPhoto, ...otherPhotos] = business.photos;
+  const bookingService = business.services.find((service) => service.id === bookingId && service.isBookable && service.durationMinutes);
   return (
     <Container className="space-y-8">
       <Link to="/explore" className="text-sm font-medium text-brand-700 hover:underline">Back to all businesses</Link>
@@ -144,9 +154,7 @@ export function BusinessDetailsPage() {
 
           <section>
             <h2 className="text-xl font-bold">Services and prices</h2>
-            <div className="mt-3 rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700">
-              Online booking and quote requests open soon. Until then, contact {business.displayName} directly using the details on this page.
-            </div>
+            <p className="mt-1 text-sm text-slate-600">Book a free time online, or contact {business.displayName} for services marked "quote on request".</p>
             <ul className="mt-4 divide-y divide-slate-200 rounded-2xl bg-white ring-1 ring-slate-200">
               {business.services.map((service) => (
                 <li key={service.id} className="flex flex-col gap-2 p-5 sm:flex-row sm:items-start sm:justify-between">
@@ -155,10 +163,13 @@ export function BusinessDetailsPage() {
                     {service.description && <p className="mt-1 text-sm text-slate-600">{service.description}</p>}
                     <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                       {service.durationMinutes && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" aria-hidden /> {formatDuration(service.durationMinutes)}</span>}
-                      {service.isBookable ? <Badge color="blue">Bookable online soon</Badge> : <Badge>Quote on request</Badge>}
+                      {!service.isBookable && <Badge>Quote on request</Badge>}
                     </p>
                   </div>
-                  <span className="shrink-0 text-lg font-semibold text-slate-900">{priceLabel(service.priceType, service.priceCents)}</span>
+                  <div className="flex shrink-0 items-center gap-4 sm:flex-col sm:items-end sm:gap-2">
+                    <span className="text-lg font-semibold text-slate-900">{priceLabel(service.priceType, service.priceCents)}</span>
+                    {service.isBookable && service.durationMinutes && <Button onClick={() => setBookingId(service.id)}>Book</Button>}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -170,6 +181,7 @@ export function BusinessDetailsPage() {
           <OpeningHours business={business} />
         </aside>
       </div>
+      {bookingService && <BookingPanel business={business} service={bookingService} onClose={closeBooking} />}
     </Container>
   );
 }

@@ -9,6 +9,7 @@ import { Card } from '../../components/ui/Card';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { FullPageSpinner } from '../../components/ui/Spinner';
 import { useApi } from '../../hooks/useApi';
+import { timeInZone } from '../../utils/dates';
 
 export function BusinessOverviewPage() {
   const { data: overview, loading, error } = useApi('business-overview', () => businessApi.overview());
@@ -54,8 +55,27 @@ export function BusinessOverviewPage() {
             </div>
           </Card>
           <Card>
-            <h2 className="font-semibold">Today</h2>
-            <p className="mt-2 text-sm text-slate-600">No appointments yet. Reservations arrive in phase 8.</p>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Today</h2>
+              <Link to="/dashboard/reservations" className="text-sm font-semibold text-brand-700 hover:underline">All reservations</Link>
+            </div>
+            {overview.reservations.pendingCount > 0 && (
+              <Link to="/dashboard/reservations?tab=pending" className="mt-3 block rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100">
+                {overview.reservations.pendingCount} request{overview.reservations.pendingCount > 1 ? 's' : ''} waiting for your answer
+              </Link>
+            )}
+            {overview.reservations.today.length === 0 ? (
+              <p className="mt-3 text-sm text-slate-600">No appointments today.</p>
+            ) : (
+              <ul className="mt-3 divide-y divide-slate-100 text-sm">
+                {overview.reservations.today.map((r) => (
+                  <li key={r.id} className="flex items-center justify-between gap-3 py-2">
+                    <span><span className="font-semibold">{timeInZone(r.startsAt, r.timezone)}</span> {r.service.name}</span>
+                    <span className="truncate text-slate-500">{r.customer.name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Card>
           <Card>
             <h2 className="font-semibold">New quote requests</h2>

@@ -1,4 +1,4 @@
-import type { ApiListResponse, ApiResponse, BusinessCard, Category, City, MessageResponse, Plan, PlatformConfig, PublicBusiness } from '../types/api';
+import type { ApiListResponse, ApiResponse, Availability, BusinessCard, Category, City, MessageResponse, Plan, PlatformConfig, PublicBusiness } from '../types/api';
 import { api } from './client';
 
 export interface ContactInput {
@@ -30,6 +30,8 @@ export const publicApi = {
   searchBusinesses: (search: BusinessSearch) =>
     api.get<ApiListResponse<BusinessCard>>(`/api/businesses${queryString({ ...search })}`),
   business: async (slug: string) => (await api.get<ApiResponse<PublicBusiness>>(`/api/businesses/${encodeURIComponent(slug)}`)).data,
+  availability: async (slug: string, serviceId: string, date: string) =>
+    (await api.get<ApiResponse<Availability>>(`/api/businesses/${encodeURIComponent(slug)}/availability?serviceId=${serviceId}&date=${date}`)).data,
   cities: async () => (await api.get<ApiResponse<City[]>>('/api/cities')).data,
   config: async () => (await api.get<ApiResponse<PlatformConfig>>('/api/config')).data,
   categories: async () => (await api.get<ApiResponse<Category[]>>('/api/categories')).data,

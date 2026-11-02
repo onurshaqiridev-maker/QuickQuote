@@ -4,6 +4,8 @@ import type {
   BookingSettings,
   BusinessOverview,
   BusinessProfile,
+  BusinessReservation,
+  ApiListResponse,
   Offering,
   Photo,
   PriceType,
@@ -68,6 +70,11 @@ export const businessApi = {
   addBlockedTime: (input: { startsAt: string; endsAt: string; reason: string }) =>
     data(api.post<ApiResponse<BlockedTime>>('/api/business/blocked-times', input)),
   deleteBlockedTime: (id: string) => api.delete<void>(`/api/business/blocked-times/${id}`),
+
+  reservations: (tab: 'pending' | 'upcoming' | 'past' | 'all', page = 1) =>
+    api.get<ApiListResponse<BusinessReservation>>(`/api/business/reservations?tab=${tab}&page=${page}&pageSize=20`),
+  reservationAction: (id: string, action: 'confirm' | 'reject' | 'cancel' | 'complete', message?: string) =>
+    data(api.post<ApiResponse<BusinessReservation>>(`/api/business/reservations/${id}/${action}`, message ? { message } : {})),
 
   settings: () => data(api.get<ApiResponse<BookingSettings>>('/api/business/settings')),
   saveSettings: (input: BookingSettings) => data(api.put<ApiResponse<BookingSettings>>('/api/business/settings', input)),

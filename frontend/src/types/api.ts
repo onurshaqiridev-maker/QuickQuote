@@ -185,6 +185,7 @@ export interface BusinessOverview {
     photos: { used: number; limit: number };
   };
   subscription: { status: SubscriptionStatus; planName: string; currentPeriodEnd: string | null } | null;
+  reservations: { pendingCount: number; today: BusinessReservation[] };
 }
 
 // ---------------------------------------------------------------------------
@@ -227,6 +228,7 @@ export interface PublicBusiness {
   logoUrl: string | null;
   isFeatured: boolean;
   timezone: string;
+  booking: { maxAdvanceDays: number; minNoticeHours: number; cancellationNoticeHours: number };
   contact: { email: string | null; phone: string | null; websiteUrl: string | null };
   address: { line: string | null; city: string | null; postalCode: string | null; country: string | null };
   categories: PublicCategory[];
@@ -274,4 +276,66 @@ export interface AdminBusinessDetail {
   profile: BusinessProfile;
   activeServices: number;
   checklist: ChecklistItem[];
+}
+
+// ---------------------------------------------------------------------------
+// Reservations
+// ---------------------------------------------------------------------------
+
+export type ReservationStatus = 'pending' | 'confirmed' | 'rejected' | 'cancelled' | 'completed';
+
+export interface Slot {
+  startsAt: string;
+  localTime: string;
+}
+
+export interface Availability {
+  date: string;
+  timezone: string;
+  service: { id: string; name: string; durationMinutes: number };
+  slots: Slot[];
+}
+
+export interface ReservationServiceInfo {
+  id: string;
+  name: string;
+  priceType: PriceType;
+  priceCents: number | null;
+  durationMinutes: number;
+}
+
+export interface CustomerReservation {
+  id: string;
+  status: ReservationStatus;
+  startsAt: string;
+  endsAt: string;
+  timezone: string;
+  service: ReservationServiceInfo;
+  business: { slug: string; displayName: string; logoUrl: string | null; city: string | null; addressLine: string | null; phone: string | null };
+  customerNotes: string | null;
+  businessMessage: string | null;
+  cancelledBy: 'customer' | 'business' | 'system' | null;
+  canCancel: boolean;
+  cancelDeadline: string;
+  createdAt: string;
+}
+
+export interface BusinessReservation {
+  id: string;
+  status: ReservationStatus;
+  startsAt: string;
+  endsAt: string;
+  timezone: string;
+  service: ReservationServiceInfo;
+  customer: { name: string; email: string; phone: string | null; previousVisits: number };
+  customerNotes: string | null;
+  businessMessage: string | null;
+  cancelledBy: 'customer' | 'business' | 'system' | null;
+  canComplete: boolean;
+  createdAt: string;
+}
+
+export interface CustomerOverview {
+  upcoming: CustomerReservation[];
+  counts: { upcoming: number; past: number; cancelled: number };
 }
