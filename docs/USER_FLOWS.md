@@ -334,14 +334,14 @@ sequenceDiagram
 
 **Page:** Manage Quote Requests (`/dashboard/quotes`)
 
-1. Tabs: **New** (`pending`), **In progress** (`processing`), **Answered** (`completed`), **Declined** (`rejected`).
+1. Tabs: **New** (`pending`), **In progress** (`processing`), **Answered** (`completed`, with the customer's decision), **Declined** (`rejected`).
 2. A request's details show the subject, description, preferred date, budget, the service (if any) and **customer information** (name, email, phone).
 3. Actions:
    - **Start working on it** → `processing`. The customer is told the business is preparing a quote.
    - **Send quote** → `completed`, with a **message** (required) and a **price** (optional, for example when the price depends on a visit).
    - **Decline** → `rejected`, with an optional message.
 4. Every status change sends `quote_status_customer`.
-5. The customer sees the answer in **My Quote Requests**. They can contact the business by email or phone, or book a service if one is available. A chat feature may come later.
+5. The customer sees the answer in **My Quote Requests** and can **accept** or **decline** the quote (once). The business receives `quote_decision_business`. After accepting, the customer sees the business's phone and email, and the business gets the customer's contact details to plan the next steps. A chat feature may come later.
 
 ### 7.3 Quotation statuses
 
@@ -363,6 +363,8 @@ stateDiagram-v2
 | `processing` | "In progress" | The business is preparing the quote |
 | `completed` | "Quote received" | The business answered with a message and maybe a price |
 | `rejected` | "Declined" | The business cannot take the job |
+
+After `completed`, the customer's answer is stored next to the status in `customer_decision` (`accepted` or `declined`). The status itself stays `completed`, so the business's flow above does not change.
 
 ---
 

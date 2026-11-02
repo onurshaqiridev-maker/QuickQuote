@@ -160,14 +160,16 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/customer/overview` | Customer | Upcoming reservations, recent quote requests, counts |
+| `GET` | `/api/customer/overview` | Customer | Upcoming reservations and counts, plus `quotes` (the 3 latest requests and counts) |
 | `GET` | `/api/customer/reservations` | Customer | My reservations. Query: `tab` (`upcoming`, `past`, `cancelled`), `page`. |
 | `POST` | `/api/customer/reservations` | Customer (verified) | Book an appointment |
 | `GET` | `/api/customer/reservations/:id` | Customer | One of my reservations |
 | `POST` | `/api/customer/reservations/:id/cancel` | Customer | Cancel (only if `pending` or `confirmed`, and before the cancellation deadline) |
-| `GET` | `/api/customer/quote-requests` | Customer | My quote requests. Query: `status`, `page`. |
+| `GET` | `/api/customer/quote-requests` | Customer | My quote requests. Query: `tab` (`all`, `open`, `answered`, `declined`), `page`. |
 | `POST` | `/api/customer/quote-requests` | Customer (verified) | Send a quote request |
 | `GET` | `/api/customer/quote-requests/:id` | Customer | One of my quote requests, including the business's answer |
+| `POST` | `/api/customer/quote-requests/:id/accept` | Customer | Accept an answered quote (once). The business is emailed. |
+| `POST` | `/api/customer/quote-requests/:id/decline` | Customer | Decline an answered quote (once). The business is emailed. |
 
 ### 6.6 Business — `/api/business`
 
@@ -223,7 +225,7 @@ Each list has a sensible fixed sort order (for example: newest first, or soonest
 
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| `GET` | `/api/business/quote-requests` | Business | My quote requests. Query: `status`, `page`. |
+| `GET` | `/api/business/quote-requests` | Business | My quote requests. Query: `tab` (`new`, `in_progress`, `answered`, `declined`), `page`. |
 | `GET` | `/api/business/quote-requests/:id` | Business | One request, with customer information |
 | `POST` | `/api/business/quote-requests/:id/start` | Business | `pending` → `processing` ("we're working on it") |
 | `POST` | `/api/business/quote-requests/:id/respond` | Business | `pending` or `processing` → `completed`. Body: `{ "message": string, "quotedPriceCents"?: number }` |
@@ -602,6 +604,14 @@ Content-Type: application/json
 ```
 
 The answer is **`200 OK`** with `"status": "completed"`. The customer is emailed with the price and message.
+
+**The customer accepts (or declines) the quote:**
+
+```http
+POST /api/customer/quote-requests/q77d.../accept
+```
+
+The answer is **`200 OK`** with `"customerDecision": "accepted"` and `"canDecide": false`. The business is emailed (`quote_decision_business`) with the customer's contact details. A second decision returns `409 INVALID_STATUS_TRANSITION`.
 
 ### 7.11 Start a subscription (mock payment)
 

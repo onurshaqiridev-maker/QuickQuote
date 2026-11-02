@@ -457,6 +457,8 @@ Requests for a price quotation.
 | `quoted_price_cents` | `integer` | NULL, CHECK `>= 0` | The price the business offers |
 | `business_message` | `text` | NULL, up to 3000 characters | The business's answer or reason for rejecting |
 | `responded_at` | `timestamptz` | NULL | When the business completed or rejected the request |
+| `customer_decision` | `text` | NULL, CHECK in (`accepted`, `declined`), only when `status = 'completed'` | The customer's answer to the quote (added in migration 12) |
+| `customer_decided_at` | `timestamptz` | NULL, set together with `customer_decision` | When the customer answered |
 | `created_at`, `updated_at` | `timestamptz` | NOT NULL | |
 
 ### 5.13 `subscription_plans`
@@ -729,6 +731,7 @@ The same values exist in the code, in `src/models/enums.ts`, so the code and the
 | 9 | `create-subscriptions-and-payments` | `subscription_plans`, `subscriptions`, `payments` |
 | 10 | `create-email-jobs` | `email_jobs` |
 | 11 | `create-activity-logs` | `activity_logs` |
+| 12 | `add-quote-customer-decision` | `quote_requests.customer_decision` and `customer_decided_at` (the customer accepts or declines a quote) |
 
 **Rules for migrations:**
 
@@ -759,7 +762,7 @@ The script refuses to run when `NODE_ENV=production`.
 | Demo businesses | 8 approved and published businesses in Berlin, Munich, Hamburg and Cologne, across 8 categories, each with a generated logo, photos, services with prices and working hours |
 | Waiting business | 1 business in `pending_review` (to try admin approval) |
 | Demo customers | 3 customers with confirmed emails |
-| Later phases | Reservations and quote requests will be added to the demo seed in phases 8 and 9 |
+| Demo quote requests | 5 requests in every status (new, in progress, answered, accepted, declined by the business), so both sides' pages have something to show |
 
 All demo accounts share one simple password, printed in the terminal when the seed finishes.
 

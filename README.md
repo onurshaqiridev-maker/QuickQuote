@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Quote requests work** (phase 9): customers describe what they need, businesses answer with a message and an optional price (or decline), and customers accept or decline the quote, with an email at every step. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -171,7 +171,7 @@ Full details: [docs/EMAIL_WORKFLOW.md](docs/EMAIL_WORKFLOW.md).
    npm run seed
    ```
 
-   Optional, for development: add 8 demo businesses with logos, photos, services and hours, 1 business waiting for review, and 3 demo customers (password `QuickQuote2026`, e.g. `bella.demo@example.com` or `sara.demo@example.com`):
+   Optional, for development: add 8 demo businesses with logos, photos, services and hours, 1 business waiting for review, 3 demo customers and 5 quote requests (password `QuickQuote2026`, e.g. `bella.demo@example.com` or `sara.demo@example.com`):
 
    ```bash
    npm run seed:demo
@@ -422,6 +422,27 @@ curl -s -b bella.txt -X POST http://localhost:4000/api/business/reservations/<re
   -H "Content-Type: application/json" -d '{"message":"See you then!"}'
 ```
 
+### Ask for a quote
+
+Sara (logged in from the booking example) asks for a price. `serviceId` is optional (leave it out for a general request):
+
+```bash
+curl -s -b sara.txt -X POST http://localhost:4000/api/customer/quote-requests \
+  -H "Content-Type: application/json" \
+  -d '{"businessId":"<business id>","subject":"Bridal hair for my wedding","description":"Long hair, an updo with flowers, and a trial session.","budgetCents":25000}'
+```
+
+The business answers with a message and an optional price, then the customer accepts:
+
+```bash
+curl -s -b bella.txt -X POST http://localhost:4000/api/business/quote-requests/<quote id>/respond \
+  -H "Content-Type: application/json" -d '{"quotedPriceCents":22000,"message":"Includes a trial session."}'
+
+curl -s -b sara.txt -X POST http://localhost:4000/api/customer/quote-requests/<quote id>/accept
+```
+
+Each step queues an email (`quote_new_business` and `quote_received_customer`, then `quote_status_customer`, then `quote_decision_business`).
+
 ### All endpoints available now
 
 | Method | Path | Who | Purpose |
@@ -447,10 +468,13 @@ curl -s -b bella.txt -X POST http://localhost:4000/api/business/reservations/<re
 | `GET` | `/api/businesses/:slug` | public | Public profile: photos, services, prices, hours, contact |
 | `GET` | `/api/cities` | public | Cities with visible businesses |
 | `GET` | `/api/businesses/:slug/availability` | public | Free time slots for a service on a day (`serviceId`, `date=YYYY-MM-DD`) |
-| `GET` | `/api/customer/overview` | customer | Reservation counts and the next appointments |
+| `GET` | `/api/customer/overview` | customer | Next appointments, reservation counts, latest quote requests |
 | `GET` / `POST` | `/api/customer/reservations` | customer | List (`tab=upcoming\|past\|cancelled`) / book (needs a confirmed email) |
 | `GET` | `/api/customer/reservations/:id` | customer | One reservation |
 | `POST` | `/api/customer/reservations/:id/cancel` | customer | Cancel (before the business's cancellation deadline) |
+| `GET` / `POST` | `/api/customer/quote-requests` | customer | List (`tab=all\|open\|answered\|declined`) / send a request (needs a confirmed email) |
+| `GET` | `/api/customer/quote-requests/:id` | customer | One request, with the business's answer |
+| `POST` | `/api/customer/quote-requests/:id/accept` / `decline` | customer | Answer a quote (once); the business is emailed |
 | `GET` | `/api/admin/businesses` | admin | List businesses (`status`, `search`, `page`) |
 | `GET` | `/api/admin/businesses/:id` | admin | Business details for review |
 | `POST` | `/api/admin/businesses/:id/approve` / `suspend` / `deactivate` / `reactivate` | admin | Change the status (suspend and deactivate need `{ "reason" }`); the owner is emailed |
@@ -464,6 +488,10 @@ curl -s -b bella.txt -X POST http://localhost:4000/api/business/reservations/<re
 | `GET` / `PUT` | `/api/business/working-hours` | business | Weekly hours (whole week at once, no overlaps) |
 | `GET` / `POST` / `DELETE` | `/api/business/blocked-times[/:id]` | business | Holidays and other blocked periods |
 | `GET` / `PUT` | `/api/business/settings` | business | Booking settings |
+| `GET` | `/api/business/quote-requests[/:id]` | business | List (`tab=new\|in_progress\|answered\|declined`) / one request |
+| `POST` | `/api/business/quote-requests/:id/start` | business | "We are working on it" (`pending` to `processing`) |
+| `POST` | `/api/business/quote-requests/:id/respond` | business | Send the quote: `{ "message", "quotedPriceCents"? }` |
+| `POST` | `/api/business/quote-requests/:id/reject` | business | Decline (optional `{ "message" }`) |
 | `GET` | `/api/business/reservations[/:id]` | business | List (`tab=pending\|upcoming\|past\|all`) / one reservation |
 | `POST` | `/api/business/reservations/:id/confirm` / `reject` / `cancel` / `complete` | business | Answer a request (optional `{ "message" }`); the customer is emailed |
 | `GET` | `/api/admin/email-jobs` | admin | List email jobs (`?status=pending\|sent\|failed&page=1&pageSize=20`) |
@@ -492,7 +520,7 @@ The full planned API is in [docs/API_DESIGN.md](docs/API_DESIGN.md).
 | `npm run migrate:down` | Undo the last migration |
 | `npm run migrate:create -- <name>` | Create a new SQL migration file |
 | `npm run seed` | Insert categories, plans and the first admin (safe to run again) |
-| `npm run seed:demo` | Development only: demo businesses and customers (refuses to run in production) |
+| `npm run seed:demo` | Development only: demo businesses, customers and quote requests (refuses to run in production) |
 | `npm run migrate:deploy` / `npm run seed:deploy` | The same, using the compiled code (used on Render after `npm run build`) |
 | `npm test` | Run all tests |
 | `npm run lint` | Code style **and the layer rules** |

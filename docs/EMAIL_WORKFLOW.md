@@ -297,16 +297,17 @@ Every email the platform sends:
 | 12 | `quote_new_business` | A customer sends a quote request | Business | Subject, description, budget, preferred date + link |
 | 13 | `quote_received_customer` | A customer sends a quote request | Customer | "Your request was sent" + summary |
 | 14 | `quote_status_customer` | The business sets a request to processing, completed or rejected | Customer | New status. When completed: the quoted price and message. |
-| 15 | `subscription_activated` | First payment received | Business | Plan, period end date, next steps to go live |
-| 16 | `payment_receipt` | Any payment is marked paid | Business | Amount, plan, period covered |
-| 17 | `payment_failed` | A payment is marked failed | Business | What happened + how to try again |
-| 18 | `subscription_renewal_reminder` | 7 days and 1 day before the period ends | Business | End date + "Renew now" link |
-| 19 | `subscription_past_due` | The period ended without renewal | Business | "3-day grace period. Renew to stay visible." |
-| 20 | `subscription_expired` | The grace period ended | Business | "Your profile is hidden" + renew link |
-| 21 | `subscription_cancelled` | A cancelled subscription reaches its end | Business | Confirmation + "come back any time" |
-| 22 | `business_approved` | The admin approves the business | Business | "You are approved" + remaining go-live steps |
-| 23 | `business_suspended` | The admin suspends or deactivates the business | Business | Status + reason + contact info |
-| 24 | `contact_message_admin` | Someone uses the Contact form | Admin | Name, email, subject, message |
+| 15 | `quote_decision_business` | The customer accepts or declines a quote | Business | The decision, the quoted price, and (when accepted) the customer's contact details |
+| 16 | `subscription_activated` | First payment received | Business | Plan, period end date, next steps to go live |
+| 17 | `payment_receipt` | Any payment is marked paid | Business | Amount, plan, period covered |
+| 18 | `payment_failed` | A payment is marked failed | Business | What happened + how to try again |
+| 19 | `subscription_renewal_reminder` | 7 days and 1 day before the period ends | Business | End date + "Renew now" link |
+| 20 | `subscription_past_due` | The period ended without renewal | Business | "3-day grace period. Renew to stay visible." |
+| 21 | `subscription_expired` | The grace period ended | Business | "Your profile is hidden" + renew link |
+| 22 | `subscription_cancelled` | A cancelled subscription reaches its end | Business | Confirmation + "come back any time" |
+| 23 | `business_approved` | The admin approves the business | Business | "You are approved" + remaining go-live steps |
+| 24 | `business_suspended` | The admin suspends or deactivates the business | Business | Status + reason + contact info |
+| 25 | `contact_message_admin` | Someone uses the Contact form | Admin | Name, email, subject, message |
 
 ---
 

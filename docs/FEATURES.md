@@ -64,7 +64,7 @@ Customers use everything for **free**.
 | C-03 | Reservation history | All reservations with status, filterable: upcoming, past, cancelled |
 | C-04 | Cancel a reservation | Allowed for `pending` and `confirmed` reservations until `cancellation_notice_hours` before the start |
 | C-05 | Request a quotation | For a specific service, or a general request: subject, description, preferred date, budget, phone |
-| C-06 | Quote request history | All requests with status. Shows the business's answer (price + message) when completed. |
+| C-06 | Quote request history | All requests with status. Shows the business's answer (price + message) when completed, and lets the customer **accept or decline** the quote. |
 | C-07 | Profile and settings | Edit name and phone, change password |
 | C-08 | Email notifications | Welcome, confirmation of each request, and every status change of their reservations and quotes |
 
