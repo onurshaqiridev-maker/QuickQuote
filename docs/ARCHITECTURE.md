@@ -532,11 +532,11 @@ The step-by-step guide is in [DEPLOYMENT.md](DEPLOYMENT.md). The backend is depl
 | Backend: API server | A Node.js host, as a web service running `npm run start` | Proposal: **Render**. Alternatives: Railway, Fly.io or a small virtual server. |
 | Backend: email worker | The same host, as a **background worker** running `npm run start:worker` | If the hosting plan has no separate background worker, use **one** web service running `npm run start:all` (API + worker in one process) |
 | PostgreSQL | A managed PostgreSQL database from the same host | Its connection string goes into `DATABASE_URL` |
-| Frontend | Static hosting, for example Netlify or Vercel | Only needed once the frontend exists |
+| Frontend | Served by the API web service itself (`FRONTEND_DIST_DIR`) | One address for website and API, so the `SameSite=Lax` login cookie works and no CORS setup is needed. Static hosting (Netlify, Vercel) is possible later, but then the cookie and CORS need extra setup. |
 | Files | S3-compatible object storage | Only needed once photo uploads exist |
 | Monitoring | Asniher checks `https://<api-host>/health` | — |
 
-> **Why not Vercel or Netlify for the backend?** They are great for the static frontend. But the email worker must run **all the time** in the background, and those platforms are built for short-lived functions, not long-running processes.
+> **Why not Vercel or Netlify for the backend?** They could host the static frontend. But the email worker must run **all the time** in the background, and those platforms are built for short-lived functions, not long-running processes.
 
 ### 15.2 Deploying
 

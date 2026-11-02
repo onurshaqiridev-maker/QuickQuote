@@ -65,7 +65,7 @@ function PasswordForm() {
       await accountApi.changePassword(currentPassword, newPassword);
       setCurrentPassword('');
       setNewPassword('');
-      setStatus({ tone: 'success', text: 'Your password was changed.' });
+      setStatus({ tone: 'success', text: 'Your password was changed. You were logged out on your other devices.' });
     } catch (error) {
       if (error instanceof ApiError) setErrors(error.fieldErrors());
       setStatus({ tone: 'error', text: errorMessage(error) });

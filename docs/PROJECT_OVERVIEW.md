@@ -153,7 +153,7 @@ Each phase ends with something you can run and try. **Phases 1–3 build and dep
 | 8 (done) | Reservations | Available time slots, booking, double-booking protection, and reservation pages for businesses and customers |
 | 9 (done) | Quotations | Quote request form, business responses, and customer quote history |
 | 10 (done; subscription pages wait for phase 6) | Admin dashboard | Overview, management pages, activity log and email queue monitor |
-| 11 | Launch preparation | About and Contact pages, frontend deployment, a security review and more tests |
+| 11 (done) | Launch preparation | About and Contact pages, frontend deployment, a [security review](SECURITY.md) and more tests |
 
 ---
 
@@ -193,7 +193,7 @@ These choices shape everything else. Please confirm or change them before implem
 | 8 | Layer rule | Models are plain data shapes that every layer may import. Running logic ("calling") only goes one layer down. |
 | 9 | Currency | Euro (EUR) for the whole platform in version 1 |
 | 10 | Business owners booking | A business-owner account cannot book appointments. To book somewhere else, the owner uses a separate customer account. |
-| 11 | Hosting | Render for the API, worker and PostgreSQL (alternatives: Railway, Fly.io). The frontend later on Netlify or Vercel. |
+| 11 | Hosting | Render for the website, API, worker and PostgreSQL in one free web service plus a database (alternatives: Railway, Fly.io). The API server serves the built website, so both share one address (needed for the login cookie). |
 | 12 | Build order | Backend core first (phases 1–3, meeting the backend requirements), then the frontend and the remaining features |
 
 ---

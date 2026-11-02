@@ -14,7 +14,7 @@ See the [roadmap](docs/PROJECT_OVERVIEW.md#9-implementation-roadmap) for what co
 
 | | |
 |---|---|
-| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Quote requests work** (phase 9): customers describe what they need, businesses answer with a message and an optional price (or decline), and customers accept or decline the quote, with an email at every step. **The admin panel is complete** (phase 10): platform numbers and an activity feed, user management (suspend and reactivate), read-only lists of all reservations and quote requests, and category management. **Phase 3** (deployment on Render + Asniher monitoring) is ready: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). |
+| **Status** | **Phases 1, 2, 4 and 5 done:** the four-layer backend (migrations, seed, `GET /health`, email queue + worker, accounts), the frontend foundation (all 29 pages routed, login and registration, settings, contact form, admin email queue) and the business profile (profile details, logo and photos, categories, services and prices, working hours, blocked times, booking settings, go-live checklist, publishing). **Listing is free during the launch** (no payments). Customers can **explore** businesses (search, category and city filters, public profiles), and admins **review and approve** businesses. **Reservations work** (phase 8): customers pick a free time slot and book, businesses confirm, reject, cancel or complete, both sides are emailed, and the database blocks double bookings. **Quote requests work** (phase 9): customers describe what they need, businesses answer with a message and an optional price (or decline), and customers accept or decline the quote, with an email at every step. **The admin panel is complete** (phase 10): platform numbers and an activity feed, user management (suspend and reactivate), read-only lists of all reservations and quote requests, and category management. **Launch preparation is done** (phase 11): the API server also serves the website (one address, one free Render service), a security review with fixes ([docs/SECURITY.md](docs/SECURITY.md)), page titles, and more tests. **Phase 3** (going online on Render + the Asniher monitor) is ready to follow in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Payments (phase 6) are postponed. |
 | **Backend** | Node.js 22, Express 5, TypeScript, PostgreSQL 16, `pg` with plain SQL, `node-pg-migrate`, Zod, Resend, pino, Vitest |
 | **Frontend** | React 19, Vite, TypeScript, React Router, Tailwind CSS 4, Vitest + Testing Library |
 
@@ -223,8 +223,9 @@ Every setting comes from environment variables. In development they are read fro
 | `DATABASE_POOL_MAX` | no | `10` | Maximum database connections |
 | `JWT_SECRET` | **yes** | — | Secret that signs login sessions (at least 32 characters) |
 | `JWT_EXPIRES_IN` | no | `7d` | How long a login lasts (in days, e.g. `7d`) |
-| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed browser origin (CORS) and base URL for links in emails |
-| `API_PUBLIC_URL` | no | `http://localhost:4000` | Public address of this API |
+| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed browser origin (CORS) and base URL for links in emails. On Render it defaults to the service's address; in production it must not be `localhost`. |
+| `API_PUBLIC_URL` | no | `http://localhost:4000` | Public address of this API (on Render: the service's address) |
+| `FRONTEND_DIST_DIR` | no | *(empty)* | Production: the built website (`../frontend/dist`). When set, this server also serves the website, so website and API share one address. |
 | `EMAIL_DRIVER` | no | `console` | `console` (print emails) or `resend` (really send) |
 | `RESEND_API_KEY` | if `resend` | — | Your Resend API key |
 | `EMAIL_FROM` | no | `Quick Quote <onboarding@resend.dev>` | Sender. Must be on a domain verified in Resend for real sending. |
@@ -565,9 +566,9 @@ The tests use a separate database, `quickquote_test` (override it with `TEST_DAT
 
 ## Deployment and monitoring
 
-The backend is deployed on **[Render](https://render.com)** using the Blueprint in [`render.yaml`](render.yaml). It creates:
+Quick Quote is deployed on **[Render](https://render.com)** using the Blueprint in [`render.yaml`](render.yaml). It creates:
 - a **PostgreSQL** database,
-- one **web service** that runs the API and the email worker together (`node dist/src/all.js`), because Render's free plan has no background workers.
+- one **web service** that serves the website **and** runs the API and the email worker together (`node dist/src/all.js`), because Render's free plan has no background workers. Website and API share one address, so the login cookie works without extra setup.
 
 On every start, the service applies new migrations (`npm run migrate:deploy`), makes sure the seed data exists (`npm run seed:deploy`), and then starts. Render also uses `GET /health` as its own health check.
 
@@ -631,3 +632,4 @@ Full explanation: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
 | [Email Workflow](docs/EMAIL_WORKFLOW.md) | Email queue, worker, retries, email catalog |
 | [Project Structure](docs/PROJECT_STRUCTURE.md) | Where code lives and naming conventions |
 | [Deployment](docs/DEPLOYMENT.md) | Step-by-step: Render, Resend and the Asniher monitor |
+| [Security](docs/SECURITY.md) | How the app is protected, review findings and fixes, checklist before going live |
