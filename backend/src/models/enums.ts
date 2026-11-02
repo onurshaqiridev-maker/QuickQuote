@@ -1,5 +1,5 @@
 /**
- * All fixed lists of values used in Quick Quote.
+ * All fixed lists of values used in Quotiva.
  * They match the CHECK constraints in the database migrations exactly.
  */
 

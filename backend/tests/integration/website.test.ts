@@ -10,7 +10,7 @@ import { closePool } from '../../src/data/db';
 let dist: string;
 beforeAll(() => {
   dist = mkdtempSync(path.join(tmpdir(), 'qq-website-'));
-  writeFileSync(path.join(dist, 'index.html'), '<!doctype html><title>Quick Quote</title><div id="root"></div>');
+  writeFileSync(path.join(dist, 'index.html'), '<!doctype html><title>Quotiva</title><div id="root"></div>');
   writeFileSync(path.join(dist, 'favicon.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>');
   mkdirSync(path.join(dist, 'assets'));
   writeFileSync(path.join(dist, 'assets', 'index-abc123.js'), 'console.log("app")');

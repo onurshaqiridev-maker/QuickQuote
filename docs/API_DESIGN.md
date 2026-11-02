@@ -1,4 +1,4 @@
-# Quick Quote — API Design
+# Quotiva — API Design
 
 This document describes every endpoint of the backend API: what it does, who may call it, what it accepts and what it returns.
 

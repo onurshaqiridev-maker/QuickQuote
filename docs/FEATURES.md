@@ -1,6 +1,6 @@
-# Quick Quote — Features
+# Quotiva — Features
 
-This document lists **everything Quick Quote can do**, sorted by who uses it. It then describes **all 29 pages**, who may do what, and the main business rules. It ends with a checklist that maps each original requirement to the features that cover it.
+This document lists **everything Quotiva can do**, sorted by who uses it. It then describes **all 29 pages**, who may do what, and the main business rules. It ends with a checklist that maps each original requirement to the features that cover it.
 
 ---
 
@@ -33,7 +33,7 @@ Every feature has a short **ID** so other documents and tasks can refer to it:
 | P-08 | Start a reservation | A **Book** button on bookable services opens the booking panel (login required to confirm) |
 | P-09 | Start a quote request | A **Request a quote** button on the profile and on each service (login required to submit) |
 | P-10 | Pricing page | Shows the active subscription plans with prices, limits and features. **Get started** leads to business registration. |
-| P-11 | About Us | What Quick Quote is, the mission, and how it works for both sides |
+| P-11 | About Us | What Quotiva is, the mission, and how it works for both sides |
 | P-12 | Contact form | Name, email, subject, message → a queued email to the admin |
 
 ---

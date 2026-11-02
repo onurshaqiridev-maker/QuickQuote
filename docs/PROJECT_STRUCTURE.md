@@ -1,4 +1,4 @@
-# Quick Quote — Project Structure
+# Quotiva — Project Structure
 
 This document shows **where every piece of code will live**, how files are named, and how to add a new feature without breaking the architecture rules.
 
@@ -418,7 +418,7 @@ API_PUBLIC_URL=http://localhost:4000
 # Email: "console" prints emails, "resend" sends them
 EMAIL_DRIVER=console
 RESEND_API_KEY=re_your_api_key_here
-EMAIL_FROM="Quick Quote <noreply@example.com>"
+EMAIL_FROM="Quotiva <noreply@example.com>"
 ADMIN_NOTIFICATION_EMAIL=admin@example.com
 EMAIL_POLL_INTERVAL_MS=5000
 EMAIL_BATCH_SIZE=10
@@ -452,7 +452,7 @@ When the backend is built, the root `README.md` will be rewritten to include:
 
 | Section | Content |
 |---|---|
-| About | What Quick Quote is, in a few sentences |
+| About | What Quotiva is, in a few sentences |
 | Architecture | Mermaid diagram of API server, worker, PostgreSQL, Resend and Asniher, plus the four layers and their rules |
 | Setup | The local setup steps from §9 |
 | Environment variables | A table of every variable: required or optional, example, meaning |

@@ -42,7 +42,7 @@ export function AboutPage() {
   const freeLaunch = config.data?.subscriptionsRequired !== true;
 
   const faq = [
-    { q: 'Is Quick Quote free for customers?', a: 'Yes. Creating an account, requesting quotes and booking appointments is always free.' },
+    { q: 'Is Quotiva free for customers?', a: 'Yes. Creating an account, requesting quotes and booking appointments is always free.' },
     {
       q: 'What does it cost for businesses?',
       a: freeLaunch
@@ -57,12 +57,12 @@ export function AboutPage() {
 
   return (
     <Container className="space-y-10">
-      <PageHeader title="About Quick Quote" description="We connect people who need a service with the local businesses that offer it." />
+      <PageHeader title="About Quotiva" description="We connect people who need a service with the local businesses that offer it." />
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <h2 className="text-lg font-semibold">For customers</h2>
           <p className="mt-2 text-sm text-slate-600">
-            Finding a good business and comparing prices takes time. On Quick Quote you can search by category and city, see
+            Finding a good business and comparing prices takes time. On Quotiva you can search by category and city, see
             services and prices at a glance, request quotes and book a free time slot without phone calls.
           </p>
           <ButtonLink to="/register" className="mt-4">Create a free account</ButtonLink>

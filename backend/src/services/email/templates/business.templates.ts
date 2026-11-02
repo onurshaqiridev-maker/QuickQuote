@@ -5,8 +5,8 @@ import { button, layout, paragraph } from './layout';
 export function businessApproved(data: EmailPayloads['business_approved']): RenderedEmail {
   const title = `${data.businessName} is approved`;
   const next = data.isPublished
-    ? 'Your profile is published, so customers can now find you on Quick Quote.'
-    : 'Publish your profile from your dashboard and customers can find you on Quick Quote.';
+    ? 'Your profile is published, so customers can now find you on Quotiva.'
+    : 'Publish your profile from your dashboard and customers can find you on Quotiva.';
   return {
     subject: `Good news: ${data.businessName} is approved`,
     html: layout(
@@ -30,7 +30,7 @@ export function businessSuspended(data: EmailPayloads['business_suspended']): Re
         paragraph(`Your business ${data.businessName} has been ${word} and is no longer visible to customers.`) +
         paragraph(`Reason: ${data.reason}`) +
         paragraph('If you think this is a mistake, please contact us.') +
-        button(data.contactUrl, 'Contact Quick Quote'),
+        button(data.contactUrl, 'Contact Quotiva'),
     ),
     text: `Hi ${data.fullName},\n\nYour business ${data.businessName} has been ${word} and is no longer visible to customers.\n\nReason: ${data.reason}\n\nIf you think this is a mistake, contact us: ${data.contactUrl}`,
   };

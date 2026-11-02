@@ -1,6 +1,6 @@
-# Quick Quote
+# Quotiva
 
-Quick Quote is a platform for finding businesses, requesting quotes and booking appointments.
+Quotiva is a platform for finding businesses, requesting quotes and booking appointments.
 
 - **Businesses** pay a monthly subscription. For that they get a public profile, a list of their services and prices, and they can receive quotation requests and reservations.
 - **Customers** use the platform for free. They can find businesses, compare services, request quotes and book appointments.
@@ -228,7 +228,7 @@ Every setting comes from environment variables. In development they are read fro
 | `FRONTEND_DIST_DIR` | no | *(empty)* | Production: the built website (`../frontend/dist`). When set, this server also serves the website, so website and API share one address. |
 | `EMAIL_DRIVER` | no | `console` | `console` (print emails) or `resend` (really send) |
 | `RESEND_API_KEY` | if `resend` | — | Your Resend API key |
-| `EMAIL_FROM` | no | `Quick Quote <onboarding@resend.dev>` | Sender. Must be on a domain verified in Resend for real sending. |
+| `EMAIL_FROM` | no | `Quotiva <onboarding@resend.dev>` | Sender. Must be on a domain verified in Resend for real sending. |
 | `ADMIN_NOTIFICATION_EMAIL` | no | `admin@example.com` | Receives contact form messages and "new business" notices |
 | `EMAIL_POLL_INTERVAL_MS` | no | `5000` | How often the worker looks for due jobs |
 | `EMAIL_BATCH_SIZE` | no | `10` | Jobs claimed per round |
@@ -566,7 +566,7 @@ The tests use a separate database, `quickquote_test` (override it with `TEST_DAT
 
 ## Deployment and monitoring
 
-Quick Quote is deployed on **[Render](https://render.com)** using the Blueprint in [`render.yaml`](render.yaml). It creates:
+Quotiva is deployed on **[Render](https://render.com)** using the Blueprint in [`render.yaml`](render.yaml). It creates:
 - a **PostgreSQL** database,
 - one **web service** that serves the website **and** runs the API and the email worker together (`node dist/src/all.js`), because Render's free plan has no background workers. Website and API share one address, so the login cookie works without extra setup.
 

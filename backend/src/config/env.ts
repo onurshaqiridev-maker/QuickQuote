@@ -56,7 +56,7 @@ const envSchema = z
     // Email
     EMAIL_DRIVER: z.enum(['console', 'resend']).default('console'),
     RESEND_API_KEY: z.string().optional(),
-    EMAIL_FROM: z.string().min(3).default('Quick Quote <onboarding@resend.dev>'),
+    EMAIL_FROM: z.string().min(3).default('Quotiva <onboarding@resend.dev>'),
     ADMIN_NOTIFICATION_EMAIL: z.email().default('admin@example.com'),
     EMAIL_POLL_INTERVAL_MS: z.coerce.number().int().min(500).default(5000),
     EMAIL_BATCH_SIZE: z.coerce.number().int().min(1).max(100).default(10),

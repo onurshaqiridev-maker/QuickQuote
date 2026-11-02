@@ -1,19 +1,19 @@
-# Quick Quote — Project Overview
+# Quotiva — Project Overview
 
 > **Status:** Planning. This document and the eight others in `docs/` describe what we will build.
 > No application code exists yet. Implementation starts after the plan is approved.
 
 ---
 
-## 1. What is Quick Quote?
+## 1. What is Quotiva?
 
-Quick Quote is a website where **customers find businesses** and **businesses get new clients**.
+Quotiva is a website where **customers find businesses** and **businesses get new clients**.
 
 - A **business** pays a monthly subscription. This could be a hair salon, a plumber, a photographer, a car repair shop, and so on. In return it gets a public profile page showing its logo, photos, description, location, services and prices. Customers can send it **quotation requests** and **book appointments**.
 - A **customer** uses the platform for free. They search for businesses, compare services and prices, ask for a quote, or book an appointment in a free time slot.
 - A **platform administrator** runs the platform. They approve businesses, manage categories and subscription plans, and watch platform activity.
 
-> **In simple terms:** Quick Quote is a business directory, a "request a quote" form and an appointment calendar in one place. Businesses pay a monthly fee to be listed.
+> **In simple terms:** Quotiva is a business directory, a "request a quote" form and an appointment calendar in one place. Businesses pay a monthly fee to be listed.
 
 ---
 
@@ -25,7 +25,7 @@ Quick Quote is a website where **customers find businesses** and **businesses ge
 | Calling around to ask for prices and free times takes a long time. | Answering calls and messages to schedule appointments takes a long time. |
 | There is no single place to see your own bookings and requests. | Bookings arrive by phone, chat and email, and some get lost. |
 
-Quick Quote puts **discovery, quotes and bookings in one place**.
+Quotiva puts **discovery, quotes and bookings in one place**.
 
 ---
 
@@ -161,7 +161,7 @@ Each phase ends with something you can run and try. **Phases 1–3 build and dep
 
 How the plan meets each point of the backend requirements:
 
-| # | Requirement | Points | How Quick Quote meets it | Details |
+| # | Requirement | Points | How Quotiva meets it | Details |
 |---|---|---|---|---|
 | 1 | **Architecture:** four layers (`api`, `services`, `data`, `models`). Each calls only the layer below. No SQL outside `data`, no HTTP outside `api`. | 25 | Folders `backend/src/api`, `services`, `data`, `models`. ESLint import rules make the linter fail if a file breaks the rules. Services throw domain errors, and only the API turns them into HTTP statuses. | [ARCHITECTURE.md §5](ARCHITECTURE.md#5-the-four-backend-layers), [PROJECT_STRUCTURE.md §2–3](PROJECT_STRUCTURE.md#2-backend-structure) |
 | 2 | **Database:** PostgreSQL, migrations, seed script, connection settings from environment variables | 20 | SQL migrations with `node-pg-migrate`, `npm run seed`, `DATABASE_URL` / `DATABASE_SSL` / `DATABASE_POOL_MAX` read and checked in `config/env.ts` | [DATABASE_DESIGN.md §10–11](DATABASE_DESIGN.md#10-migrations-plan), [ARCHITECTURE.md §10](ARCHITECTURE.md#10-configuration-environment-variables) |

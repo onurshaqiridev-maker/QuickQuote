@@ -1,4 +1,4 @@
-# Quick Quote — User Flows
+# Quotiva — User Flows
 
 This document walks through the main journeys **step by step**: what the user does, what the system does, and what can go wrong.
 

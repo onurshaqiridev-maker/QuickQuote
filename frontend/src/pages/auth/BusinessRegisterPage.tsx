@@ -69,7 +69,7 @@ export function BusinessRegisterPage() {
   return (
     <AuthCard
       wide
-      title="List your business on Quick Quote"
+      title="List your business on Quotiva"
       subtitle={
         <span className="flex flex-wrap items-center gap-2">
           Step {step} of 2: {step === 1 ? 'your account' : 'your business'}

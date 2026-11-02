@@ -18,11 +18,11 @@ export function SubscriptionPage() {
   if (!overview.subscriptionsRequired) {
     return (
       <>
-        <PageHeader title="Subscription" description="Your Quick Quote listing and its limits." />
+        <PageHeader title="Subscription" description="Your Quotiva listing and its limits." />
         <Card>
           <CardTitle action={<Badge color="green">Free</Badge>}>Free during our launch</CardTitle>
           <p className="text-sm text-slate-600">
-            Listing your business on Quick Quote is free while we launch. You do not need to choose a plan or pay
+            Listing your business on Quotiva is free while we launch. You do not need to choose a plan or pay
             anything to publish your profile and receive customers.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2">

@@ -11,11 +11,11 @@ function Home() {
 describe('usePageTitle', () => {
   it('names the page in the browser tab', () => {
     render(<PageHeader title="My quote requests" />);
-    expect(document.title).toBe('My quote requests | Quick Quote');
+    expect(document.title).toBe('My quote requests | Quotiva');
   });
 
   it('uses the site name alone on the home page', () => {
     render(<Home />);
-    expect(document.title).toBe('Quick Quote: find local businesses, request quotes and book');
+    expect(document.title).toBe('Quotiva: find local businesses, request quotes and book');
   });
 });

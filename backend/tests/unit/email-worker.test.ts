@@ -20,7 +20,7 @@ describe('retry schedule', () => {
 describe('email templates', () => {
   it('renders subject, HTML and plain text', () => {
     const email = renderEmail('customer_welcome', { fullName: 'Sara', verifyUrl: 'https://example.com/v?token=abc' });
-    expect(email.subject).toBe('Welcome to Quick Quote!');
+    expect(email.subject).toBe('Welcome to Quotiva!');
     expect(email.html).toContain('https://example.com/v?token=abc');
     expect(email.text).toContain('Hi Sara');
   });

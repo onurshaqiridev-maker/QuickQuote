@@ -51,7 +51,7 @@ services:
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
-        value: "Quick Quote <onboarding@resend.dev>"
+        value: "Quotiva <onboarding@resend.dev>"
       - key: ADMIN_NOTIFICATION_EMAIL
         sync: false
       - key: SEED_ADMIN_EMAIL

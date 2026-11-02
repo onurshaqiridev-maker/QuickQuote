@@ -1,6 +1,6 @@
-# Quick Quote — Email Workflow
+# Quotiva — Email Workflow
 
-This document explains how Quick Quote sends emails: through a **queue** stored in PostgreSQL and a **background worker** that delivers them with **Resend**.
+This document explains how Quotiva sends emails: through a **queue** stored in PostgreSQL and a **background worker** that delivers them with **Resend**.
 
 ---
 
@@ -328,7 +328,7 @@ Every email the platform sends:
 |---|---|---|
 | `EMAIL_DRIVER` | `console`: the email is printed in the worker's terminal and marked `sent`. No Resend account needed. | `resend` |
 | `RESEND_API_KEY` | Not needed | Required. Stored only in the host's environment settings, never in Git. |
-| `EMAIL_FROM` | Anything | An address on a **domain verified in Resend**, for example `Quick Quote <noreply@quickquote.example>` |
+| `EMAIL_FROM` | Anything | An address on a **domain verified in Resend**, for example `Quotiva <noreply@quickquote.example>` |
 
 **Testing retries without breaking anything:** with the `console` driver, any recipient ending in **`@fail.test`** always fails. Register a test user like `demo@fail.test` and you can watch the job go through 5 attempts and end up `failed`. This only works when `NODE_ENV` is not `production`.
 

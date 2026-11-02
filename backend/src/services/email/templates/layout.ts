@@ -23,19 +23,19 @@ export function button(url: string, label: string): string {
   return `<p style="margin:24px 0;"><a href="${escapeHtml(url)}" style="background:#2563eb;color:#ffffff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block;">${escapeHtml(label)}</a></p>`;
 }
 
-/** Wraps the email content in the Quick Quote frame. `bodyHtml` must already be safe HTML. */
+/** Wraps the email content in the Quotiva frame. `bodyHtml` must already be safe HTML. */
 export function layout(title: string, bodyHtml: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111827;">
   <div style="max-width:560px;margin:0 auto;padding:24px;">
-    <div style="font-size:22px;font-weight:bold;color:#2563eb;margin-bottom:16px;">Quick Quote</div>
+    <div style="font-size:22px;font-weight:bold;color:#2563eb;margin-bottom:16px;">Quotiva</div>
     <div style="background:#ffffff;border-radius:8px;padding:24px;">
       <h1 style="font-size:20px;margin:0 0 16px;">${escapeHtml(title)}</h1>
       ${bodyHtml}
     </div>
-    <p style="font-size:12px;color:#6b7280;margin-top:16px;">You receive this email because of activity on your Quick Quote account.</p>
+    <p style="font-size:12px;color:#6b7280;margin-top:16px;">You receive this email because of activity on your Quotiva account.</p>
   </div>
 </body>
 </html>`;

@@ -1,12 +1,12 @@
-# Quick Quote — Architecture
+# Quotiva — Architecture
 
-This document explains **how Quick Quote is built**: its main parts, how they talk to each other, and how the backend code is organized into four layers.
+This document explains **how Quotiva is built**: its main parts, how they talk to each other, and how the backend code is organized into four layers.
 
 ---
 
 ## 1. The big picture
 
-Quick Quote has five main parts:
+Quotiva has five main parts:
 
 1. **Frontend.** The React website that runs in the user's browser.
 2. **API server.** The Node.js backend. It receives requests from the frontend, applies the business rules, and reads and writes the database.
@@ -386,7 +386,7 @@ A file called `.env.example` (committed to Git) lists every variable. Each devel
 | `API_PUBLIC_URL` | `http://localhost:4000` | API | The public API address. Used for links to uploaded files. |
 | `EMAIL_DRIVER` | `console` | worker | `console` prints emails in the terminal (development). `resend` really sends them. |
 | `RESEND_API_KEY` | `re_...` | worker | Resend API key (only needed when `EMAIL_DRIVER=resend`) |
-| `EMAIL_FROM` | `Quick Quote <noreply@quickquote.example>` | worker | The sender shown in emails |
+| `EMAIL_FROM` | `Quotiva <noreply@quickquote.example>` | worker | The sender shown in emails |
 | `ADMIN_NOTIFICATION_EMAIL` | `admin@quickquote.example` | API | Receives contact form messages and "new business registered" notices |
 | `EMAIL_POLL_INTERVAL_MS` | `5000` | worker | How often the worker checks for new email jobs |
 | `EMAIL_BATCH_SIZE` | `10` | worker | How many jobs the worker claims at once |

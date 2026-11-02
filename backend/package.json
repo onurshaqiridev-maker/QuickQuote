@@ -2,7 +2,7 @@
   "name": "quickquote-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Quick Quote backend: API server + email worker (4-layer monolith)",
+  "description": "Quotiva backend: API server + email worker (4-layer monolith)",
   "engines": {
     "node": ">=22"
   },

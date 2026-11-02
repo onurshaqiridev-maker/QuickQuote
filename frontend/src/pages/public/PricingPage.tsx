@@ -24,7 +24,7 @@ const FAQ = [
   { q: 'How does billing work?', a: 'Plans are paid monthly, in advance. You can renew from your dashboard.' },
   { q: 'Can I change or cancel my plan?', a: 'Yes. Plan changes apply from your next month. If you cancel, you keep everything until the paid month ends.' },
   { q: 'What happens if I do not renew?', a: 'You get a 3-day grace period. After that your profile is hidden until you pay again.' },
-  { q: 'Do customers pay anything?', a: 'No. Quick Quote is always free for customers.' },
+  { q: 'Do customers pay anything?', a: 'No. Quotiva is always free for customers.' },
 ];
 
 export function PricingPage() {
@@ -34,7 +34,7 @@ export function PricingPage() {
 
   return (
     <Container className="space-y-12">
-      <PageHeader title="Simple monthly plans" description="Customers use Quick Quote for free. Businesses choose the plan that fits them." />
+      <PageHeader title="Simple monthly plans" description="Customers use Quotiva for free. Businesses choose the plan that fits them." />
       {freeLaunch && (
         <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-brand-600 p-6 text-white sm:flex-row sm:items-center">
           <div>

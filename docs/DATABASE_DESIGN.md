@@ -1,4 +1,4 @@
-# Quick Quote — Database Design
+# Quotiva — Database Design
 
 This document describes every table in the PostgreSQL database, how the tables are connected, and which rules (constraints) protect the data.
 

@@ -58,7 +58,7 @@ export function buildChecklist(
       done: facts.workingHoursCount > 0 || (facts.activeServiceCount > 0 && facts.bookableServiceCount === 0),
       requiredToPublish: true,
     },
-    { key: 'approved', label: 'Approved by the Quick Quote team', done: approved, requiredToPublish: false },
+    { key: 'approved', label: 'Approved by the Quotiva team', done: approved, requiredToPublish: false },
     { key: 'published', label: 'Publish your profile', done: published, requiredToPublish: false },
   ];
   return subscriptionsRequired ? items : items.filter((item) => item.key !== 'subscription');

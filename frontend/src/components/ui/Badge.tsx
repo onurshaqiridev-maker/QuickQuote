@@ -14,7 +14,7 @@ export function Badge({ color = 'gray', children }: { color?: Color; children: R
   return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${COLORS[color]}`}>{children}</span>;
 }
 
-/** Coloured badge for any status value used in Quick Quote. */
+/** Coloured badge for any status value used in Quotiva. */
 export function StatusBadge({ status }: { status: string }) {
   const color: Color =
     ['sent', 'approved', 'active', 'confirmed', 'completed'].includes(status)

@@ -1,6 +1,6 @@
-# Quick Quote — Deployment and Monitoring Guide (Phases 3 and 11)
+# Quotiva — Deployment and Monitoring Guide (Phases 3 and 11)
 
-This guide puts Quick Quote online (the website, the API, the email worker and the database) and connects it to **Asniher**, so you get an alert when it goes down. Follow the steps in order. It takes about 20–30 minutes.
+This guide puts Quotiva online (the website, the API, the email worker and the database) and connects it to **Asniher**, so you get an alert when it goes down. Follow the steps in order. It takes about 20–30 minutes.
 
 > **In simple terms:** Render runs our code and our PostgreSQL database on the internet. Resend delivers the emails. Asniher calls `GET /health` every minute and warns you if the answer is not "200 OK".
 
@@ -93,7 +93,7 @@ Have one **email address of your own** ready. You will use it for the admin acco
 
 Replace `https://YOUR-URL` with your Render URL. You can paste the `curl` commands into a terminal, or open the GET URLs in a browser.
 
-1. The website opens: visit `https://YOUR-URL` in your browser. You see the Quick Quote homepage. Click **Log in** and use your admin email and password: you land on the admin overview. The API answers too:
+1. The website opens: visit `https://YOUR-URL` in your browser. You see the Quotiva homepage. Click **Log in** and use your admin email and password: you land on the admin overview. The API answers too:
    ```bash
    curl https://YOUR-URL/api/categories
    ```
@@ -114,7 +114,7 @@ Replace `https://YOUR-URL` with your Render URL. You can paste the `curl` comman
    ```bash
    curl -i -X POST https://YOUR-URL/api/contact \
      -H "Content-Type: application/json" \
-     -d '{"name":"Deploy Test","email":"test@example.com","subject":"It works","message":"My first email through the Quick Quote queue."}'
+     -d '{"name":"Deploy Test","email":"test@example.com","subject":"It works","message":"My first email through the Quotiva queue."}'
    ```
    The answer is `202 Accepted` immediately. Within a few seconds the email "[Contact] It works" arrives in your inbox. Check the spam folder too.
 

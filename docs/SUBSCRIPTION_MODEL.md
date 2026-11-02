@@ -1,6 +1,6 @@
-# Quick Quote — Subscription Model
+# Quotiva — Subscription Model
 
-This document explains how businesses pay for Quick Quote: plans, subscription statuses, payments, renewal and expiration.
+This document explains how businesses pay for Quotiva: plans, subscription statuses, payments, renewal and expiration.
 
 > **Important:** Real payment processing is **not** part of version 1 until the architecture is approved. The design below works with a **mock (pretend) payment provider** and **manual bank transfers**. A real provider such as Stripe can be added later by writing one new provider file.
 
@@ -8,7 +8,7 @@ This document explains how businesses pay for Quick Quote: plans, subscription s
 
 ## 0. Free launch (current setting)
 
-**Quick Quote starts free for businesses.** Payments are not part of the first release.
+**Quotiva starts free for businesses.** Payments are not part of the first release.
 
 | Setting | `SUBSCRIPTIONS_REQUIRED=false` (default, free launch) | `SUBSCRIPTIONS_REQUIRED=true` (later, paid) |
 |---|---|---|

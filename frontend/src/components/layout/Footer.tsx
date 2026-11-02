@@ -29,7 +29,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <p className="border-t border-slate-100 py-4 text-center text-xs text-slate-500">© {new Date().getFullYear()} Quick Quote</p>
+      <p className="border-t border-slate-100 py-4 text-center text-xs text-slate-500">© {new Date().getFullYear()} Quotiva</p>
     </footer>
   );
 }

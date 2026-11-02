@@ -3,22 +3,22 @@ import type { EmailPayloads, RenderedEmail } from '../../../models/dto/email.dto
 import { button, layout, paragraph } from './layout';
 
 export function customerWelcome(data: EmailPayloads['customer_welcome']): RenderedEmail {
-  const title = 'Welcome to Quick Quote!';
+  const title = 'Welcome to Quotiva!';
   return {
     subject: title,
     html: layout(
       title,
       paragraph(`Hi ${data.fullName},`) +
-        paragraph('Thanks for joining Quick Quote. Please confirm your email address so you can book appointments and request quotes.') +
+        paragraph('Thanks for joining Quotiva. Please confirm your email address so you can book appointments and request quotes.') +
         button(data.verifyUrl, 'Confirm my email') +
         paragraph('This link is valid for 48 hours.'),
     ),
-    text: `Hi ${data.fullName},\n\nThanks for joining Quick Quote. Please confirm your email address so you can book appointments and request quotes:\n${data.verifyUrl}\n\nThis link is valid for 48 hours.`,
+    text: `Hi ${data.fullName},\n\nThanks for joining Quotiva. Please confirm your email address so you can book appointments and request quotes:\n${data.verifyUrl}\n\nThis link is valid for 48 hours.`,
   };
 }
 
 export function businessWelcome(data: EmailPayloads['business_welcome']): RenderedEmail {
-  const title = `Welcome to Quick Quote, ${data.businessName}!`;
+  const title = `Welcome to Quotiva, ${data.businessName}!`;
   return {
     subject: title,
     html: layout(
@@ -69,7 +69,7 @@ export function passwordReset(data: EmailPayloads['password_reset']): RenderedEm
     html: layout(
       title,
       paragraph(`Hi ${data.fullName},`) +
-        paragraph('Someone (hopefully you) asked to reset your Quick Quote password.') +
+        paragraph('Someone (hopefully you) asked to reset your Quotiva password.') +
         button(data.resetUrl, 'Choose a new password') +
         paragraph('This link is valid for 1 hour. If you did not ask for this, you can ignore this email.'),
     ),

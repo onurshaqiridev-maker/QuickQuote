@@ -1,6 +1,6 @@
-# Quick Quote — Security
+# Quotiva — Security
 
-This page explains how Quick Quote protects its users, what the phase 11 security review found and fixed, which small risks were accepted on purpose, and what to check before going live.
+This page explains how Quotiva protects its users, what the phase 11 security review found and fixed, which small risks were accepted on purpose, and what to check before going live.
 
 ## 1. How the app is protected
 

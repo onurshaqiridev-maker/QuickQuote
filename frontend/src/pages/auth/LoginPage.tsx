@@ -39,7 +39,7 @@ export function LoginPage() {
   return (
     <AuthCard
       title="Log in"
-      subtitle="Welcome back! Log in to your Quick Quote account."
+      subtitle="Welcome back! Log in to your Quotiva account."
       footer={
         <>
           New here? <Link to="/register" className="font-semibold text-brand-700 hover:underline">Create a free account</Link> or{' '}

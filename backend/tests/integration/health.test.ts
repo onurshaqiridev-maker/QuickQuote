@@ -20,6 +20,6 @@ describe('GET /', () => {
   it('explains what this server is and where the health check is', async () => {
     const response = await request(createApp()).get('/');
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ name: 'Quick Quote API', health: '/health' });
+    expect(response.body).toMatchObject({ name: 'Quotiva API', health: '/health' });
   });
 });
